@@ -1,0 +1,184 @@
+{
+    "name": "RFM Customer Segmentation \u2014 Palette C Muted Earth",
+    "dataColors": [
+        "#4A7AA0",
+        "#7BA8B8",
+        "#8FA87E",
+        "#D4A762",
+        "#A05A55",
+        "#A5A29A",
+        "#6B7F94",
+        "#B8916A",
+        "#9DAE96",
+        "#7A6E6E"
+    ],
+    "background": "#FFFFFF",
+    "foreground": "#3D4752",
+    "tableAccent": "#4A7AA0",
+    "good": "#8FA87E",
+    "neutral": "#D4A762",
+    "bad": "#A05A55",
+    "maximum": "#4A7AA0",
+    "center": "#D4A762",
+    "minimum": "#A05A55",
+    "textClasses": {
+        "title": {
+            "fontFace": "Segoe UI Semibold",
+            "fontSize": 14,
+            "color": "#3D4752"
+        },
+        "header": {
+            "fontFace": "Segoe UI Semibold",
+            "fontSize": 12,
+            "color": "#4A5560"
+        },
+        "callout": {
+            "fontFace": "Segoe UI",
+            "fontSize": 22,
+            "color": "#3D4752"
+        },
+        "label": {
+            "fontFace": "Segoe UI",
+            "fontSize": 11,
+            "color": "#64748B"
+        }
+    },
+    "visualStyles": {
+        "*": {
+            "*": {
+                "background": [
+                    {
+                        "color": {
+                            "solid": {
+                                "color": "#FFFFFF"
+                            }
+                        },
+                        "transparency": 0
+                    }
+                ],
+                "border": [
+                    {
+                        "color": {
+                            "solid": {
+                                "color": "#DDD6CC"
+                            }
+                        },
+                        "width": 1,
+                        "show": true
+                    }
+                ],
+                "visualHeader": [
+                    {
+                        "show": true
+                    }
+                ],
+                "title": [
+                    {
+                        "show": true,
+                        "fontColor": {
+                            "solid": {
+                                "color": "#3D4752"
+                            }
+                        },
+                        "fontSize": 11,
+                        "fontFamily": "Segoe UI Semibold",
+                        "alignment": "left"
+                    }
+                ]
+            }
+        },
+        "page": {
+            "*": {
+                "background": [
+                    {
+                        "color": {
+                            "solid": {
+                                "color": "#F7F5F1"
+                            }
+                        },
+                        "transparency": 0
+                    }
+                ]
+            }
+        },
+        "cardVisual": {
+            "*": {
+                "value": [
+                    {
+                        "$id": "default",
+                        "fontSize": 22,
+                        "fontFamily": "Segoe UI",
+                        "bold": true,
+                        "fontColor": {
+                            "solid": {
+                                "color": "#3D4752"
+                            }
+                        },
+                        "horizontalAlignment": "left"
+                    }
+                ],
+                "label": [
+                    {
+                        "$id": "default",
+                        "show": true,
+                        "fontSize": 11,
+                        "fontFamily": "Segoe UI",
+                        "bold": false,
+                        "fontColor": {
+                            "solid": {
+                                "color": "#64748B"
+                            }
+                        },
+                        "horizontalAlignment": "left",
+                        "position": "belowValue"
+                    }
+                ],
+                "paddingUniform": [
+                    {
+                        "$id": "default",
+                        "padding": 4
+                    }
+                ]
+            }
+        },
+        "card": {
+            "*": {
+                "labels": [
+                    {
+                        "fontSize": 22,
+                        "fontFamily": "Segoe UI",
+                        "fontWeight": "700",
+                        "color": {
+                            "solid": {
+                                "color": "#3D4752"
+                            }
+                        }
+                    }
+                ],
+                "categoryLabels": [
+                    {
+                        "show": true,
+                        "fontSize": 11,
+                        "fontFamily": "Segoe UI",
+                        "color": {
+                            "solid": {
+                                "color": "#64748B"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "slicer": {
+            "*": {
+                "items": [{
+                    "fontColor": { "solid": { "color": "#64748B" } },
+                    "background": { "solid": { "color": "#F7F5F1" } }
+                }],
+                "selection": [{
+                    "strictSingleSelect": true
+                }]
+            }
+        }
+    }
+}

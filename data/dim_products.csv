@@ -1,0 +1,61 @@
+ProductID,ProductName,ProductCategory,Brand,RetailPrice,UnitCost,MarginPct
+PROD-001,Single Origin Ethiopia Yirgacheffe 250g,Specialty Coffee,Terroir Select,12.9,4.5,0.6512
+PROD-002,Single Origin Colombia Huila 250g,Specialty Coffee,Terroir Select,11.9,4.2,0.6471
+PROD-003,Single Origin Guatemala Antigua 250g,Specialty Coffee,Terroir Select,14.37,5.1,0.6451
+PROD-004,House Blend Morgenrot 500g,Specialty Coffee,Kupferkanne Eigenmarke,20.28,7.2,0.645
+PROD-005,House Blend Nachtschicht 500g,Specialty Coffee,Kupferkanne Eigenmarke,20.28,7.2,0.645
+PROD-006,Espresso Blend Berliner Mischung 1kg,Specialty Coffee,Terroir Select,32.39,11.5,0.645
+PROD-007,Decaf Swiss Water Process 250g,Specialty Coffee,Terroir Select,17.18,6.1,0.6449
+PROD-008,Cold Brew Concentrate 500ml,Specialty Coffee,Artisan Direct,9.9,3.2,0.6768
+PROD-009,Coffee Advent Calendar 24 Varieties,Specialty Coffee,Kupferkanne Geschenke,61.97,22.0,0.645
+PROD-010,Coffee Starter Discovery Box 6x100g,Specialty Coffee,Kupferkanne Geschenke,38.03,13.5,0.645
+PROD-011,Japanese Sencha Organic 100g,Premium Teas,Artisan Direct,14.9,4.8,0.6779
+PROD-012,Darjeeling First Flush FTGFOP 100g,Premium Teas,Terroir Select,18.5,6.2,0.6649
+PROD-013,Earl Grey Berliner Nebel 200g,Premium Teas,Kupferkanne Eigenmarke,11.9,3.9,0.6723
+PROD-014,Rooibos Vanilla Organic 150g,Premium Teas,Artisan Direct,9.9,3.1,0.6869
+PROD-015,Matcha Ceremonial Grade 30g,Premium Teas,Artisan Direct,26.76,9.5,0.645
+PROD-016,Herbal Blend Alpenkraeuter 150g,Premium Teas,Kupferkanne Eigenmarke,8.9,2.8,0.6854
+PROD-017,Chai Masala Loose Leaf 200g,Premium Teas,Artisan Direct,12.5,4.1,0.672
+PROD-018,Tea Advent Calendar 24 Varieties,Premium Teas,Kupferkanne Geschenke,50.7,18.0,0.645
+PROD-019,Tea Starter Discovery Box 8x50g,Premium Teas,Kupferkanne Geschenke,29.58,10.5,0.645
+PROD-020,Kampot Pepper Black 80g,Artisan Spices & Oils,Terroir Select,10.14,3.6,0.645
+PROD-021,Kampot Pepper Red 50g,Artisan Spices & Oils,Terroir Select,15.49,5.5,0.6449
+PROD-022,Fleur de Sel Guerande 250g,Artisan Spices & Oils,Artisan Direct,9.01,3.2,0.6448
+PROD-023,Smoked Paprika La Vera DO 100g,Artisan Spices & Oils,Artisan Direct,7.89,2.8,0.6451
+PROD-024,Zaatar Blend Organic 100g,Artisan Spices & Oils,Artisan Direct,8.73,3.1,0.6449
+PROD-025,Saffron Threads Iranian 2g,Artisan Spices & Oils,Terroir Select,21.97,7.8,0.645
+PROD-026,Truffle Salt Black 100g,Artisan Spices & Oils,Artisan Direct,14.65,5.2,0.6451
+PROD-027,Extra Virgin Olive Oil Koroneiki 500ml,Artisan Spices & Oils,Terroir Select,21.13,7.5,0.6451
+PROD-028,Pumpkin Seed Oil Styrian 250ml,Artisan Spices & Oils,Terroir Select,17.18,6.1,0.6449
+PROD-029,Balsamic Vinegar Aged 12yr 250ml,Artisan Spices & Oils,Terroir Select,24.79,8.8,0.645
+PROD-030,Spice Gift Box Weltreise 8 Spices,Artisan Spices & Oils,Kupferkanne Geschenke,49.3,17.5,0.645
+PROD-031,Cooking Oil Trio Gift Set,Artisan Spices & Oils,Kupferkanne Geschenke,53.52,19.0,0.645
+PROD-032,Raw Forest Honey Carpathian 500g,Specialty Pantry,Artisan Direct,19.72,7.0,0.645
+PROD-033,Manuka Honey MGO 400+ 250g,Specialty Pantry,Artisan Direct,52.11,18.5,0.645
+PROD-034,Artisan Chocolate Bar 72% Ecuador 100g,Specialty Pantry,Artisan Direct,9.01,3.2,0.6448
+PROD-035,Artisan Chocolate Bar 85% Madagascar 100g,Specialty Pantry,Artisan Direct,10.14,3.6,0.645
+PROD-036,Hazelnut Spread Nussknacker 250g,Specialty Pantry,Kupferkanne Eigenmarke,11.55,4.1,0.645
+PROD-037,Fig Jam Dalmatian 220g,Specialty Pantry,Artisan Direct,9.86,3.5,0.645
+PROD-038,Sourdough Crackers Organic 200g,Specialty Pantry,Artisan Direct,7.89,2.8,0.6451
+PROD-039,Dried Mango Organic 200g,Specialty Pantry,Artisan Direct,8.17,2.9,0.645
+PROD-040,Mixed Nuts Roasted and Salted 400g,Specialty Pantry,Artisan Direct,15.21,5.4,0.645
+PROD-041,Granola Kupferkanne Crunch 500g,Specialty Pantry,Kupferkanne Eigenmarke,11.83,4.2,0.645
+PROD-042,Pantry Essentials Gift Box,Specialty Pantry,Kupferkanne Geschenke,73.24,26.0,0.645
+PROD-043,Christmas Hamper Festtagskorb,Specialty Pantry,Kupferkanne Geschenke,107.04,38.0,0.645
+PROD-044,Hario V60 Pour Over Dripper,Kitchen Accessories,Partner Brands,40.85,14.5,0.645
+PROD-045,Chemex Classic 6-Cup,Kitchen Accessories,Partner Brands,72.68,25.8,0.645
+PROD-046,Fellow Stagg EKG Kettle,Kitchen Accessories,Partner Brands,259.15,92.0,0.645
+PROD-047,Porlex Mini Hand Grinder,Kitchen Accessories,Partner Brands,108.45,38.5,0.645
+PROD-048,Copper Turkish Cezve,Kitchen Accessories,Partner Brands,55.77,19.8,0.645
+PROD-049,Cast Iron Teapot 800ml,Kitchen Accessories,Partner Brands,80.28,28.5,0.645
+PROD-050,Olive Wood Pepper Mill,Kitchen Accessories,Partner Brands,61.97,22.0,0.645
+PROD-051,Linen Tea Towel Set 3pc,Kitchen Accessories,Partner Brands,36.06,12.8,0.645
+PROD-052,Ceramic Spice Jar Set 6pc,Kitchen Accessories,Partner Brands,46.48,16.5,0.645
+PROD-053,Bamboo Cutting Board XL,Kitchen Accessories,Partner Brands,53.52,19.0,0.645
+PROD-054,Kaffeepause Gift Box,Curated Gift Boxes,Kupferkanne Geschenke,59.15,21.0,0.645
+PROD-055,Teezeit Gift Box,Curated Gift Boxes,Kupferkanne Geschenke,74.65,26.5,0.645
+PROD-056,Geniesser Premium Box,Curated Gift Boxes,Kupferkanne Geschenke,101.41,36.0,0.645
+PROD-057,Firmengeschenk Corporate Gift Box 10-pack,Curated Gift Boxes,Kupferkanne Geschenke,521.13,185.0,0.645
+PROD-058,Willkommen New Customer Welcome Box,Curated Gift Boxes,Kupferkanne Geschenke,39.44,14.0,0.645
+PROD-059,Valentinstag Gift Box,Curated Gift Boxes,Kupferkanne Geschenke,52.11,18.5,0.645
+PROD-060,Sommerpause Cold Brew Kit,Curated Gift Boxes,Kupferkanne Geschenke,42.25,15.0,0.645

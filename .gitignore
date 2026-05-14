@@ -1,0 +1,55 @@
+# ============================================================
+# .gitignore — kupferkanne-rfm-customer-segmentation
+# ============================================================
+
+# Working / private folders (NOT for public repo) -----------
+_backups/
+_checkpoints/
+_outputs/
+_personal/
+
+# _graphics/        # uncomment if you decide NOT to track graphics
+
+# Logs ------------------------------------------------------
+logs/
+_sqlfluff_*.txt
+
+# PBI binaries — track only canonical -----------------------
+pbix/*
+!pbix/Kupferkanne-rfm-customer-segmentation.pbix
+*.pbix.bak
+PowerBI*-Cache/
+
+# Python / venv ---------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.python-version
+
+# Secrets ---------------------------------------------------
+.env
+.env.local
+*.json.key
+service_account*.json
+
+# OS / editor noise -----------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# Temp ------------------------------------------------------
+*.tmp
+.tmp_*
+~$*
+*.bak
+
+# Quarto (Phase 4 EDA notebook) -----------------------------
+/.quarto/
+*_files/
+*_cache/

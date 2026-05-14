@@ -1,0 +1,30 @@
+# FILENAME: .sqlfluff (root repo)
+[sqlfluff]
+dialect = bigquery
+max_line_length = 100
+large_file_skip_byte_limit = 50000
+
+# Excluded rules — documented in RULES.md (R036/R037)
+# CP02: per-file "consistent" autodetect produces conflicting verdicts across
+#       the pipeline. Convention is to preserve source casing
+#       (CustomerID, OrderDate, LineNetAmount).
+# AL03: audit/validation CTEs (c01-c29) use positional naming by design.
+# RF02: subquery refs like (SELECT n FROM ob) are unambiguous in audit CTEs.
+# AM06: positional GROUP BY/ORDER BY is intentional in pivot queries.
+exclude_rules = CP02, AL03, RF02, AM06
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 4
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:aliasing.table]
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.column]
+aliasing = explicit
