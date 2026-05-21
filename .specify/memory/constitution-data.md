@@ -5,9 +5,9 @@ Invariant rules for this project. These do not change session-to-session. If a r
 ## Stack
 
 - **Primary database / warehouse**: BigQuery
-- **Modeling layer**: dbt-style SQL views with `_curated`, `_staged`, `_raw` naming
-- **BI tool**: Power BI (`.pbix` for working state, `.pbip` for production / version control)
-- **Pipeline / scripting**: Python 3.11+ with `uv` for env management
+- **Modeling layer**: BigQuery views with `_curated`, `_staged`, `_raw` naming (no dbt)
+- **BI tool**: Power BI (`.pbix` only currently; `.pbip` migration planned v1.2 per D025)
+- **Pipeline / scripting**: Python 3.12 (3.13 not adopted for stability) with `uv` for env management
 - **SQL linter**: `sqlfluff` with `.sqlfluff` config at repo root
 
 ## Invariants
@@ -26,7 +26,7 @@ Invariant rules for this project. These do not change session-to-session. If a r
 
 ### Power BI rules
 
-- **`.pbix` is working state, `.pbip` is production.** Conversion to `.pbip` happens at v1.2+ milestone, not during active development.
+- **`.pbix` is the current working AND production format.** `.pbip` currently NOT used; `.pbix` only. `.pbip` migration planned v1.2 per D025, not during active development.
 - **DAX measures live in the model, NOT in calculated columns.** Calculated columns are an anti-pattern for this stack.
 - **Format strings are explicit per measure.** Currency: `"€"#,##0.00;-"€"#,##0.00`. Percent: `0.00%`. Date: `dd-mmm-yyyy`.
 - **Every measure has a `docs/measures.md` entry.** Sync these in the same session as any measure change (no batched documentation drift).

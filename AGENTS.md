@@ -6,7 +6,7 @@ Master agent configuration for `project-1-rfm-customer-segmentation`. Read this 
 
 - **Name**: project-1-rfm-customer-segmentation
 - **Stack**: data (data | trading | generic)
-- **Owner**: Ryszard Twardy (`r.twardy@stratusstudio.eu`)
+- **Owner**: Ryszard Twardy (`r.twardy@proton.me`)
 - **Status**: v1.0.0 stable, v1.0.1 in development (pre-tag)
 - **Primary objective**: RFM (Recency, Frequency, Monetary) customer segmentation for Kupferkanne e-commerce — BigQuery modeling + Power BI BI layer + Python pipelines.
 

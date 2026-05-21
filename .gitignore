@@ -53,7 +53,6 @@ desktop.ini
 /.quarto/
 *_files/
 *_cache/
-.scratch/
 
 # === Workflow v3 (Ryszard) ===
 # Session state and personal notes — synced via OneDrive separately
@@ -63,6 +62,7 @@ desktop.ini
 .claude/
 
 # Per-device transient state — not synced anywhere
+.scratch/
 .backups/
 
 # Spec-Kit caches

@@ -5,6 +5,7 @@ This repository uses **GitHub Issues** as the primary issue tracker.
 - **Repository**: `ryszard-twardy/rfm-customer-segmentation-kupferkanne`
 - **URL**: `https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/issues`
 - **Default visibility**: PRIVATE (until v1.2 PUBLIC flip per R039)
+- **Projects v2 ID**: `PVT_kwHODYeDCc4BYXw3` (board #1, linked to repo; consumed by `/mp-to-issues` for field assignment)
 
 ## Skills that consume this file
 
