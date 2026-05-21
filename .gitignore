@@ -4,9 +4,9 @@
 
 # Working / private folders (NOT for public repo) -----------
 _backups/
-_checkpoints/
+.checkpoints/
 _outputs/
-_personal/
+.personal/
 
 # _graphics/        # uncomment if you decide NOT to track graphics
 
@@ -53,3 +53,36 @@ desktop.ini
 /.quarto/
 *_files/
 *_cache/
+.scratch/
+
+# === Workflow v3 (Ryszard) ===
+# Session state and personal notes — synced via OneDrive separately
+# .checkpoints/ and .personal/ already declared above
+
+# Claude Code session state — local only
+.claude/
+
+# Per-device transient state — not synced anywhere
+.backups/
+
+# Spec-Kit caches
+.specify/cache/
+.specify/state/
+
+# Data / Python (workflow v3 data stack)
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Power BI (workflow v3 data stack)
+*.pbix.tmp
+*.pbip.tmp
+.pbi/
+LocalCache/
+
+# Credentials (workflow v3 data stack — variants beyond service_account*.json above)
+service-account*.json
+credentials*.json
+*.pem
+# === End workflow v3 additions ===

@@ -1,0 +1,58 @@
+# Issue tracker configuration
+
+This repository uses **GitHub Issues** as the primary issue tracker.
+
+- **Repository**: `ryszard-twardy/rfm-customer-segmentation-kupferkanne`
+- **URL**: `https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/issues`
+- **Default visibility**: PRIVATE (until v1.2 PUBLIC flip per R039)
+
+## Skills that consume this file
+
+- `/mp-to-issues` — publishes new issues here
+- `/mp-to-prd` — creates PRDs as long-form issues here
+- `/mp-triage` — reads and re-labels existing issues here
+
+## Drafts and exploratory issues
+
+Issues that are not yet ready for the team tracker go to `.scratch/local-issues.md` (gitignored). Skills should NOT publish exploratory or half-formed tickets to GitHub directly.
+
+When a draft is ready, the user runs `/mp-to-issues` explicitly with the draft as input to publish.
+
+## Required fields per issue
+
+Every published issue must have:
+
+- Clear title (verb-first, action-oriented)
+- Body with: context, expected behavior, current behavior, acceptance criteria
+- One or more of the canonical triage labels (see `triage-labels.md`)
+- An optional type label (see `triage-labels.md`)
+- Optional milestone (see Milestones section below)
+
+## Milestones
+
+This repo uses GitHub Milestones for version tracking. Skills should suggest the right milestone based on context, but never assign automatically without user confirmation.
+
+- `v1.0.0` — initial stable release (closed)
+- `v1.0.1` — Fix A + F001 LTV + F002 calendar rebuild + HIGH BPA batch
+- `v1.0.2` — LTV surfacing + BigQuery `source_month` CAST INT64 mini-patch
+- `v1.1` — F005 Float→Fixed Decimal + LOW/MEDIUM BPA polish + docs/measures.md v7 rewrite
+- `v1.2` — `.pbix` → `.pbip` conversion + ADR 0010/0011 + PUBLIC flip
+
+## Operating via the `gh` CLI
+
+- Create issue: `gh issue create --title "..." --body "..."` (use HEREDOC for multi-line bodies)
+- View issue: `gh issue view <number> --comments`
+- List issues (JSON): `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'`
+- Comment: `gh issue comment <number> --body "..."`
+- Apply/remove labels: `gh issue edit <number> --add-label "..." --remove-label "..."`
+- Close: `gh issue close <number> --comment "..."`
+
+`gh` infers the repo from `git remote -v` when run inside a clone.
+
+## When a skill says "publish to the issue tracker"
+
+Create a GitHub issue.
+
+## When a skill says "fetch the relevant ticket"
+
+`gh issue view <number> --comments`.
