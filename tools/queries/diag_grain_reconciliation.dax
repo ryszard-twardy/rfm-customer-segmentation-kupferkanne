@@ -1,0 +1,6 @@
+EVALUATE
+ROW (
+    "Order Grain Total Revenue", [Total Revenue],
+    "Line Grain Total Revenue", [Line Revenue],
+    "Grain Delta", [Total Revenue] - [Line Revenue]
+)
