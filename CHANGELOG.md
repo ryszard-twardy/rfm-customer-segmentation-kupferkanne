@@ -6,6 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.0.1] – 2026-05-24
+
+Model-hygiene release. Five SQLBI / Best Practice Analyzer findings resolved (F003, F004, F006, F007, F008) plus one bundled DAX-formatting fix (F028). All changes are metadata-only: no measure expressions altered, no folder structure changed, no SQL pipeline touched. `[Total Revenue]`, `[Total Profit]`, and the dual-grain Grain Reconciliation invariant all preserved.
+
+### Added
+
+- `tools/format_string_batch.csx` — Tabular Editor 2 C# script for FormatString normalization across 32 measures (F003)
+- `tools/format_summarize_by_batch.csx` — Tabular Editor 2 C# script for `SummarizeBy = None` batch across 33 columns (F006)
+- `tools/queries/` — five reusable DAX diagnostic queries: `info_measures_export`, `diag_grain_reconciliation`, `diag_kpi_values`, `diag_segment_filter_test`, `diag_cols_hidden_check`
+
+### Changed
+
+- `docs/measures.md` → v7, synced with the BPA batch per the atomic-invariant rule (BPA changes and docs land in the same session)
+- 32 measures: FormatString normalized to SQLBI gold standard — Currency `"€"#,##0.00;-"€"#,##0.00`, Percentage `0.00%`, Count `#,##0`, Decimal `0.00`, Date `dd-mmm-yyyy` (F003, issue #1)
+- 4 calculated tables: DAX expressions reformatted per SQLBI / daxformatter.com short-line gold standard — `dim_SegmentOrder`, `dim_SegmentActions`, `Reactivation Rate`, `dim_KPI_Selector` (F028, bundled with F003)
+- 33 columns: `SummarizeBy = None` to force explicit measure usage and block implicit aggregations from drag-and-drop (F006, issue #4)
+
+### Hidden (UI-only, no functional change)
+
+- 4 fact-source columns: `sales_curated[Order Value]`, `sales_curated[Order Profit]`, `v_items_for_bi[Line Net Amount]`, `v_items_for_bi[Line Profit]` (F004, issue #2)
+- 10 foreign key columns: `Customer ID`, `Order ID`, `Order Date`, `Product ID`, `Segment` across `sales_curated`, `v_items_for_bi`, `v_rfm_for_bi`, `v_dim_customers_std`, `dim_SegmentOrder` — defensive star-schema UX per Kimball / SQLBI; canonical access via dimensions (F007, issue #5)
+
+### Removed
+
+- Inactive auto-detected relationship `v_items_for_bi[Order ID]` → `sales_curated[Order ID]`. No DAX expression activated it via `USERELATIONSHIP()`. Cross-fact reconciliation is performed by the `[Grain Reconciliation]` measure (invariant = 0), not by a model relationship. (F008, issue #6)
+
+### Deferred to v1.1
+
+- **F005**: Float → Fixed Decimal conversion for 16 numeric columns. Type change has measure-recompute and storage-format implications; warrants a dedicated session with full regression suite.
+- **F033**: `dim_SegmentActions` Power Query M-code refresh bug — M code references column `EmailFrequency` but model column is `Email Cadence`; Refresh All fails. Model functions without Refresh as data is pre-loaded.
+
+### Documentation
+
+- v7 of `docs/measures.md` adds four cross-cutting sections — **Format String Standards**, **Column Behavior: SummarizeBy = None**, **Foreign Key Visibility**, **Hidden Fact Columns** — plus a "Fact-to-fact joins explicitly NOT used" sub-section under Relationships. D028 dual-grain customer satellite documented as the explicit exception to the FK-hide policy.
+- Two new diagnostic lessons logged in audit findings:
+  - **F031** — Power BI Desktop's DAX query view returns an empty `[FormatString]` column from `INFO.VIEW.MEASURES()` even when format strings are applied. Verify measure metadata via the Tabular Editor 2 Properties panel, not the DAX view.
+  - **F032** — Tabular Editor 2's "Rules for the local user" BPA collection sometimes fails to persist across restarts. Re-import the ruleset from URL or fall back to a local file.
+
+### Internal
+
+- `_checkpoints/` → `.checkpoints/` migration completed (gitignored, workflow v3 atomic invariant)
+- Workflow v3 stack consolidated: atomic per-finding commits (one per issue, with `Closes #N` trailer), `/mp-to-issues` skill adopted for tracer-bullet issue creation, GitHub Projects v2 board with cached field/option IDs for skill consumption
+- New TE2 batch-script hygiene rule: pattern-matching scripts require `dryRun = true` default, explicit manual-override list, and `INFO.VIEW.*` pre-flight introspection
+- New rule on TE2 C# Roslyn compatibility: use `KeyValuePair<string, string>` instead of value tuples (TE2's embedded Roslyn predates C# 7.0)
+
+---
+
 ## [1.0.0] – 2026-05-12
 
 First public release. Complete data warehouse with eight-step SQL pipeline on BigQuery, dual-grain dimensional model, RFM customer segmentation, and a Power BI Import-mode dashboard. Five core documentation files plus eight Architecture Decision Records describe the design.
@@ -99,4 +146,5 @@ Earlier iteration history is preserved in `_checkpoints/CHECKPOINT_*.md` (local 
 
 ---
 
+[1.0.1]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.1
 [1.0.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.0
