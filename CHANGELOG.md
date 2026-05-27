@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.0.2] – 2026-05-27
+
+Internal agent-configuration and documentation-hygiene release. No functional, model, SQL, or measure changes; all KPI invariants preserved (Total Revenue, Total Profit, and the dual-grain Grain Reconciliation = 0).
+
+### Internal
+
+- `AGENTS.md` agent-configuration refreshed: project name canonicalised, backups path corrected, and the release-status line synced to the shipped v1.0.1 tag.
+- Prose dash characters across `AGENTS.md` normalised to ASCII hyphens for cross-tool consistency.
+
+---
+
 ## [1.0.1] – 2026-05-24
 
 Model-hygiene release. Five SQLBI / Best Practice Analyzer findings resolved (F003, F004, F006, F007, F008) plus one bundled DAX-formatting fix (F028). All changes are metadata-only: no measure expressions altered, no folder structure changed, no SQL pipeline touched. `[Total Revenue]`, `[Total Profit]`, and the dual-grain Grain Reconciliation invariant all preserved.
@@ -146,5 +157,6 @@ Earlier iteration history is preserved in `_checkpoints/CHECKPOINT_*.md` (local 
 
 ---
 
+[1.0.2]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.2
 [1.0.1]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.1
 [1.0.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.0
