@@ -16,3 +16,6 @@ ADRs are intentionally focused – they capture **strategic** decisions where th
 | [0006](0006-rfm-segmentation-with-ntile.md) | RFM segmentation with `NTILE(5)` | Accepted |
 | [0007](0007-two-tier-margin-calculation.md) | Two-tier margin calculation | Accepted |
 | [0008](0008-synthetic-data-with-realistic-quality-issues.md) | Synthetic data with realistic quality issues | Accepted |
+| 0009 | Analytical Notebook with Quarto | reserved (planned) |
+| [0010](0010-segment-dimensions-separation.md) | Segment Dimensions Separation | Accepted |
+| [0011](0011-bidirectional-customer-satellite-relationship.md) | Bidirectional Customer-Satellite Relationship | Accepted |
