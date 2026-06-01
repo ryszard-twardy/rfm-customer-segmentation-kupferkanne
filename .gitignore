@@ -58,8 +58,10 @@ desktop.ini
 # Session state and personal notes — synced via OneDrive separately
 # .checkpoints/ and .personal/ already declared above
 
-# Claude Code session state — local only
-.claude/
+# Claude Code: track shared config + hooks (cross-machine), keep local overrides private
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
 
 # Per-device transient state — not synced anywhere
 .scratch/
