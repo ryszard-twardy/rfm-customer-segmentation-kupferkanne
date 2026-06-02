@@ -1,10 +1,10 @@
 # Triage labels
 
-This repository uses **9 labels** total: 5 status (canonical mattpocock roles) + 4 type. Priority and version live in GitHub Projects v2 custom fields and Milestones — NOT labels.
+This repository uses **9 labels** total: 5 status (canonical mattpocock roles) + 4 type. Priority and version live in GitHub Projects v2 custom fields and Milestones – NOT labels.
 
 ## Status labels (5 canonical roles)
 
-These are the five canonical roles defined by the mattpocock `/triage` skill. Every issue must have exactly one status label at any time. This repo uses **prefixed strings** (`status:` / `closed:`) to group labels visually in the GitHub UI — the canonical role still applies.
+These are the five canonical roles defined by the mattpocock `/triage` skill. Every issue must have exactly one status label at any time. This repo uses **prefixed strings** (`status:` / `closed:`) to group labels visually in the GitHub UI – the canonical role still applies.
 
 | Label in repo | Canonical role | Color | Meaning |
 |---|---|---|---|
@@ -36,7 +36,7 @@ These are additive: an issue can have zero or one type label. Use them to catego
 
 ## How `/mp-triage` uses this file
 
-The skill reads this file at the start of each triage session and matches issues to one of the 5 canonical roles. If the user has customized label strings (e.g., `agent-ready` instead of `ready-for-agent`), the skill respects that — but the canonical role name is still what it reasons about internally.
+The skill reads this file at the start of each triage session and matches issues to one of the 5 canonical roles. If the user has customized label strings (e.g., `agent-ready` instead of `ready-for-agent`), the skill respects that – but the canonical role name is still what it reasons about internally.
 
 If you want to customize the label strings, edit the table above. Keep the canonical role names in the right-hand column unchanged.
 

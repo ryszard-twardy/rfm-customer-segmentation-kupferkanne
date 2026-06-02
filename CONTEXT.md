@@ -1,6 +1,6 @@
-# Context: project-1-rfm-customer-segmentation
+# Context: rfm-customer-segmentation-kupferkanne
 
-The vocabulary of this domain. When the code, docs, or this team's writing names a concept that lives here, it uses these terms — never synonyms.
+The vocabulary of this domain. When the code, docs, or this team's writing names a concept that lives here, it uses these terms – never synonyms.
 
 ## How to use this file
 
@@ -13,7 +13,7 @@ The vocabulary of this domain. When the code, docs, or this team's writing names
 
 ### Core domain
 
-- (none yet — populate via `/mp-grill-with-docs`)
+- (none yet – populate via `/mp-grill-with-docs`)
 
 ### Boundaries
 

@@ -1,4 +1,4 @@
-# Constitution: project-1-rfm-customer-segmentation (data stack)
+# Constitution: rfm-customer-segmentation-kupferkanne (data stack)
 
 Invariant rules for this project. These do not change session-to-session. If a rule needs to change, it requires a recorded decision in `.checkpoints/L2_DECISIONS.md` AND a corresponding ADR in `docs/adr/`.
 
@@ -52,4 +52,4 @@ Invariant rules for this project. These do not change session-to-session. If a r
 
 ## Change log
 
-- 2026-05-21 — Initial constitution for `project-1-rfm-customer-segmentation` (data stack). [D051]
+- 2026-05-21 – Initial constitution for `rfm-customer-segmentation-kupferkanne` (data stack).

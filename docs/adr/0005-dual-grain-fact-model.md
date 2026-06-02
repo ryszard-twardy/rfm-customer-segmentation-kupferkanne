@@ -21,7 +21,7 @@ Each grain has its own measure namespace enforced by convention:
 - `[Total Revenue]`, `[Total Orders]`, `[Total Customers]`, `[Total Profit]` – order-grain.
 - `[Line Revenue]`, `[Line Quantity]`, `[Line Margin %]` – line-grain.
 
-The naming rule (R028 in internal rules) lets a reader immediately tell which grain is being aggregated, and lets a reviewer catch grain-mixing mistakes at code-review time.
+The naming rule lets a reader immediately tell which grain is being aggregated, and lets a reviewer catch grain-mixing mistakes at code-review time.
 
 ## Consequences
 

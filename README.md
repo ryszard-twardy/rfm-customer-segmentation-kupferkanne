@@ -1,6 +1,6 @@
 # Kupferkanne – Retail Analytics Platform
 
-[![Status](https://img.shields.io/badge/status-v1.0.0-blue)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-v1.0.2-blue)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![BigQuery](https://img.shields.io/badge/warehouse-BigQuery-4285F4)](docs/architecture.md)
 [![Power BI](https://img.shields.io/badge/BI-Power%20BI-F2C811)](pbix/)
@@ -20,7 +20,7 @@ End-to-end retail analytics platform for **Kupferkanne**, a fictional Erlangen-b
    ~440K records          (11 tables + 19 views)  36+ DAX measures
 ```
 
-- **38 months** of order data (2023-01 to 2026-03), ~169K orders from ~15,000 customers.
+- **39 months** of order data (2023-01 to 2026-03), ~169K orders from ~15,000 customers.
 - **Eight-step SQL pipeline** on Google BigQuery, idempotent, lint-clean, with explicit exception policy.
 - **Dual-grain Kimball star schema**: order-grain `sales_curated` (~169K) for revenue and segmentation, line-grain `v_items_for_bi` (~275K) for product detail.
 - **RFM customer segmentation** with `NTILE(5)` quintiles, six segments derived from composite score 3–15.
@@ -40,7 +40,7 @@ End-to-end retail analytics platform for **Kupferkanne**, a fictional Erlangen-b
 ## Repository structure
 
 ```
-project-1-rfm-customer-segmentation/
+rfm-customer-segmentation-kupferkanne/
 ├── README.md                  This file
 ├── CHANGELOG.md               Release notes
 ├── LICENSE

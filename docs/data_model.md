@@ -90,7 +90,7 @@ The dual-grain approach prevents aggregation errors that would arise from joinin
 | `CustomerID` | STRING | Joined to `dim_customers` |
 | `r_score`, `f_score`, `m_score` | INT64 | `NTILE(5)` per dimension |
 | `composite_score` | INT64 | Sum 3–15 |
-| `segment` | STRING | Champions, Loyal, Potential, At Risk, Lost, Hibernating |
+| `segment` | STRING | Champions, Loyal Customers, Potential Loyalists, Recent Customers, At Risk, Hibernating |
 | `recommended_action` | STRING | Mapped from segment band |
 
 See [methodology.md](methodology.md) for the RFM scoring logic and [ADR 0006](adr/0006-rfm-segmentation-with-ntile.md) for the choice of NTILE-based scoring.
