@@ -6,9 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "shell": "powershell",
-            "command": "pwsh -NoProfile -File .claude/hooks/git-state-check.ps1",
-            "timeout": 15
+            "command": "pwsh -NoProfile -File .claude/hooks/git-hygiene.ps1",
+            "timeout": 20,
+            "statusMessage": "Checking git hygiene (uncommitted / behind remote)..."
           }
         ]
       }
