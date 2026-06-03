@@ -5,7 +5,7 @@
 # Working / private folders (NOT for public repo) -----------
 _backups/
 .checkpoints/
-_outputs/
+.outputs/
 .personal/
 
 # _graphics/        # uncomment if you decide NOT to track graphics

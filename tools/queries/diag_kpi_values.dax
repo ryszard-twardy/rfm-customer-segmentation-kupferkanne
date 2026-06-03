@@ -1,9 +1,0 @@
-EVALUATE
-ROW (
-    "Total Revenue", [Total Revenue],
-    "Total Profit", [Total Profit],
-    "Total Customers", [Total Customers],
-    "Total Orders", [Total Orders],
-    "AOV", [Avg Order Value],
-    "Profit Margin %", [Profit Margin %]
-)
