@@ -101,17 +101,27 @@ Strategic decisions follow the [Michael Nygard format](https://cognitect.com/blo
 
 ## Reproducibility
 
-1. **Generate the dataset** (or use the CSVs in `data/`):
+The Python environment for the ingest utility is managed with [uv](https://docs.astral.sh/uv/) and pinned to Python 3.12 (`pyproject.toml` + `uv.lock`).
+
+1. **Set up the Python environment** (creates `.venv` from the lock file):
+   ```bash
+   uv sync
+   ```
+2. **Authenticate to Google Cloud** with Application Default Credentials:
+   ```bash
+   gcloud auth application-default login
+   ```
+3. **Raw data**: the 80 monthly CSV shards are committed in `data/`, so no generation step is required. To regenerate them from scratch instead, use the companion [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) CLI:
    ```bash
    pip install synth-datagen
    synth-datagen --scenario retail --seed <SEED>
    ```
-2. **Ingest into BigQuery** with schema enforcement:
+4. **Ingest into BigQuery** with schema enforcement (defaults shown; override with flags):
    ```bash
-   python scripts/upload_to_bigquery_schema_enforced.py
+   uv run python scripts/upload_to_bigquery_schema_enforced.py --data-dir ./data --project kupferkanne-2026 --dataset sales
    ```
-3. **Run the SQL pipeline** in step order (1 through 8). Each script is independently runnable; downstream steps consume upstream outputs by name.
-4. **Open** `pbix/Kupferkanne-rfm-customer-segmentation.pbix` in Power BI Desktop and refresh against your BigQuery dataset.
+5. **Run the SQL pipeline** in step order, from `00_0` through `05_analytics_marts` (see the SQL pipeline table above). Each script is idempotent; downstream steps consume upstream outputs by name.
+6. **Open** `pbix/Kupferkanne-rfm-customer-segmentation.pbix` in Power BI Desktop and refresh against your BigQuery dataset.
 
 The full dataset is regenerable from a single seed value; pipeline runs are byte-identical given the same inputs.
 

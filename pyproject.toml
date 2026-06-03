@@ -1,0 +1,12 @@
+[project]
+name = "rfm-customer-segmentation-kupferkanne"
+version = "0.0.0"
+description = "Reproducible Python environment for the BigQuery ingest utility in scripts/."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "google-api-core>=2.30.3",
+    "google-cloud-bigquery>=3.41.0",
+]
+
+[tool.uv]
+package = false
