@@ -1,0 +1,14 @@
+EVALUATE
+SELECTCOLUMNS (
+    INFO.VIEW.MEASURES (),
+    "Table", [Table],
+    "DisplayFolder", [DisplayFolder],
+    "Measure", [Name],
+    "DAX", [Expression],
+    "IsHidden", [IsHidden],
+    "State", [State]
+)
+ORDER BY
+    [Table],
+    [DisplayFolder],
+    [Measure]

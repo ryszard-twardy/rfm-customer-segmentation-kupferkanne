@@ -88,3 +88,9 @@ service-account*.json
 credentials*.json
 *.pem
 # === End workflow v3 additions ===
+
+# Power BI Project (.pbip) - local cache and user settings (machine-local, not source)
+**/.pbi/
+
+# DAX Query View scratch (auto-named ad-hoc queries; rename a query to track it deliberately)
+**/DAXQueries/Query *.dax

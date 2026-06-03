@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "kupferkanne-rfm-customer-segmentation"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "70ca21a7-5097-4c27-aff4-af7d870522d7"
+  }
+}

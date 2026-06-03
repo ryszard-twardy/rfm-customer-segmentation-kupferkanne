@@ -1,0 +1,283 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.2.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY26SU02",
+      "reportVersionAtImport": {
+        "visual": "2.6.0",
+        "report": "3.1.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "RFM_Customer_Segmentation___Pa5196197683041371.json",
+      "reportVersionAtImport": {
+        "visual": "2.7.0",
+        "report": "3.2.0",
+        "page": "2.3.1"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "ChicletSlicer1448559807354",
+    "InforiverCharts582F6C55AB6442EF8FA129089285CB47",
+    "deneb7E15AEF80B9E4D4F8E12924291ECE89A"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU02",
+          "path": "BaseThemes/CY26SU02.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "nav_01_executive_active03459149860029287.svg",
+          "path": "nav_01_executive_active03459149860029287.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_active10427645870286661.svg",
+          "path": "nav_01_executive_active10427645870286661.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_active9926872556480066.svg",
+          "path": "nav_01_executive_active9926872556480066.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_click8975537277764456.svg",
+          "path": "nav_01_executive_click8975537277764456.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_default02119367693942631.svg",
+          "path": "nav_01_executive_default02119367693942631.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_default04323267333767067.svg",
+          "path": "nav_01_executive_default04323267333767067.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_default3701823718936391.svg",
+          "path": "nav_01_executive_default3701823718936391.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_default4662754340581027.svg",
+          "path": "nav_01_executive_default4662754340581027.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_01_executive_hover30451579245282456.svg",
+          "path": "nav_01_executive_hover30451579245282456.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_active07356401370833265.svg",
+          "path": "nav_02_segments_active07356401370833265.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_active32980228474277884.svg",
+          "path": "nav_02_segments_active32980228474277884.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_active9965948764474816.svg",
+          "path": "nav_02_segments_active9965948764474816.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_click8825460177011426.svg",
+          "path": "nav_02_segments_click8825460177011426.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_click9172440091868391.svg",
+          "path": "nav_02_segments_click9172440091868391.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_default05454758520698244.svg",
+          "path": "nav_02_segments_default05454758520698244.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_default8472995770954355.svg",
+          "path": "nav_02_segments_default8472995770954355.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_hover08353921337847192.svg",
+          "path": "nav_02_segments_hover08353921337847192.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_02_segments_hover576780928345472.svg",
+          "path": "nav_02_segments_hover576780928345472.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_products_active5694097158459968.svg",
+          "path": "nav_03_products_active5694097158459968.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_products_active7029169346723149.svg",
+          "path": "nav_03_products_active7029169346723149.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_products_active9358399060084555.svg",
+          "path": "nav_03_products_active9358399060084555.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_products_click8625782709427016.svg",
+          "path": "nav_03_products_click8625782709427016.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_products_default8708266851580443.svg",
+          "path": "nav_03_products_default8708266851580443.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_03_products_hover16803204615944944.svg",
+          "path": "nav_03_products_hover16803204615944944.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_churn_active4787436884454973.svg",
+          "path": "nav_04_churn_active4787436884454973.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_churn_active5379245187788959.svg",
+          "path": "nav_04_churn_active5379245187788959.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_churn_active905435642391916.svg",
+          "path": "nav_04_churn_active905435642391916.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_churn_click2096091463844375.svg",
+          "path": "nav_04_churn_click2096091463844375.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_churn_default9453287292159134.svg",
+          "path": "nav_04_churn_default9453287292159134.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_04_churn_hover33757918779202334.svg",
+          "path": "nav_04_churn_hover33757918779202334.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_05_regional_active7610653146824914.svg",
+          "path": "nav_05_regional_active7610653146824914.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_05_regional_active9144073880042656.svg",
+          "path": "nav_05_regional_active9144073880042656.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_05_regional_active9435748251728874.svg",
+          "path": "nav_05_regional_active9435748251728874.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_05_regional_click9470071845013442.svg",
+          "path": "nav_05_regional_click9470071845013442.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_05_regional_default6133256403596988.svg",
+          "path": "nav_05_regional_default6133256403596988.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_05_regional_hover2789370751891348.svg",
+          "path": "nav_05_regional_hover2789370751891348.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_reset_click0472190799562443.svg",
+          "path": "nav_reset_click0472190799562443.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_reset_default28250119850476485.svg",
+          "path": "nav_reset_default28250119850476485.svg",
+          "type": "Image"
+        },
+        {
+          "name": "nav_reset_hover3712547887499589.svg",
+          "path": "nav_reset_hover3712547887499589.svg",
+          "type": "Image"
+        },
+        {
+          "name": "RFM_Customer_Segmentation___Pa5196197683041371.json",
+          "path": "RFM_Customer_Segmentation___Pa5196197683041371.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

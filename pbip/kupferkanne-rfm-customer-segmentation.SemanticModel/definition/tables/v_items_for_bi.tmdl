@@ -1,0 +1,94 @@
+table v_items_for_bi
+	lineageTag: 7d5271c9-b37f-40b8-97c4-4763500a711a
+
+	column 'Order ID'
+		dataType: string
+		isHidden
+		lineageTag: 1e472f8a-d39c-4d36-a79f-6435eea56e1e
+		summarizeBy: none
+		sourceColumn: Order ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product ID'
+		dataType: string
+		isHidden
+		lineageTag: 528a5f58-f27f-4ac8-a6e7-cd013ed4143c
+		summarizeBy: none
+		sourceColumn: Product ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: d61ab162-fb61-4390-b23b-ff1273f2f526
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0dff860c-df66-4127-8c3d-fd5096aad372
+		summarizeBy: none
+		sourceColumn: Order Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: c7c7d556-7eea-42c4-9733-5230a031cf65
+		summarizeBy: none
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Line Net Amount'
+		dataType: double
+		isHidden
+		lineageTag: b2789aec-51e5-4222-a961-efc2a81ec3be
+		summarizeBy: none
+		sourceColumn: Line Net Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Line Profit'
+		dataType: double
+		isHidden
+		lineageTag: 6918fc7e-d362-4db0-9802-c1847cee4f91
+		summarizeBy: none
+		sourceColumn: Line Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Line Margin %'
+		dataType: double
+		lineageTag: a91073e9-43c3-41ff-8369-9cfb2cf2bcc4
+		summarizeBy: none
+		sourceColumn: Line Margin %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition v_items_for_bi = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    v_items_for_bi_View = sales_Schema{[Name="v_items_for_bi",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(v_items_for_bi_View,{{"CustomerID", "Customer ID"}, {"LineMarginPct", "Line Margin %"}, {"LineNetAmount", "Line Net Amount"}, {"LineProfit", "Line Profit"}, {"OrderDate", "Order Date"}, {"OrderID", "Order ID"}, {"ProductID", "Product ID"}})
+				in
+				    #"Renamed Columns"
+

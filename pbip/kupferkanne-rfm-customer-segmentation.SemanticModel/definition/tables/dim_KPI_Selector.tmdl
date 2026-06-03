@@ -1,0 +1,41 @@
+table dim_KPI_Selector
+	lineageTag: 19a40776-a39a-4303-a736-b84eed75a3ce
+
+	column KPI
+		lineageTag: 2cc6bdc7-9536-4a79-a3bf-6ba154929ef2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [KPI]
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		formatString: 0
+		lineageTag: a109ba43-2e3b-4e07-8e72-7f43b7b157ed
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_KPI_Selector = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE (
+				    "KPI", STRING,
+				    "SortOrder", INTEGER,
+				    {
+				        { "Total Revenue", 1 },
+				        { "Total Customers", 2 },
+				        { "Average Order Value", 3 },
+				        { "Average Recency Days", 4 },
+				        { "Revenue at Risk", 5 }
+				    }
+				)
+				
+				```
+
+	annotation PBI_Id = 58afcf70a0b647ecaaf75950781dc994
+

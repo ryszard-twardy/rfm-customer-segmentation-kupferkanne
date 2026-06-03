@@ -1,0 +1,67 @@
+table dim_SegmentActions
+	lineageTag: 7f42af6e-242e-451b-9a0d-7d450caf730d
+
+	column Segment
+		dataType: string
+		lineageTag: 69278bcd-08c1-4496-8155-cb753f8143b2
+		summarizeBy: none
+		sourceColumn: Segment
+		sortByColumn: SortOrder
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Email Cadence'
+		dataType: string
+		lineageTag: 24e4cd6c-775f-49a2-82f0-c04a87d76df3
+		summarizeBy: none
+		sourceColumn: Email Cadence
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loyalty Tier'
+		dataType: string
+		lineageTag: 08f4e72d-73ad-4493-896f-4668759acbb0
+		summarizeBy: none
+		sourceColumn: Loyalty Tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Discount Approach'
+		dataType: string
+		lineageTag: bdbb3990-f32b-476b-86b5-fd0c9fadd5bb
+		summarizeBy: none
+		sourceColumn: Discount Approach
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Budget Allocation'
+		dataType: string
+		lineageTag: 5c34ef76-308e-4c59-aeb7-c19469173f9d
+		summarizeBy: none
+		sourceColumn: Budget Allocation
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		formatString: 0
+		lineageTag: c20d419b-2f71-4ab7-b061-34822b32fa24
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_SegmentActions = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("ddHBagIxEAbgVxkWBAsuuOq251ZaLNhitdSDeMiu4zqYnUh2Utm3b5K1Yg+9TXL48uefzSaZHlR9IsNNMkjeDMtBt8B4bjSKoPWXX68L+KQ4vhtGSGHvtIaTpRL93YyqA/Qnw96dP2TJdrBJ5qZVGqauEVOjDfATpWfEo279vBLFO2V3IB26Qo2l0DdC3gsZcEeuhv4oj+IoigsjyEJejTY1EtR1JIGdFWdDlmdNFRWkSVow+33k16hLHwOy4a2edfo46kssvf4n8IU2XBgflbj6R38h20hauPbiz83Z410Zk4g/CiypOd6WABZT5EpVIfPyd659hvAycVqo8ghZfgUfopdHb0YFWlbSZfpwyvo1xWLDdm6BUfdjYqp9cf1xRO6T7fYH", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Segment#(lf)" = _t, #"EmailFrequency#(lf)" = _t, LoyaltyProgram = _t, DiscountStrategy = _t, BudgetTier = _t, SortOrder = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Segment#(lf)", type text}, {"EmailFrequency#(lf)", type text}, {"LoyaltyProgram", type text}, {"DiscountStrategy", type text}, {"BudgetTier", type text}, {"SortOrder", Int64.Type}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"BudgetTier", "Budget Allocation"}, {"EmailFrequency", "Email Cadence"}, {"LoyaltyProgram", "Loyalty Tier"}, {"DiscountStrategy", "Discount Approach"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

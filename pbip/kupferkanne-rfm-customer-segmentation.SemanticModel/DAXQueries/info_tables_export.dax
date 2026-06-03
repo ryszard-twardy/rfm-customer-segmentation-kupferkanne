@@ -1,0 +1,11 @@
+EVALUATE
+SELECTCOLUMNS (
+    INFO.VIEW.TABLES (),
+    "Table", [Name],
+    "Description", [Description],
+    "IsHidden", [IsHidden],
+    "DataCategory", [DataCategory],
+    "StorageMode", [StorageMode],
+    "Expression", [Expression]
+)
+ORDER BY [Table]

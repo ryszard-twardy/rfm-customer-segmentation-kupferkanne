@@ -1,0 +1,178 @@
+table sales_curated
+	lineageTag: e0136b96-5a72-4e68-aedd-e60e9d130abe
+
+	column 'Order ID'
+		dataType: string
+		isHidden
+		lineageTag: 3c86cc57-0d10-4805-8d84-89160ad2bc83
+		summarizeBy: none
+		sourceColumn: Order ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: 9f6cf60e-597c-4dc2-b44f-17fe33add119
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Date'
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 76680087-6b72-4a22-a5d8-6ccda7742bd3
+		summarizeBy: none
+		sourceColumn: Order Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Country
+		dataType: string
+		lineageTag: 54429a11-ec67-4895-be96-a9b4e42cad2e
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 0e02e350-a5b3-47a5-9e75-6a8fbf6373e8
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 4b4c906d-4830-42ad-9b8e-5fafb52e9e6d
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Discount %'
+		dataType: double
+		lineageTag: 957f2990-bc97-4179-a6bc-7616389f56ac
+		summarizeBy: none
+		sourceColumn: Order Discount %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Basket Item Count'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1560e528-f387-4522-873b-6d89aba75fea
+		summarizeBy: none
+		sourceColumn: Basket Item Count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Value'
+		dataType: double
+		isHidden
+		lineageTag: 863007ba-c825-4b25-8400-775f0102a7bf
+		summarizeBy: none
+		sourceColumn: Order Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Order Cost'
+		dataType: double
+		lineageTag: e6101e9a-3bd5-4d0a-a06a-43b40edd6be5
+		summarizeBy: none
+		sourceColumn: Order Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Order Profit'
+		dataType: double
+		isHidden
+		lineageTag: 38a8c4f8-6db0-4daf-8528-3b71d5173c44
+		summarizeBy: none
+		sourceColumn: Order Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Order Margin %'
+		dataType: double
+		lineageTag: 2421be9e-387d-4860-abe9-fb5e321f3d60
+		summarizeBy: none
+		sourceColumn: Order Margin %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total Units'
+		dataType: int64
+		formatString: 0
+		lineageTag: e02b5607-e418-41d1-aa0e-59c9437e4dca
+		summarizeBy: none
+		sourceColumn: Total Units
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Distinct Products'
+		dataType: int64
+		formatString: 0
+		lineageTag: 60ecaf52-b3b8-41b7-a3c8-026f168a328b
+		summarizeBy: none
+		sourceColumn: Distinct Products
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dominant Category'
+		dataType: string
+		lineageTag: c125e84a-3524-4af9-bd2c-7c189c38079c
+		summarizeBy: none
+		sourceColumn: Dominant Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dominant Brand'
+		dataType: string
+		lineageTag: 7c5cf55f-3143-48db-bf63-92cdfc052112
+		summarizeBy: none
+		sourceColumn: Dominant Brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Source Month'
+		dataType: int64
+		formatString: 0
+		lineageTag: 768f3a67-ceed-416b-b7ea-6299b49094ce
+		summarizeBy: none
+		sourceColumn: Source Month
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales_curated = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    sales_curated_Table = sales_Schema{[Name="sales_curated",Kind="Table"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(sales_curated_Table,{{"CustomerID", "Customer ID"}, {"DistinctProducts", "Distinct Products"}, {"DominantBrand", "Dominant Brand"}, {"DominantCategory", "Dominant Category"}, {"OrderCost", "Order Cost"}, {"OrderDate", "Order Date"}, {"OrderDiscountPct", "Order Discount %"}, {"OrderID", "Order ID"}, {"OrderMarginPct", "Order Margin %"}, {"OrderProfit", "Order Profit"}, {"OrderValue", "Order Value"}, {"TotalUnits", "Total Units"}, {"source_month", "Source Month"}, {"BasketItemCount", "Basket Item Count"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Source Month", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

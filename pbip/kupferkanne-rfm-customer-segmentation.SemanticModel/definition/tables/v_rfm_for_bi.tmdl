@@ -1,0 +1,265 @@
+table v_rfm_for_bi
+	lineageTag: de5918a1-ac5c-404a-9547-a26318978716
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: 1b9f91a7-1973-42d2-9638-da0b2b9ae177
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Analysis Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4d5ebf55-4382-4594-a903-e160995776c9
+		summarizeBy: none
+		sourceColumn: Analysis Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Last Order Date'
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 0bb12f48-caf6-41eb-b8ea-d38b2c10ef08
+		summarizeBy: none
+		sourceColumn: Last Order Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Recency Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: 18db0e51-b1aa-4fa8-8c32-f6d793845fb1
+		summarizeBy: none
+		sourceColumn: Recency Days
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"v_rfm_for_bi","TableItemName":"Recency Days (bins)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	column 'Order Count'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2dd70cfb-93e9-4b77-ae74-02b58da9f32c
+		summarizeBy: none
+		sourceColumn: Order Count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Spend'
+		dataType: double
+		lineageTag: 8e76a385-7ab3-456e-936f-3dcc2772791e
+		summarizeBy: none
+		sourceColumn: Total Spend
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total Profit'
+		dataType: double
+		lineageTag: 527367b1-c91b-4476-82ee-9978bc730c12
+		summarizeBy: none
+		sourceColumn: Total Profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Margin %'
+		dataType: double
+		lineageTag: 0dd614aa-bfe4-465b-97f9-854ff2879fea
+		summarizeBy: none
+		sourceColumn: Margin %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Avg Order Value'
+		dataType: double
+		lineageTag: bab431ab-ddeb-4362-8841-f1644a237d52
+		summarizeBy: none
+		sourceColumn: Avg Order Value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total Units'
+		dataType: int64
+		formatString: 0
+		lineageTag: 833e7ba4-cbdf-4a37-b5c8-7607a54d1904
+		summarizeBy: none
+		sourceColumn: Total Units
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Avg Products per Order'
+		dataType: double
+		lineageTag: 2611152e-710a-478c-85c3-c70fa78a6fb1
+		summarizeBy: none
+		sourceColumn: Avg Products per Order
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Country
+		dataType: string
+		lineageTag: ab20a693-beea-429d-a06a-ed0592d7f478
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 11178a19-dec1-4883-829b-48e66ab4b9ff
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: a17d0f98-62d6-4424-9a97-70ae8463a6c0
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'R Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8059d571-5d61-4456-bca6-577c1e3076a0
+		summarizeBy: none
+		sourceColumn: R Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'F Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5bd9cf0b-e8aa-4814-823f-19490e29bec9
+		summarizeBy: none
+		sourceColumn: F Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'M Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: cf95d3a3-2d3f-412c-977f-48b3922957c5
+		summarizeBy: none
+		sourceColumn: M Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'RFM Cell'
+		dataType: string
+		lineageTag: a81e0581-8632-4382-b5ba-fcbab6077a3d
+		summarizeBy: none
+		sourceColumn: RFM Cell
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Health Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: c3403c65-9217-4741-961a-f6ab0bd28841
+		summarizeBy: none
+		sourceColumn: Health Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		isHidden
+		lineageTag: 62f3c390-a438-4651-a949-ecb7cb61564d
+		summarizeBy: none
+		sourceColumn: Segment
+		sortByColumn: SortOrderSegment
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Action
+		dataType: string
+		lineageTag: e4977f70-1fed-4851-9471-f7675ee5adfb
+		summarizeBy: none
+		sourceColumn: Action
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrderSegment = RELATED(dim_SegmentOrder[SortOrder])
+		isHidden
+		formatString: 0
+		lineageTag: 814e8835-f11c-4b7a-be6f-0994675c00c3
+		summarizeBy: sum
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Recency Days (bins)' =
+			IF(
+				ISBLANK('v_rfm_for_bi'[Recency Days]),
+				BLANK(),
+				INT('v_rfm_for_bi'[Recency Days] / 30) * 30
+			)
+		formatString: 0
+		lineageTag: ae381d98-a0e4-4378-bccb-dc0795823d07
+		summarizeBy: none
+
+		extendedProperty GroupingMetadata =
+				{
+				  "version": 0,
+				  "groupedColumns": [
+				    {
+				      "Column": {
+				        "Expression": {
+				          "SourceRef": {
+				            "Entity": "v_rfm_for_bi"
+				          }
+				        },
+				        "Property": "Recency Days"
+				      }
+				    }
+				  ],
+				  "binningMetadata": {
+				    "binSize": {
+				      "value": 30.0,
+				      "unit": 0
+				    }
+				  }
+				}
+
+		annotation GroupingDesignState = {"Version":0,"Sources":[{"Name":"v","Entity":"v_rfm_for_bi"}],"GroupedColumns":[{"Column":{"Expression":{"SourceRef":{"Source":"v"}},"Property":"Recency Days"}}],"BinItem":{"Expression":{"Floor":{"Expression":{"Column":{"Expression":{"SourceRef":{"Source":"v"}},"Property":"Recency Days"}},"Size":30.0}}}}
+
+		annotation SummarizationSetBy = Automatic
+
+	partition v_rfm_for_bi = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    v_rfm_for_bi_View = sales_Schema{[Name="v_rfm_for_bi",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(v_rfm_for_bi_View,{{"total_spend", "Total Spend"}, {"total_profit", "Total Profit"}, {"total_units", "Total Units"}, {"recency_days", "Recency Days"}, {"r_score", "R Score"}, {"f_score", "F Score"}, {"m_score", "M Score"}, {"health_score", "Health Score"}, {"customer_id", "Customer ID"}, {"last_order_date", "Last Order Date"}, {"order_count", "Order Count"}, {"city", "City"}, {"country", "Country"}, {"segment", "Segment"}, {"state", "State"}, {"action", "Action"}, {"avg_order_value", "Avg Order Value"}, {"margin_pct", "Margin %"}, {"rfm_cell", "RFM Cell"}, {"analysis_date", "Analysis Date"}, {"avg_products_per_order", "Avg Products per Order"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Exception
+

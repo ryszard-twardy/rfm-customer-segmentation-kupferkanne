@@ -1,0 +1,82 @@
+table v_dim_products_std
+	lineageTag: 16c1ff24-1f36-449a-8526-2689831d69d7
+
+	column 'Product ID'
+		dataType: string
+		isHidden
+		lineageTag: 96eab873-1e4a-4afe-a060-9b04ab87db4c
+		summarizeBy: none
+		sourceColumn: Product ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: b37de3fb-2ab5-4d14-8010-b6f1b6197c7a
+		summarizeBy: none
+		sourceColumn: Product Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Category'
+		dataType: string
+		lineageTag: 7d7e168f-bc19-44e4-9e36-c6ecde42dc02
+		summarizeBy: none
+		sourceColumn: Product Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Brand
+		dataType: string
+		lineageTag: efea7d23-4346-4c16-ba5a-ef4174ba1107
+		summarizeBy: none
+		sourceColumn: Brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Retail Price'
+		dataType: double
+		lineageTag: fee94870-eebe-42bd-a27e-a4d7f3bfa585
+		summarizeBy: none
+		sourceColumn: Retail Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Unit Cost'
+		dataType: double
+		lineageTag: cc3109af-83fb-4bb5-b3fb-8d1567a985b1
+		summarizeBy: none
+		sourceColumn: Unit Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Margin %'
+		dataType: double
+		lineageTag: e9162f02-c6f8-4629-b3ed-f325f2dd5292
+		summarizeBy: none
+		sourceColumn: Margin %
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition v_dim_products_std = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    v_dim_products_std_View = sales_Schema{[Name="v_dim_products_std",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(v_dim_products_std_View,{{"ProductName", "Product Name"}, {"RetailPrice", "Retail Price"}, {"UnitCost", "Unit Cost"}, {"MarginPct", "Margin %"}, {"ProductCategory", "Product Category"}, {"ProductID", "Product ID"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Exception
+

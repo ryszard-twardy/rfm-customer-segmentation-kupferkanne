@@ -1,0 +1,35 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["v_dim_customers_std","v_dim_products_std","v_rfm_for_bi","dim_Date","dim_SegmentActions","sales_curated","v_items_for_bi"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+annotation __TEdtr = 1
+
+annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":[]}
+
+annotation BestPracticeAnalyzer_ExternalRuleFiles = ["https://raw.githubusercontent.com/microsoft/Analysis-Services/master/BestPracticeRules/BPARules.json"]
+
+ref table v_dim_customers_std
+ref table v_dim_products_std
+ref table v_rfm_for_bi
+ref table dim_Date
+ref table _Measures
+ref table dim_SegmentOrder
+ref table dim_KPI_Selector
+ref table 'Reactivation Rate'
+ref table 'RFM Score Selector'
+ref table dim_SegmentActions
+ref table sales_curated
+ref table v_items_for_bi
+
+ref cultureInfo en-US
+

@@ -1,0 +1,534 @@
+table _Measures
+	lineageTag: a3a134bb-f7a7-4964-8501-b8188dcbce0a
+
+	measure 'Total Revenue' =
+			
+			SUM ( sales_curated[Order Value] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: e27ebb98-0bbc-4b38-8092-7937821c8158
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Customers' =
+			
+			DISTINCTCOUNT ( v_rfm_for_bi[Customer ID] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: f5bf0588-f124-4262-8ba2-497f9c4f00d1
+
+	measure 'Total Orders' =
+			
+			SUM ( v_rfm_for_bi[Order Count] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: c588885a-88aa-4b8e-a349-0984f195d34b
+
+	measure 'Avg Order Value' =
+			
+			DIVIDE (
+			    [Total Revenue],
+			    [Total Orders],
+			    0
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 35d673c0-8155-4dcb-a3f7-a95bd46d3a22
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Customer LTV' =
+			
+			DIVIDE (
+			    [Total Revenue],
+			    [Total Customers],
+			    0
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 29fda56d-1d45-4e90-b1e2-5a5442823256
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Recency Days' =
+			
+			AVERAGE ( v_rfm_for_bi[Recency Days] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: 58ad69cb-a3ec-4f15-8ae2-eb328a14c005
+
+	measure 'Avg Frequency' =
+			
+			AVERAGE ( v_rfm_for_bi[Order Count] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: 77e805fb-be3b-4cd2-b3b6-67dcbcb2dafa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Monetary' =
+			
+			AVERAGE ( v_rfm_for_bi[Total Spend] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: be1e02a6-8844-4058-b879-a189bbb07172
+
+	measure 'Avg R Score' =
+			
+			AVERAGE ( v_rfm_for_bi[R Score] )
+		formatString: 0.00
+		displayFolder: 02 - RFM Scores
+		lineageTag: 56225373-0fbe-470a-ab4d-064fc2f7b731
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg F Score' =
+			
+			AVERAGE ( v_rfm_for_bi[F Score] )
+		formatString: 0.00
+		displayFolder: 02 - RFM Scores
+		lineageTag: 71301511-51f7-4a96-a026-ae9f38117446
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg M Score' =
+			
+			AVERAGE ( v_rfm_for_bi[M Score] )
+		formatString: 0.00
+		displayFolder: 02 - RFM Scores
+		lineageTag: f928d2f4-641e-489b-ad7e-d7dfbe40879b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Health Score' =
+			
+			AVERAGE ( v_rfm_for_bi[Health Score] )
+		formatString: 0.0 "/ 15"
+		displayFolder: 02 - RFM Scores
+		lineageTag: 7d30ec94-58b3-42b9-bb01-6d35dc7cd89a
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Segment % of Total' =
+			
+			VAR SegmentCount =
+			    COUNTROWS ( v_rfm_for_bi )
+			VAR TotalCount =
+			    CALCULATE (
+			        COUNTROWS ( v_rfm_for_bi ),
+			        ALL ( v_rfm_for_bi )
+			    )
+			RETURN
+			    DIVIDE (
+			        SegmentCount,
+			        TotalCount,
+			        0
+			    )
+		formatString: 0.00%
+		displayFolder: 03 - Segment Analysis
+		lineageTag: 7d0d4543-b44a-4a90-b7a5-f87db47dbdc7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue % of Total' =
+			
+			VAR SegmentRevenue =
+			    SUM ( v_rfm_for_bi[Total Spend] )
+			VAR TotalRevenue =
+			    CALCULATE (
+			        SUM ( v_rfm_for_bi[Total Spend] ),
+			        ALL ( v_rfm_for_bi )
+			    )
+			RETURN
+			    DIVIDE (
+			        SegmentRevenue,
+			        TotalRevenue,
+			        0
+			    )
+		formatString: 0.00%
+		displayFolder: 03 - Segment Analysis
+		lineageTag: 0196b41c-c569-4fdc-b90d-16422dc0fd32
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue at Risk' =
+			
+			CALCULATE (
+			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    v_rfm_for_bi[segment]
+			        IN {
+			            "At Risk",
+			            "Hibernating"
+			        }
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 03 - Segment Analysis
+		lineageTag: 4f673189-f4ce-4043-8765-a0cc6fe05688
+
+	measure 'Revenue Active' =
+			
+			CALCULATE (
+			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    v_rfm_for_bi[Recency Days] <= 90
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 04 - Time Intelligence (Recency Buckets)
+		lineageTag: 80277715-e07f-42a3-b819-71cde6e5bf8f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue Cooling' =
+			
+			CALCULATE (
+			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    v_rfm_for_bi[Recency Days] > 90
+			        && v_rfm_for_bi[Recency Days] <= 180
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 04 - Time Intelligence (Recency Buckets)
+		lineageTag: 3e18133c-07c7-431b-91e3-827dad96c767
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue Dormant' =
+			
+			CALCULATE (
+			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    v_rfm_for_bi[Recency Days] > 180
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 04 - Time Intelligence (Recency Buckets)
+		lineageTag: e3aae03a-8f0a-439d-925f-bcea7814b109
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'What-If Revenue Impact' =
+			
+			VAR AtRiskRev =
+			    CALCULATE (
+			        SUM ( v_rfm_for_bi[Total Spend] ),
+			        v_rfm_for_bi[Segment]
+			            IN {
+			                "At Risk",
+			                "Hibernating"
+			            }
+			    )
+			VAR Rate =
+			    SELECTEDVALUE (
+			        'Reactivation Rate'[Reactivation Rate],
+			        10
+			    ) / 100
+			RETURN
+			    AtRiskRev * Rate
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 05 - Dynamic & What-If
+		lineageTag: d5521e1f-3eb7-43b6-8c4b-6b52544a2182
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Dynamic KPI Selector' =
+			
+			VAR Selected =
+			    SELECTEDVALUE (
+			        dim_KPI_Selector[KPI],
+			        "Total Revenue"
+			    )
+			RETURN
+			    SWITCH (
+			        Selected,
+			        "Total Revenue", [Total Revenue],
+			        "Total Customers", [Total Customers],
+			        "Average Order Value", [Avg Order Value],
+			        "Average Recency Days", [Avg Recency Days],
+			        "Revenue at Risk", [Revenue at Risk],
+			        [Total Revenue]
+			    )
+		displayFolder: 05 - Dynamic & What-If
+		lineageTag: cc8df1f6-cf08-4c78-ac86-c62abc92d1ca
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Health Indicator' =
+			
+			VAR Score =
+			    AVERAGE ( v_rfm_for_bi[Health Score] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        Score >= 11, "● Healthy",
+			        Score >= 7, "◐ Monitor",
+			        "○ Critical"
+			    )
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: f24d00f6-2062-46ef-8efc-f87ad9402310
+
+	measure 'ARPU by Country' =
+			
+			DIVIDE (
+			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    COUNTROWS ( v_rfm_for_bi ),
+			    0
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 4c092dcc-cf45-4a1d-94fc-349b9f15d2ec
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Country Revenue Share' =
+			
+			DIVIDE (
+			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    CALCULATE (
+			        SUM ( v_rfm_for_bi[Total Spend] ),
+			        ALL ( v_rfm_for_bi )
+			    ),
+			    0
+			)
+		formatString: 0.00%
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: a03f95c6-0685-4106-afc6-47b8691ff0f7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Segment Color' =
+			
+			SWITCH (
+			    SELECTEDVALUE ( v_rfm_for_bi[Segment] ),
+			    "Champions", "#2563EB",
+			    "Loyal Customers", "#0891B2",
+			    "Potential Loyalists", "#059669",
+			    "Recent Customers", "#D97706",
+			    "At Risk", "#A32638",
+			    "Hibernating", "#6B7280",
+			    "#94A3B8"
+			)
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: b1dd26eb-576c-4894-9ad0-48832a062fde
+
+	measure 'Distinct Orders' =
+			
+			DISTINCTCOUNT ( sales_curated[Order ID] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: c7cee83f-8a00-41f5-9790-5d3bee388ed0
+
+	measure 'Total Profit' =
+			
+			SUM ( sales_curated[Order Profit] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 44e2e694-8394-489c-b49d-d59a51f77217
+
+	measure 'Profit Margin %' =
+			
+			DIVIDE (
+			    [Total Profit],
+			    [Total Revenue],
+			    0
+			)
+		formatString: 0.00%
+		displayFolder: 01 - Core KPIs
+		lineageTag: 828d7382-58dc-49e2-8560-93bd20b21132
+
+	measure 'Revenue Trend Chart Title' =
+			
+			"Weekly Revenue Trend Across "
+			    & DISTINCTCOUNT ( sales_curated[Source Month] )
+			    & " Months"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 6325ebe8-f042-412f-95f9-4d291e5db17f
+
+	measure 'Subtitle Page 1' =
+			
+			"Kupferkanne – D2C E-commerce · 9 European markets · Rolling "
+			    & DISTINCTCOUNT ( sales_curated[Source Month] )
+			    & " months"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: d675d5e4-55c3-4696-a70c-01092b4406ec
+
+	measure 'Dynamic KPI Label' =
+			
+			SELECTEDVALUE (
+			    dim_KPI_Selector[KPI],
+			    "Total Revenue"
+			)
+		displayFolder: 05 - Dynamic & What-If
+		lineageTag: 2660f964-e1a9-4876-921d-8e29254effea
+
+	measure 'R Label' =
+			
+			"R"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 03cf0f79-27a3-48a0-9392-81f81c28892b
+
+	measure 'M Label' =
+			
+			"M"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: f7611bd9-444e-4a53-b702-9ac8b2d975e5
+
+	measure 'F Label' =
+			
+			"F"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 491a01f9-dcfd-4b9a-8cdf-e690b05a6458
+
+	measure 'Total Products' =
+			
+			DISTINCTCOUNT ( v_dim_products_std[Product ID] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: 6afb354c-1c5b-4578-9b1d-9fc326b5b67e
+
+	measure 'Top Brand Revenue' =
+			
+			MAXX (
+			    VALUES ( v_dim_products_std[Brand] ),
+			    [Line Revenue]
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: ab046c17-7e49-4989-84b1-f626e69b9253
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Brand Margin %' =
+			
+			AVERAGEX (
+			    VALUES ( v_dim_products_std[Brand] ),
+			    [Line Margin %]
+			)
+		formatString: 0.00%
+		displayFolder: 01 - Core KPIs
+		lineageTag: 3f718105-6299-421f-8728-5298004297a0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Top Category Revenue' =
+			
+			MAXX (
+			    VALUES ( v_dim_products_std[Product Category] ),
+			    [Line Revenue]
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 8d6a8337-2079-4809-a95a-69339ad91df5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Subtitle Page 3' =
+			
+			"Profitability across "
+			    & [Total Products]
+			    & " products and "
+			    & [Total Brands]
+			    & " brands"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 458efd47-dc70-4f08-a853-b9c5f88dd665
+
+	measure 'Top Category Name' =
+			
+			VAR TopCategory =
+			    TOPN (
+			        1,
+			        VALUES ( v_dim_products_std[Product Category] ),
+			        [Line Revenue], DESC,
+			        v_dim_products_std[Product Category], ASC
+			    )
+			RETURN
+			    MAXX (
+			        TopCategory,
+			        v_dim_products_std[Product Category]
+			    )
+		displayFolder: 01 - Core KPIs
+		lineageTag: 1a023e34-320e-4b22-9e58-bf013592f9c5
+
+	measure 'Subtitle Page 2' =
+			
+			"RFM profile comparison across "
+			    & DISTINCTCOUNT ( dim_SegmentOrder[Segment] ) & " segments"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 50e22469-7d24-4b4d-8799-fd8fd3a7749a
+
+	measure 'Top Brand Name' =
+			
+			VAR TopBrand =
+			    TOPN (
+			        1,
+			        VALUES ( v_dim_products_std[Brand] ),
+			        [Line Revenue], DESC,
+			        v_dim_products_std[Brand], ASC
+			    )
+			RETURN
+			    MAXX (
+			        TopBrand,
+			        v_dim_products_std[Brand]
+			    )
+		displayFolder: 01 - Core KPIs
+		lineageTag: 4b359491-7e06-41d1-8ba9-31a29d578273
+
+	measure 'Line Profit' =
+			
+			SUM ( v_items_for_bi[Line Profit] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: ae7e57d7-9ca3-4da8-99f6-12104911f27e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Line Revenue' =
+			
+			SUM ( v_items_for_bi[Line Net Amount] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 54ed303b-0e85-4fe0-9316-a99c7e683927
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Line Margin %' =
+			
+			DIVIDE (
+			    [Line Profit],
+			    [Line Revenue],
+			    0
+			)
+		formatString: 0.00%
+		displayFolder: 01 - Core KPIs
+		lineageTag: 94e4eb48-07a3-43df-bfc5-9aec3cb739fa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Grain Reconciliation' =
+			
+			[Total Revenue] - [Line Revenue]
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 59f9cdea-addd-49c8-a701-91153fb99226
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Brands' =
+			
+			DISTINCTCOUNT ( v_dim_products_std[Brand] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: 651b4502-be94-4783-827b-0c30a3a3fc73
+
+	column x
+		isHidden
+		formatString: 0
+		displayFolder: helpers
+		lineageTag: e3f70544-2115-47e3-84d3-d9a09f09653b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [x]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("x", BLANK())
+
+	annotation PBI_Id = a72d0acece614f1aa6737e225ba8761b
+

@@ -1,0 +1,50 @@
+table 'RFM Score Selector'
+	lineageTag: e0ded359-bc09-4a03-9836-352fb646617a
+
+	column 'RFM Score Selector'
+		lineageTag: 6b427318-c8b5-4412-a5c1-b155ff47df91
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'RFM Score Selector Order'
+
+		relatedColumnDetails
+			groupByColumn: 'RFM Score Selector Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'RFM Score Selector Fields'
+		isHidden
+		lineageTag: 570786b0-c78b-4818-94f4-fce02a4b9547
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'RFM Score Selector Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'RFM Score Selector Order'
+		isHidden
+		formatString: 0
+		lineageTag: baa71172-d1ab-4b51-b9a0-faed54019587
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'RFM Score Selector' = calculated
+		mode: import
+		source =
+				
+				{
+				    ( "R Score", NAMEOF ( 'v_rfm_for_bi'[R Score] ), 0 ),
+				    ( "F Score", NAMEOF ( 'v_rfm_for_bi'[F Score] ), 1 ),
+				    ( "M Score", NAMEOF ( 'v_rfm_for_bi'[M Score] ), 2 )
+				}
+
+	annotation PBI_Id = aaeb40690f884013a79b9b3a732cb50f
+

@@ -1,0 +1,35 @@
+relationship AutoDetected_f5271076-196e-4f8c-9982-2f8bf9564ee3
+	crossFilteringBehavior: bothDirections
+	fromColumn: v_rfm_for_bi.'Customer ID'
+	toColumn: v_dim_customers_std.'Customer ID'
+
+relationship 57bd7c5b-d761-cc70-7b43-b64e6f1277a3
+	fromColumn: v_rfm_for_bi.'Last Order Date'
+	toColumn: dim_Date.Date
+
+relationship b48eb893-3be3-5638-e94a-6a2922225364
+	fromColumn: v_rfm_for_bi.Segment
+	toColumn: dim_SegmentOrder.Segment
+
+relationship 50d9d619-81ee-ffc7-822c-f126736ff692
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: dim_SegmentOrder.Segment
+	toColumn: dim_SegmentActions.Segment
+
+relationship AutoDetected_efedc1d9-d76a-4d9c-8a42-139014cc0f2e
+	fromColumn: v_items_for_bi.'Customer ID'
+	toColumn: v_dim_customers_std.'Customer ID'
+
+relationship AutoDetected_386e66bf-a886-4556-9399-20d2b9a7863a
+	fromColumn: v_items_for_bi.'Product ID'
+	toColumn: v_dim_products_std.'Product ID'
+
+relationship 80a8669d-c682-a9f1-8632-4e5b5a5e1256
+	fromColumn: sales_curated.'Customer ID'
+	toColumn: v_dim_customers_std.'Customer ID'
+
+relationship 1793688d-e254-6d24-9d34-8a969e07f82e
+	fromColumn: sales_curated.'Order Date'
+	toColumn: dim_Date.Date
+
