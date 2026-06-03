@@ -1,4 +1,5 @@
 // Dual-grain integrity: order-grain vs line-grain revenue; [Grain Reconciliation] must be 0
+
 EVALUATE
 ROW (
     "Order Grain Revenue", [Total Revenue],

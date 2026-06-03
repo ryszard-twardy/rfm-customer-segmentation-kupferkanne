@@ -1,4 +1,5 @@
 // KPI baseline snapshot for regression checks
+
 EVALUATE
 ROW (
     "Total Revenue", [Total Revenue],
