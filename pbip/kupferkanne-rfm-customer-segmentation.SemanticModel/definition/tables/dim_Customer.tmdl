@@ -1,0 +1,288 @@
+table dim_Customer
+	lineageTag: a65f55b2-508b-41d2-bef5-6163e47086a2
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: 13405997-6c73-42c6-ac95-70571eec919d
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Signup Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2488a9db-5c64-4913-9d6b-68395fa3d03f
+		summarizeBy: none
+		sourceColumn: Signup Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Customer Archetype'
+		dataType: string
+		lineageTag: 72e4da81-4719-4c7d-bdd5-3a5c033be263
+		summarizeBy: none
+		sourceColumn: Customer Archetype
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Name'
+		dataType: string
+		lineageTag: 499191c0-fbd6-408d-a1b0-f311f55cf2d0
+		summarizeBy: none
+		sourceColumn: First Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last Name'
+		dataType: string
+		lineageTag: e54a1553-1a9c-4392-bb34-e30ed34611e5
+		summarizeBy: none
+		sourceColumn: Last Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Full Name'
+		dataType: string
+		lineageTag: 5b5bf7d2-6e2b-40db-bd63-97f1a4d0c33f
+		summarizeBy: none
+		sourceColumn: Full Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: 1b36dd56-59ea-46dd-a1a0-8755cc50d3ac
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Phone
+		dataType: string
+		lineageTag: d555d860-12fa-4a0b-9847-94ce202928a7
+		summarizeBy: none
+		sourceColumn: Phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 8fe65de1-5ee1-4412-af6b-e4cfd8507764
+		summarizeBy: none
+		sourceColumn: Country
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 9974c2c2-6a2e-4107-bc48-b9e329c6d09f
+		summarizeBy: none
+		sourceColumn: State
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: e456708a-0261-4085-9919-d46403c998b3
+		summarizeBy: none
+		sourceColumn: City
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Address
+		dataType: string
+		lineageTag: c288bc35-d35a-471a-834e-564869fe5347
+		summarizeBy: none
+		sourceColumn: Address
+
+		annotation SummarizationSetBy = Automatic
+
+	column analysis_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: db973e42-1125-41f3-89e8-660dc600405b
+		summarizeBy: none
+		sourceColumn: analysis_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column last_order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 41c32900-8145-48e4-bb9f-874f0b52788e
+		summarizeBy: none
+		sourceColumn: last_order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column recency_days
+		dataType: int64
+		formatString: 0
+		lineageTag: 577b4ac1-d080-40cb-8973-b19626ff3274
+		summarizeBy: sum
+		sourceColumn: recency_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_count
+		dataType: int64
+		formatString: 0
+		lineageTag: a0923349-5c3d-40e9-a586-a6db03cd8d99
+		summarizeBy: sum
+		sourceColumn: order_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_spend
+		dataType: double
+		lineageTag: 6c80c9e3-5a6f-45de-b975-d8d90191de0f
+		summarizeBy: sum
+		sourceColumn: total_spend
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_profit
+		dataType: double
+		lineageTag: 43df5449-d58d-41d7-8f63-059ddc6fcc21
+		summarizeBy: sum
+		sourceColumn: total_profit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column margin_pct
+		dataType: double
+		lineageTag: 0f8e95ff-99c2-4f3f-964b-ffdd364b2ebd
+		summarizeBy: sum
+		sourceColumn: margin_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_order_value
+		dataType: double
+		lineageTag: 4f8d9b40-e0bc-4303-90b4-0a0428bb1170
+		summarizeBy: sum
+		sourceColumn: avg_order_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_units
+		dataType: int64
+		formatString: 0
+		lineageTag: c095fed5-7c75-4b89-8f8f-e163bae292ff
+		summarizeBy: sum
+		sourceColumn: total_units
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_products_per_order
+		dataType: double
+		lineageTag: 7fa4a7a1-f8e7-49d5-a571-146c6f8ac590
+		summarizeBy: sum
+		sourceColumn: avg_products_per_order
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column r_score
+		dataType: int64
+		formatString: 0
+		lineageTag: 04496c18-c730-487a-b061-578bed15d5d8
+		summarizeBy: sum
+		sourceColumn: r_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column f_score
+		dataType: int64
+		formatString: 0
+		lineageTag: 547ea95e-7970-4a68-9516-448eea779168
+		summarizeBy: sum
+		sourceColumn: f_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column m_score
+		dataType: int64
+		formatString: 0
+		lineageTag: 800db6c5-5117-4d88-ad61-c8808467dd50
+		summarizeBy: sum
+		sourceColumn: m_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column rfm_cell
+		dataType: string
+		lineageTag: 69602911-b745-41c6-93c3-d421f1c9c2f9
+		summarizeBy: none
+		sourceColumn: rfm_cell
+
+		annotation SummarizationSetBy = Automatic
+
+	column health_score
+		dataType: int64
+		formatString: 0
+		lineageTag: 294b8d0d-27ad-4c04-9a50-50436d91745f
+		summarizeBy: sum
+		sourceColumn: health_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column segment
+		dataType: string
+		lineageTag: e513b7a0-9f85-4311-9ed5-77c937d5d997
+		summarizeBy: none
+		sourceColumn: segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column action
+		dataType: string
+		lineageTag: 43154763-2ae6-4e79-9e4a-b036b6761dbe
+		summarizeBy: none
+		sourceColumn: action
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_Customer = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    v_dim_customers_std_View = sales_Schema{[Name="v_dim_customers_for_bi",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(v_dim_customers_std_View,{{"SignupDate", "Signup Date"}, {"FullName", "Full Name"}, {"CustomerArchetype", "Customer Archetype"}, {"FirstName", "First Name"}, {"LastName", "Last Name"}, {"CustomerID", "Customer ID"}})
+				in
+				    #"Renamed Columns"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
