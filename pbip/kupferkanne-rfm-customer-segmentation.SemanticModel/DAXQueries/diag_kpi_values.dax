@@ -10,4 +10,4 @@ ROW (
     "Profit Margin %", [Profit Margin %],
     "Margin ratio 4dp", FORMAT ( [Profit Margin %], "0.0000" ),
     "Margin percent", FORMAT ( [Profit Margin %], "0.00%" )
-)Dobra, działa. Zostawimy w tej formie na razie i jedziemy dalej. s
+)
