@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_SegmentActions"
+                      "Entity": "dim_Segment"
                     }
                   },
                   "Property": "Segment"
                 }
               },
-              "queryRef": "dim_SegmentActions.Segment",
+              "queryRef": "dim_Segment.Segment",
               "nativeQueryRef": "Segment"
             },
             {
@@ -34,13 +34,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_SegmentActions"
+                      "Entity": "dim_Segment"
                     }
                   },
                   "Property": "Email Cadence"
                 }
               },
-              "queryRef": "dim_SegmentActions.Email Cadence",
+              "queryRef": "dim_Segment.Email Cadence",
               "nativeQueryRef": "Email Cadence"
             },
             {
@@ -48,13 +48,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_SegmentActions"
+                      "Entity": "dim_Segment"
                     }
                   },
                   "Property": "Loyalty Tier"
                 }
               },
-              "queryRef": "dim_SegmentActions.Loyalty Tier",
+              "queryRef": "dim_Segment.Loyalty Tier",
               "nativeQueryRef": "Loyalty Tier"
             },
             {
@@ -62,13 +62,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_SegmentActions"
+                      "Entity": "dim_Segment"
                     }
                   },
                   "Property": "Discount Approach"
                 }
               },
-              "queryRef": "dim_SegmentActions.Discount Approach",
+              "queryRef": "dim_Segment.Discount Approach",
               "nativeQueryRef": "Discount Approach"
             },
             {
@@ -76,13 +76,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_SegmentActions"
+                      "Entity": "dim_Segment"
                     }
                   },
                   "Property": "Budget Allocation"
                 }
               },
-              "queryRef": "dim_SegmentActions.Budget Allocation",
+              "queryRef": "dim_Segment.Budget Allocation",
               "nativeQueryRef": "Budget Allocation"
             }
           ]
@@ -151,7 +151,7 @@
                         "Column": {
                           "Expression": {
                             "SourceRef": {
-                              "Entity": "dim_SegmentOrder"
+                              "Entity": "dim_Segment"
                             }
                           },
                           "Property": "SegmentColor"
@@ -181,7 +181,7 @@
                                         "Column": {
                                           "Expression": {
                                             "SourceRef": {
-                                              "Entity": "dim_SegmentOrder"
+                                              "Entity": "dim_Segment"
                                             }
                                           },
                                           "Property": "SegmentColor"
@@ -219,7 +219,7 @@
                                     "Column": {
                                       "Expression": {
                                         "SourceRef": {
-                                          "Entity": "dim_SegmentOrder"
+                                          "Entity": "dim_Segment"
                                         }
                                       },
                                       "Property": "SegmentColor"
@@ -260,7 +260,7 @@
                 }
               }
             ],
-            "metadata": "dim_SegmentActions.Segment"
+            "metadata": "dim_Segment.Segment"
           }
         }
       ],
@@ -290,7 +290,7 @@
             }
           },
           "selector": {
-            "metadata": "dim_SegmentActions.Segment"
+            "metadata": "dim_Segment.Segment"
           }
         },
         {
@@ -304,7 +304,7 @@
             }
           },
           "selector": {
-            "metadata": "dim_SegmentActions.Email Cadence"
+            "metadata": "dim_Segment.Email Cadence"
           }
         },
         {
@@ -318,7 +318,7 @@
             }
           },
           "selector": {
-            "metadata": "dim_SegmentActions.Loyalty Tier"
+            "metadata": "dim_Segment.Loyalty Tier"
           }
         },
         {
@@ -332,7 +332,7 @@
             }
           },
           "selector": {
-            "metadata": "dim_SegmentActions.Discount Approach"
+            "metadata": "dim_Segment.Discount Approach"
           }
         }
       ],
@@ -348,7 +348,7 @@
             }
           },
           "selector": {
-            "metadata": "Min(dim_SegmentActions.EmailFrequency)"
+            "metadata": "dim_Segment.Email Cadence"
           }
         },
         {
@@ -362,7 +362,7 @@
             }
           },
           "selector": {
-            "metadata": "dim_SegmentActions.Segment"
+            "metadata": "dim_Segment.Segment"
           }
         }
       ],

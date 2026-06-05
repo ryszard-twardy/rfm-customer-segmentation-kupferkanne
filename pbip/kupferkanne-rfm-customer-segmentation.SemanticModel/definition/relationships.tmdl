@@ -1,9 +1,3 @@
-relationship 50d9d619-81ee-ffc7-822c-f126736ff692
-	crossFilteringBehavior: bothDirections
-	fromCardinality: one
-	fromColumn: dim_SegmentOrder.Segment
-	toColumn: dim_SegmentActions.Segment
-
 relationship AutoDetected_efedc1d9-d76a-4d9c-8a42-139014cc0f2e
 	fromColumn: v_items_for_bi.'Customer ID'
 	toColumn: dim_Customer.'Customer ID'
@@ -22,5 +16,5 @@ relationship 1793688d-e254-6d24-9d34-8a969e07f82e
 
 relationship 3a69b719-44af-4a10-b02a-23df85e87aa7
 	fromColumn: dim_Customer.Segment
-	toColumn: dim_SegmentOrder.Segment
+	toColumn: dim_Segment.Segment
 

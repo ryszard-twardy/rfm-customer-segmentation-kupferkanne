@@ -1,0 +1,87 @@
+table dim_Segment
+	lineageTag: 621bf52c-3cb6-4bce-b4f0-689ad9630086
+
+	column Segment
+		lineageTag: bbcb22da-3fa7-46c3-8d77-4df1fe832c7e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Segment]
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Email Cadence'
+		lineageTag: de401a76-38f6-4b20-8f0b-4fb5d0598a08
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Email Cadence]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loyalty Tier'
+		lineageTag: 3cfeb4f3-cc53-4a56-b597-6e79ba4e274d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Loyalty Tier]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Discount Approach'
+		lineageTag: bee29957-5b26-485a-b52b-5ce65e168d8b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Discount Approach]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Budget Allocation'
+		lineageTag: a36cc07c-3def-4acf-aba8-256ad7013c83
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Budget Allocation]
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		isHidden
+		formatString: 0
+		lineageTag: 6a3ca85d-0724-4931-844e-e10a71f8b6b8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SortOrder]
+
+		annotation SummarizationSetBy = Automatic
+
+	column SegmentColor
+		lineageTag: 2c5c374a-d5c0-4a98-af5f-e72b21bc9e8e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SegmentColor]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_Segment = calculated
+		mode: import
+		source = ```
+
+				DATATABLE (
+				    "Segment", STRING,
+				    "Email Cadence", STRING,
+				    "Loyalty Tier", STRING,
+				    "Discount Approach", STRING,
+				    "Budget Allocation", STRING,
+				    "SortOrder", INTEGER,
+				    "SegmentColor", STRING,
+				    {
+				        { "Champions", "Monthly newsletter", "VIP Tier", "None - full price", "High (40%)", 1, "#4A7AA0" },
+				        { "Loyal Customers", "Bi-weekly", "Standard tier", "Selective 5%", "Medium (25%)", 2, "#7BA8B8" },
+				        { "Potential Loyalists", "Weekly nurture", "Eligibility offer", "Welcome 10%", "Medium (15%)", 3, "#8FA87E" },
+				        { "Recent Customers", "Weekly onboarding", "Eligibility offer", "First-buy 10%", "Low (10%)", 4, "#D4A762" },
+				        { "At Risk", "Bi-weekly re-engage", "Re-engagement", "Win-back 15%", "Low (7%)", 5, "#A05A55" },
+				        { "Hibernating", "Quarterly", "None", "Win-back 20%", "Minimal (3%)", 6, "#A5A29A" }
+				    }
+				)
+
+				```
+
+	annotation PBI_Id = f73a9414a7614ec3b6a24a06acb85a56

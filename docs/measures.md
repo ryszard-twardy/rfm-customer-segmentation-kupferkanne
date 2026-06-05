@@ -24,22 +24,22 @@
 | v_category_monthly_trend | `v_category_monthly_trend` (VIEW) | 1 row per category×brand×month | Product Category, category_revenue |
 | v_country_summary | `v_country_summary` (VIEW) | 1 row per country | Country, revenue, profit, arpu |
 | dim_Date | DAX CALENDAR | 1 row per day | Date, Year, Month, Year-Month |
-| dim_SegmentOrder | DAX DATATABLE | 6 rows | Segment, SortOrder, SegmentColor |
+| dim_Segment | DAX DATATABLE | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder, SegmentColor |
 | dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI Name (disconnected) |
-| dim_SegmentActions | Enter Data | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder |
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
 
 **v6 architecture rule (R026):** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
-**Active relationships (6) — verified against `relationships.tmdl`, post-S3 / D060:**
+**Active relationships (5) - verified against `relationships.tmdl`, post-S4 / D060:**
 - sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - v_items_for_bi[Product ID] → v_dim_products_std[Product ID] | M:1 | Single
-- dim_Customer[Segment] → dim_SegmentOrder[Segment] | M:1 | Single — **R3′, re-homed from v_rfm_for_bi (S3)**
-- dim_SegmentOrder[Segment] ↔ dim_SegmentActions[Segment] | 1:1 | **Both** — sole surviving bidirectional (S4 merge target)
+- dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **R3′, re-pointed onto merged dim_Segment (S4)**
 
 **S3 / D060 (retire `v_rfm_for_bi`):** dropped the table and its 3 relationships — `[Customer ID] ↔ dim_Customer` (Fix-A bidirectional, D046, superseded by D060), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via R3′ (`dim_Customer[Segment] → dim_SegmentOrder[Segment]`). Bidirectional count: 2 → **1**.
+
+**S4 / D060 (merge segment dims):** `dim_SegmentOrder` + `dim_SegmentActions` merged into a single `dim_Segment` (DAX DATATABLE, D074), and R3′ re-pointed onto `dim_Segment[Segment]`. The 1:1 bidirectional was dropped. Bidirectional count: 1 → **0** (D060 end state).
 
 ---
 

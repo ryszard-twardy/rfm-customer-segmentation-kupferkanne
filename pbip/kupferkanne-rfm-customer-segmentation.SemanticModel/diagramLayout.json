@@ -78,8 +78,8 @@
             "x": 386.21155986132811,
             "y": 35.877419652499221
           },
-          "nodeIndex": "dim_SegmentOrder",
-          "nodeLineageTag": "10b85285-2e17-486f-8ba6-90f2fc13add8",
+          "nodeIndex": "dim_Segment",
+          "nodeLineageTag": "621bf52c-3cb6-4bce-b4f0-689ad9630086",
           "size": {
             "height": 200,
             "width": 234
@@ -98,19 +98,6 @@
             "width": 234
           },
           "zIndex": 3
-        },
-        {
-          "location": {
-            "x": 871.14007285255013,
-            "y": 17.938709826249749
-          },
-          "nodeIndex": "dim_SegmentActions",
-          "nodeLineageTag": "7f42af6e-242e-451b-9a0d-7d450caf730d",
-          "size": {
-            "height": 224,
-            "width": 234
-          },
-          "zIndex": 4
         },
         {
           "location": {
@@ -196,7 +183,7 @@
             "x": 1031.3333320617676,
             "y": 0
           },
-          "nodeIndex": "dim_SegmentOrder",
+          "nodeIndex": "dim_Segment",
           "size": {
             "height": 145,
             "width": 234

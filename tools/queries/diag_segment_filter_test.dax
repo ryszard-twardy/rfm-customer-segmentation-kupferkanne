@@ -1,9 +1,9 @@
 EVALUATE
 CALCULATETABLE (
     SUMMARIZECOLUMNS (
-        dim_SegmentOrder[Segment],
+        dim_Segment[Segment],
         "Revenue", [Total Revenue],
         "Customers", [Total Customers]
     ),
-    dim_SegmentOrder[Segment] IN { "Champions", "Loyal Customers", "Potential Loyalists", "Recent Customers", "At Risk", "Hibernating" }
+    dim_Segment[Segment] IN { "Champions", "Loyal Customers", "Potential Loyalists", "Recent Customers", "At Risk", "Hibernating" }
 )

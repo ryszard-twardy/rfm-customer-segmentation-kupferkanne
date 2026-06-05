@@ -8,7 +8,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["dim_Customer","v_dim_products_std","dim_Date","dim_SegmentActions","sales_curated","v_items_for_bi"]
+annotation PBI_QueryOrder = ["dim_Customer","v_dim_products_std","dim_Date","sales_curated","v_items_for_bi"]
 
 annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
 
@@ -22,11 +22,10 @@ ref table dim_Customer
 ref table v_dim_products_std
 ref table dim_Date
 ref table _Measures
-ref table dim_SegmentOrder
+ref table dim_Segment
 ref table dim_KPI_Selector
 ref table 'Reactivation Rate'
 ref table 'RFM Score Selector'
-ref table dim_SegmentActions
 ref table sales_curated
 ref table v_items_for_bi
 

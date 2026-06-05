@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_SegmentOrder"
+                      "Entity": "dim_Segment"
                     }
                   },
                   "Property": "Segment"
                 }
               },
-              "queryRef": "dim_SegmentOrder.Segment",
+              "queryRef": "dim_Segment.Segment",
               "nativeQueryRef": "Segment",
               "active": true
             }
@@ -114,7 +114,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "dim_SegmentOrder"
+                    "Entity": "dim_Segment"
                   }
                 },
                 "Property": "Segment"

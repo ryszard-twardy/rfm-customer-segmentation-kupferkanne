@@ -63,7 +63,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "dim_SegmentOrder"
+                          "Entity": "dim_Segment"
                         }
                       },
                       "Property": "Segment"
@@ -97,7 +97,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "dim_SegmentOrder"
+                          "Entity": "dim_Segment"
                         }
                       },
                       "Property": "Segment"
@@ -527,7 +527,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "dim_SegmentOrder"
+                          "Entity": "dim_Segment"
                         }
                       },
                       "Property": "Segment"
@@ -546,7 +546,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "dim_SegmentOrder"
+                          "Entity": "dim_Segment"
                         }
                       },
                       "Property": "Segment"
