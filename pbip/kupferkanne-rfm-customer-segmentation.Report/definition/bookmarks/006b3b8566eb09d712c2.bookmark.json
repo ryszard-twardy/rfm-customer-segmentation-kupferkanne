@@ -117,7 +117,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "v_rfm_for_bi"
+                          "Entity": "dim_Customer"
                         }
                       },
                       "Property": "Recency Days (bins)"
@@ -166,7 +166,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "v_rfm_for_bi"
+                          "Entity": "dim_Customer"
                         }
                       },
                       "Property": "Recency Days (bins)"

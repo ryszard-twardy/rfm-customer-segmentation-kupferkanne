@@ -140,6 +140,8 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"dim_Customer","TableItemName":"Recency Days (bins)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
 	column 'Order Count'
 		dataType: int64
 		formatString: 0
@@ -255,6 +257,43 @@ table dim_Customer
 		lineageTag: 43154763-2ae6-4e79-9e4a-b036b6761dbe
 		summarizeBy: none
 		sourceColumn: action
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Recency Days (bins)' =
+			IF(
+				ISBLANK('dim_Customer'[Recency Days]),
+				BLANK(),
+				INT('dim_Customer'[Recency Days] / 30) * 30
+			)
+		formatString: 0
+		lineageTag: 475a8107-4171-40f3-b7f4-7839a166ee4a
+		summarizeBy: none
+
+		extendedProperty GroupingMetadata =
+				{
+				  "version": 0,
+				  "groupedColumns": [
+				    {
+				      "Column": {
+				        "Expression": {
+				          "SourceRef": {
+				            "Entity": "dim_Customer"
+				          }
+				        },
+				        "Property": "Recency Days"
+				      }
+				    }
+				  ],
+				  "binningMetadata": {
+				    "binSize": {
+				      "value": 30.0,
+				      "unit": 0
+				    }
+				  }
+				}
+
+		annotation GroupingDesignState = {"Version":0,"Sources":[{"Name":"d","Entity":"dim_Customer"}],"GroupedColumns":[{"Column":{"Expression":{"SourceRef":{"Source":"d"}},"Property":"Recency Days"}}],"BinItem":{"Expression":{"Floor":{"Expression":{"Column":{"Expression":{"SourceRef":{"Source":"d"}},"Property":"Recency Days"}},"Size":30.0}}}}
 
 		annotation SummarizationSetBy = Automatic
 

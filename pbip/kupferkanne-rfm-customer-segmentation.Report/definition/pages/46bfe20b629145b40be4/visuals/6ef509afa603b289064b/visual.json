@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "v_rfm_for_bi"
+                      "Entity": "dim_Customer"
                     }
                   },
                   "Property": "Recency Days (bins)"
                 }
               },
-              "queryRef": "v_rfm_for_bi.Recency Days (bins)",
+              "queryRef": "dim_Customer.Recency Days (bins)",
               "nativeQueryRef": "Recency Days (bins)",
               "active": true
             }
@@ -235,5 +235,94 @@
     },
     "drillFilterOtherVisuals": true
   },
-  "parentGroupName": "0af0b920801ddac37b33"
+  "parentGroupName": "0af0b920801ddac37b33",
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "7271b828d7b3787ed082",
+        "ordinal": 0,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_Customer"
+              }
+            },
+            "Property": "Recency Days (bins)"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "a7482b923737eca42330",
+        "ordinal": 1,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_Customer"
+              }
+            },
+            "Property": "Recency Days"
+          }
+        },
+        "type": "Advanced",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "d",
+              "Entity": "dim_Customer",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "Comparison": {
+                      "ComparisonKind": 0,
+                      "Left": {
+                        "Column": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Source": "d"
+                            }
+                          },
+                          "Property": "Recency Days"
+                        }
+                      },
+                      "Right": {
+                        "Literal": {
+                          "Value": "null"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      },
+      {
+        "name": "80cf1220e78366d1489b",
+        "ordinal": 2,
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Total Customers"
+          }
+        },
+        "type": "Advanced"
+      }
+    ],
+    "filterSortOrder": "Custom"
+  }
 }

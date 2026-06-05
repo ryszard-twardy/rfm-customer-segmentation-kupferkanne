@@ -1,16 +1,3 @@
-relationship AutoDetected_f5271076-196e-4f8c-9982-2f8bf9564ee3
-	crossFilteringBehavior: bothDirections
-	fromColumn: v_rfm_for_bi.'Customer ID'
-	toColumn: dim_Customer.'Customer ID'
-
-relationship 57bd7c5b-d761-cc70-7b43-b64e6f1277a3
-	fromColumn: v_rfm_for_bi.'Last Order Date'
-	toColumn: dim_Date.Date
-
-relationship b48eb893-3be3-5638-e94a-6a2922225364
-	fromColumn: v_rfm_for_bi.Segment
-	toColumn: dim_SegmentOrder.Segment
-
 relationship 50d9d619-81ee-ffc7-822c-f126736ff692
 	crossFilteringBehavior: bothDirections
 	fromCardinality: one
@@ -32,4 +19,8 @@ relationship 80a8669d-c682-a9f1-8632-4e5b5a5e1256
 relationship 1793688d-e254-6d24-9d34-8a969e07f82e
 	fromColumn: sales_curated.'Order Date'
 	toColumn: dim_Date.Date
+
+relationship 3a69b719-44af-4a10-b02a-23df85e87aa7
+	fromColumn: dim_Customer.Segment
+	toColumn: dim_SegmentOrder.Segment
 

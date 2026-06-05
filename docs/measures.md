@@ -31,13 +31,15 @@
 
 **v6 architecture rule (R026):** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
-**Active relationships (8):**
-- sales_curated[CustomerID] ↔ dim_customers[CustomerID] | M:1 | Single
-- sales_curated[ProductID] ↔ dim_products[ProductID] | M:1 | Single
-- sales_curated[OrderDate] ↔ dim_Date[Date] | M:1 | Single
-- v_rfm_for_bi[CustomerID] ↔ dim_customers[CustomerID] | M:1 | Single
-- dim_SegmentActions[Segment] ↔ dim_SegmentOrder[Segment] | 1:1 | Both
-- (3 additional from v5 retained)
+**Active relationships (6) — verified against `relationships.tmdl`, post-S3 / D060:**
+- sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
+- sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
+- v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
+- v_items_for_bi[Product ID] → v_dim_products_std[Product ID] | M:1 | Single
+- dim_Customer[Segment] → dim_SegmentOrder[Segment] | M:1 | Single — **R3′, re-homed from v_rfm_for_bi (S3)**
+- dim_SegmentOrder[Segment] ↔ dim_SegmentActions[Segment] | 1:1 | **Both** — sole surviving bidirectional (S4 merge target)
+
+**S3 / D060 (retire `v_rfm_for_bi`):** dropped the table and its 3 relationships — `[Customer ID] ↔ dim_Customer` (Fix-A bidirectional, D046, superseded by D060), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via R3′ (`dim_Customer[Segment] → dim_SegmentOrder[Segment]`). Bidirectional count: 2 → **1**.
 
 ---
 
