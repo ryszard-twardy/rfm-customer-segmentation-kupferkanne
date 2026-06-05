@@ -1,7 +1,7 @@
 EVALUATE
 SELECTCOLUMNS (
-    VALUES ( v_rfm_for_bi[Segment] ),
-    "Segment", v_rfm_for_bi[Segment],
+    VALUES ( dim_Customer[Segment] ),
+    "Segment", dim_Customer[Segment],
     "Total Revenue", [Total Revenue],
     "Line Revenue", [Line Revenue],
     "Customers", [Total Customers],

@@ -41,9 +41,9 @@ table 'RFM Score Selector'
 		source =
 				
 				{
-				    ( "R Score", NAMEOF ( 'v_rfm_for_bi'[R Score] ), 0 ),
-				    ( "F Score", NAMEOF ( 'v_rfm_for_bi'[F Score] ), 1 ),
-				    ( "M Score", NAMEOF ( 'v_rfm_for_bi'[M Score] ), 2 )
+				    ( "R Score", NAMEOF ( 'dim_Customer'[R Score] ), 0 ),
+				    ( "F Score", NAMEOF ( 'dim_Customer'[F Score] ), 1 ),
+				    ( "M Score", NAMEOF ( 'dim_Customer'[M Score] ), 2 )
 				}
 
 	annotation PBI_Id = aaeb40690f884013a79b9b3a732cb50f

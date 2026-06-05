@@ -109,7 +109,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column analysis_date
+	column 'Analysis Date'
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: db973e42-1125-41f3-89e8-660dc600405b
@@ -120,7 +120,7 @@ table dim_Customer
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	column last_order_date
+	column 'Last Order Date'
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 41c32900-8145-48e4-bb9f-874f0b52788e
@@ -131,7 +131,7 @@ table dim_Customer
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	column recency_days
+	column 'Recency Days'
 		dataType: int64
 		formatString: 0
 		lineageTag: 577b4ac1-d080-40cb-8973-b19626ff3274
@@ -140,7 +140,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column order_count
+	column 'Order Count'
 		dataType: int64
 		formatString: 0
 		lineageTag: a0923349-5c3d-40e9-a586-a6db03cd8d99
@@ -149,7 +149,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column total_spend
+	column 'Total Spend'
 		dataType: double
 		lineageTag: 6c80c9e3-5a6f-45de-b975-d8d90191de0f
 		summarizeBy: sum
@@ -159,7 +159,7 @@ table dim_Customer
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column total_profit
+	column 'Total Profit'
 		dataType: double
 		lineageTag: 43df5449-d58d-41d7-8f63-059ddc6fcc21
 		summarizeBy: sum
@@ -169,7 +169,7 @@ table dim_Customer
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column margin_pct
+	column 'Margin %'
 		dataType: double
 		lineageTag: 0f8e95ff-99c2-4f3f-964b-ffdd364b2ebd
 		summarizeBy: sum
@@ -179,17 +179,7 @@ table dim_Customer
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column avg_order_value
-		dataType: double
-		lineageTag: 4f8d9b40-e0bc-4303-90b4-0a0428bb1170
-		summarizeBy: sum
-		sourceColumn: avg_order_value
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column total_units
+	column 'Total Units'
 		dataType: int64
 		formatString: 0
 		lineageTag: c095fed5-7c75-4b89-8f8f-e163bae292ff
@@ -198,7 +188,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column avg_products_per_order
+	column 'Avg Products per Order'
 		dataType: double
 		lineageTag: 7fa4a7a1-f8e7-49d5-a571-146c6f8ac590
 		summarizeBy: sum
@@ -208,7 +198,7 @@ table dim_Customer
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column r_score
+	column 'R Score'
 		dataType: int64
 		formatString: 0
 		lineageTag: 04496c18-c730-487a-b061-578bed15d5d8
@@ -217,7 +207,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column f_score
+	column 'F Score'
 		dataType: int64
 		formatString: 0
 		lineageTag: 547ea95e-7970-4a68-9516-448eea779168
@@ -226,7 +216,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column m_score
+	column 'M Score'
 		dataType: int64
 		formatString: 0
 		lineageTag: 800db6c5-5117-4d88-ad61-c8808467dd50
@@ -235,7 +225,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column rfm_cell
+	column 'RFM Cell'
 		dataType: string
 		lineageTag: 69602911-b745-41c6-93c3-d421f1c9c2f9
 		summarizeBy: none
@@ -243,7 +233,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column health_score
+	column 'Health Score'
 		dataType: int64
 		formatString: 0
 		lineageTag: 294b8d0d-27ad-4c04-9a50-50436d91745f
@@ -252,7 +242,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column segment
+	column Segment
 		dataType: string
 		lineageTag: e513b7a0-9f85-4311-9ed5-77c937d5d997
 		summarizeBy: none
@@ -260,7 +250,7 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
-	column action
+	column Action
 		dataType: string
 		lineageTag: 43154763-2ae6-4e79-9e4a-b036b6761dbe
 		summarizeBy: none

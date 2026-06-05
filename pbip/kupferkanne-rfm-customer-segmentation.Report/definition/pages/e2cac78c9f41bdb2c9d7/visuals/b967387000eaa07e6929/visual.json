@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "v_rfm_for_bi"
+                      "Entity": "dim_Customer"
                     }
                   },
                   "Property": "R Score"
                 }
               },
-              "queryRef": "v_rfm_for_bi.R Score",
+              "queryRef": "dim_Customer.R Score",
               "nativeQueryRef": "R Score",
               "active": true,
               "displayName": "R Score"

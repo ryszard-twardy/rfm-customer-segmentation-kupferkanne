@@ -74,7 +74,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'''v_rfm_for_bi''[R Score]'"
+                                "Value": "'''dim_Customer''[R Score]'"
                               }
                             }
                           ]
@@ -102,7 +102,7 @@
                                 "0": [
                                   {
                                     "Literal": {
-                                      "Value": "'''v_rfm_for_bi''[R Score]'"
+                                      "Value": "'''dim_Customer''[R Score]'"
                                     }
                                   }
                                 ]

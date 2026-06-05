@@ -121,13 +121,13 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | # | Measure | Formula | Format | Pages |
 |---|---|---|---|---|
 | 1 | Total Revenue | `SUM(sales_curated[LineNetAmount])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
-| 2 | Total Customers | `COUNTROWS(v_rfm_for_bi)` | # 0dp | 1, 2 |
-| 3 | Total Orders | `SUM(v_rfm_for_bi[order_count])` | # 0dp | 1 |
+| 2 | Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2 |
+| 3 | Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 1 |
 | 4 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
 | 5 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | 1 |
-| 6 | Avg Recency Days | `AVERAGE(v_rfm_for_bi[recency_days])` | Custom `#,##0 "days"` | 1, 2 |
-| 7 | Avg Frequency | `AVERAGE(v_rfm_for_bi[order_count])` | Dec 1dp | 2 |
-| 8 | Avg Monetary | `AVERAGE(v_rfm_for_bi[total_spend])` | € Currency, 2dp | 2 |
+| 6 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
+| 7 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
+| 8 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
 | 25 | Distinct Orders | `DISTINCTCOUNT(v_product_analytics[OrderID])` | # 0dp | 3 |
 | 26 | Total Profit | `SUM(sales_curated[LineProfit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
 | 27 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
@@ -179,10 +179,10 @@ RETURN
 
 | # | Measure | Formula | Format | Pages |
 |---|---|---|---|---|
-| 9 | Avg R Score | `AVERAGE(v_rfm_for_bi[r_score])` | Dec 1dp | 2, 6 |
-| 10 | Avg F Score | `AVERAGE(v_rfm_for_bi[f_score])` | Dec 1dp | 2, 6 |
-| 11 | Avg M Score | `AVERAGE(v_rfm_for_bi[m_score])` | Dec 1dp | 2, 6 |
-| 12 | Avg Health Score | `AVERAGE(v_rfm_for_bi[health_score])` | Dec 1dp | 1, 2, 4 |
+| 9 | Avg R Score | `AVERAGE(dim_Customer[R Score])` | Dec 1dp | 2, 6 |
+| 10 | Avg F Score | `AVERAGE(dim_Customer[F Score])` | Dec 1dp | 2, 6 |
+| 11 | Avg M Score | `AVERAGE(dim_Customer[M Score])` | Dec 1dp | 2, 6 |
+| 12 | Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 1, 2, 4 |
 
 ---
 
@@ -196,11 +196,16 @@ RETURN
 
 ```dax
 Segment % of Total =
-VAR SegmentCount = COUNTROWS(v_rfm_for_bi)
+VAR SegmentCount =
+    CALCULATE(
+        COUNTROWS(dim_Customer),
+        NOT ISBLANK(dim_Customer[Order Count])
+    )
 VAR TotalCount =
     CALCULATE(
-        COUNTROWS(v_rfm_for_bi),
-        ALL(v_rfm_for_bi)
+        COUNTROWS(dim_Customer),
+        ALL(dim_Customer),
+        NOT ISBLANK(dim_Customer[Order Count])
     )
 RETURN
 DIVIDE(SegmentCount, TotalCount, 0)
@@ -208,11 +213,11 @@ DIVIDE(SegmentCount, TotalCount, 0)
 
 ```dax
 Revenue % of Total =
-VAR SegmentRevenue = SUM(v_rfm_for_bi[total_spend])
+VAR SegmentRevenue = SUM(dim_Customer[Total Spend])
 VAR TotalRevenue =
     CALCULATE(
-        SUM(v_rfm_for_bi[total_spend]),
-        ALL(v_rfm_for_bi)
+        SUM(dim_Customer[Total Spend]),
+        ALL(dim_Customer)
     )
 RETURN
 DIVIDE(SegmentRevenue, TotalRevenue, 0)
@@ -221,8 +226,8 @@ DIVIDE(SegmentRevenue, TotalRevenue, 0)
 ```dax
 Revenue at Risk =
 CALCULATE(
-    SUM(v_rfm_for_bi[total_spend]),
-    v_rfm_for_bi[segment] IN {"At Risk", "Hibernating"}
+    SUM(dim_Customer[Total Spend]),
+    dim_Customer[Segment] IN {"At Risk", "Hibernating"}
 )
 ```
 
@@ -239,21 +244,21 @@ CALCULATE(
 ```dax
 Revenue Active =
 CALCULATE(
-    SUM(v_rfm_for_bi[total_spend]),
-    v_rfm_for_bi[recency_days] <= 90
+    SUM(dim_Customer[Total Spend]),
+    dim_Customer[Recency Days] <= 90
 )
 
 Revenue Cooling =
 CALCULATE(
-    SUM(v_rfm_for_bi[total_spend]),
-    v_rfm_for_bi[recency_days] > 90
-        && v_rfm_for_bi[recency_days] <= 180
+    SUM(dim_Customer[Total Spend]),
+    dim_Customer[Recency Days] > 90
+        && dim_Customer[Recency Days] <= 180
 )
 
 Revenue Dormant =
 CALCULATE(
-    SUM(v_rfm_for_bi[total_spend]),
-    v_rfm_for_bi[recency_days] > 180
+    SUM(dim_Customer[Total Spend]),
+    dim_Customer[Recency Days] > 180
 )
 ```
 
@@ -270,8 +275,8 @@ CALCULATE(
 What-If Revenue Impact =
 VAR AtRiskRev =
     CALCULATE(
-        SUM(v_rfm_for_bi[total_spend]),
-        v_rfm_for_bi[segment] IN {"At Risk", "Hibernating"}
+        SUM(dim_Customer[Total Spend]),
+        dim_Customer[Segment] IN {"At Risk", "Hibernating"}
     )
 VAR Rate =
     SELECTEDVALUE('Reactivation Rate'[Reactivation Rate Value], 10) / 100
@@ -312,7 +317,7 @@ SWITCH(
 
 ```dax
 Health Indicator =
-VAR Score = AVERAGE(v_rfm_for_bi[health_score])
+VAR Score = AVERAGE(dim_Customer[Health Score])
 RETURN
 SWITCH(
     TRUE(),
@@ -325,8 +330,11 @@ SWITCH(
 ```dax
 ARPU by Country =
 DIVIDE(
-    SUM(v_rfm_for_bi[total_spend]),
-    COUNTROWS(v_rfm_for_bi),
+    SUM(dim_Customer[Total Spend]),
+    CALCULATE(
+        COUNTROWS(dim_Customer),
+        NOT ISBLANK(dim_Customer[Order Count])
+    ),
     0
 )
 ```
@@ -334,10 +342,10 @@ DIVIDE(
 ```dax
 Country Revenue Share =
 DIVIDE(
-    SUM(v_rfm_for_bi[total_spend]),
+    SUM(dim_Customer[Total Spend]),
     CALCULATE(
-        SUM(v_rfm_for_bi[total_spend]),
-        ALL(v_rfm_for_bi)
+        SUM(dim_Customer[Total Spend]),
+        ALL(dim_Customer)
     ),
     0
 )
@@ -346,7 +354,7 @@ DIVIDE(
 ```dax
 Segment Color =
 SWITCH(
-    SELECTEDVALUE(v_rfm_for_bi[segment]),
+    SELECTEDVALUE(dim_Customer[Segment]),
     "Champions",            "#4A7AA0",
     "Loyal Customers",      "#7BA8B8",
     "Potential Loyalists",  "#8FA87E",

@@ -12,14 +12,17 @@ table _Measures
 
 	measure 'Total Customers' =
 			
-			DISTINCTCOUNT ( v_rfm_for_bi[Customer ID] )
+			CALCULATE (
+			    DISTINCTCOUNT ( dim_Customer[Customer ID] ),
+			    NOT ISBLANK ( dim_Customer[Order Count] )
+			)
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: f5bf0588-f124-4262-8ba2-497f9c4f00d1
 
 	measure 'Total Orders' =
 			
-			SUM ( v_rfm_for_bi[Order Count] )
+			SUM ( dim_Customer[Order Count] )
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: c588885a-88aa-4b8e-a349-0984f195d34b
@@ -52,14 +55,14 @@ table _Measures
 
 	measure 'Avg Recency Days' =
 			
-			AVERAGE ( v_rfm_for_bi[Recency Days] )
+			AVERAGE ( dim_Customer[Recency Days] )
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: 58ad69cb-a3ec-4f15-8ae2-eb328a14c005
 
 	measure 'Avg Frequency' =
 			
-			AVERAGE ( v_rfm_for_bi[Order Count] )
+			AVERAGE ( dim_Customer[Order Count] )
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: 77e805fb-be3b-4cd2-b3b6-67dcbcb2dafa
@@ -68,14 +71,14 @@ table _Measures
 
 	measure 'Avg Monetary' =
 			
-			AVERAGE ( v_rfm_for_bi[Total Spend] )
+			AVERAGE ( dim_Customer[Total Spend] )
 		formatString: "€"#,##0.00;-"€"#,##0.00
 		displayFolder: 01 - Core KPIs
 		lineageTag: be1e02a6-8844-4058-b879-a189bbb07172
 
 	measure 'Avg R Score' =
 			
-			AVERAGE ( v_rfm_for_bi[R Score] )
+			AVERAGE ( dim_Customer[R Score] )
 		formatString: 0.00
 		displayFolder: 02 - RFM Scores
 		lineageTag: 56225373-0fbe-470a-ab4d-064fc2f7b731
@@ -84,7 +87,7 @@ table _Measures
 
 	measure 'Avg F Score' =
 			
-			AVERAGE ( v_rfm_for_bi[F Score] )
+			AVERAGE ( dim_Customer[F Score] )
 		formatString: 0.00
 		displayFolder: 02 - RFM Scores
 		lineageTag: 71301511-51f7-4a96-a026-ae9f38117446
@@ -93,7 +96,7 @@ table _Measures
 
 	measure 'Avg M Score' =
 			
-			AVERAGE ( v_rfm_for_bi[M Score] )
+			AVERAGE ( dim_Customer[M Score] )
 		formatString: 0.00
 		displayFolder: 02 - RFM Scores
 		lineageTag: f928d2f4-641e-489b-ad7e-d7dfbe40879b
@@ -102,7 +105,7 @@ table _Measures
 
 	measure 'Avg Health Score' =
 			
-			AVERAGE ( v_rfm_for_bi[Health Score] )
+			AVERAGE ( dim_Customer[Health Score] )
 		formatString: 0.0 "/ 15"
 		displayFolder: 02 - RFM Scores
 		lineageTag: 7d30ec94-58b3-42b9-bb01-6d35dc7cd89a
@@ -112,11 +115,15 @@ table _Measures
 	measure 'Segment % of Total' =
 			
 			VAR SegmentCount =
-			    COUNTROWS ( v_rfm_for_bi )
+			    CALCULATE (
+			        COUNTROWS ( dim_Customer ),
+			        NOT ISBLANK ( dim_Customer[Order Count] )
+			    )
 			VAR TotalCount =
 			    CALCULATE (
-			        COUNTROWS ( v_rfm_for_bi ),
-			        ALL ( v_rfm_for_bi )
+			        COUNTROWS ( dim_Customer ),
+			        ALL ( dim_Customer ),
+			        NOT ISBLANK ( dim_Customer[Order Count] )
 			    )
 			RETURN
 			    DIVIDE (
@@ -133,11 +140,11 @@ table _Measures
 	measure 'Revenue % of Total' =
 			
 			VAR SegmentRevenue =
-			    SUM ( v_rfm_for_bi[Total Spend] )
+			    SUM ( dim_Customer[Total Spend] )
 			VAR TotalRevenue =
 			    CALCULATE (
-			        SUM ( v_rfm_for_bi[Total Spend] ),
-			        ALL ( v_rfm_for_bi )
+			        SUM ( dim_Customer[Total Spend] ),
+			        ALL ( dim_Customer )
 			    )
 			RETURN
 			    DIVIDE (
@@ -154,8 +161,8 @@ table _Measures
 	measure 'Revenue at Risk' =
 			
 			CALCULATE (
-			    SUM ( v_rfm_for_bi[Total Spend] ),
-			    v_rfm_for_bi[segment]
+			    SUM ( dim_Customer[Total Spend] ),
+			    dim_Customer[Segment]
 			        IN {
 			            "At Risk",
 			            "Hibernating"
@@ -168,8 +175,8 @@ table _Measures
 	measure 'Revenue Active' =
 			
 			CALCULATE (
-			    SUM ( v_rfm_for_bi[Total Spend] ),
-			    v_rfm_for_bi[Recency Days] <= 90
+			    SUM ( dim_Customer[Total Spend] ),
+			    dim_Customer[Recency Days] <= 90
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
 		displayFolder: 04 - Time Intelligence (Recency Buckets)
@@ -180,9 +187,9 @@ table _Measures
 	measure 'Revenue Cooling' =
 			
 			CALCULATE (
-			    SUM ( v_rfm_for_bi[Total Spend] ),
-			    v_rfm_for_bi[Recency Days] > 90
-			        && v_rfm_for_bi[Recency Days] <= 180
+			    SUM ( dim_Customer[Total Spend] ),
+			    dim_Customer[Recency Days] > 90
+			        && dim_Customer[Recency Days] <= 180
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
 		displayFolder: 04 - Time Intelligence (Recency Buckets)
@@ -193,8 +200,8 @@ table _Measures
 	measure 'Revenue Dormant' =
 			
 			CALCULATE (
-			    SUM ( v_rfm_for_bi[Total Spend] ),
-			    v_rfm_for_bi[Recency Days] > 180
+			    SUM ( dim_Customer[Total Spend] ),
+			    dim_Customer[Recency Days] > 180
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
 		displayFolder: 04 - Time Intelligence (Recency Buckets)
@@ -206,8 +213,8 @@ table _Measures
 			
 			VAR AtRiskRev =
 			    CALCULATE (
-			        SUM ( v_rfm_for_bi[Total Spend] ),
-			        v_rfm_for_bi[Segment]
+			        SUM ( dim_Customer[Total Spend] ),
+			        dim_Customer[Segment]
 			            IN {
 			                "At Risk",
 			                "Hibernating"
@@ -251,7 +258,7 @@ table _Measures
 	measure 'Health Indicator' =
 			
 			VAR Score =
-			    AVERAGE ( v_rfm_for_bi[Health Score] )
+			    AVERAGE ( dim_Customer[Health Score] )
 			RETURN
 			    SWITCH (
 			        TRUE (),
@@ -265,8 +272,11 @@ table _Measures
 	measure 'ARPU by Country' =
 			
 			DIVIDE (
-			    SUM ( v_rfm_for_bi[Total Spend] ),
-			    COUNTROWS ( v_rfm_for_bi ),
+			    SUM ( dim_Customer[Total Spend] ),
+			    CALCULATE (
+			        COUNTROWS ( dim_Customer ),
+			        NOT ISBLANK ( dim_Customer[Order Count] )
+			    ),
 			    0
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
@@ -278,10 +288,10 @@ table _Measures
 	measure 'Country Revenue Share' =
 			
 			DIVIDE (
-			    SUM ( v_rfm_for_bi[Total Spend] ),
+			    SUM ( dim_Customer[Total Spend] ),
 			    CALCULATE (
-			        SUM ( v_rfm_for_bi[Total Spend] ),
-			        ALL ( v_rfm_for_bi )
+			        SUM ( dim_Customer[Total Spend] ),
+			        ALL ( dim_Customer )
 			    ),
 			    0
 			)
@@ -294,7 +304,7 @@ table _Measures
 	measure 'Segment Color' =
 			
 			SWITCH (
-			    SELECTEDVALUE ( v_rfm_for_bi[Segment] ),
+			    SELECTEDVALUE ( dim_Customer[Segment] ),
 			    "Champions", "#2563EB",
 			    "Loyal Customers", "#0891B2",
 			    "Potential Loyalists", "#059669",
