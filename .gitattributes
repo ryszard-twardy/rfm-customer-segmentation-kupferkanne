@@ -1,0 +1,42 @@
+# Normalize line endings to LF for all text artifacts.
+# Prevents Power BI Desktop / Tabular Editor CRLF re-writes from surfacing as diffs.
+
+# Catch-all: auto-detect text vs binary; force LF in the working tree for text.
+* text=auto eol=lf
+
+# --- Explicit text types (composed from tracked extensions) ---
+*.tmdl     text eol=lf
+*.json     text eol=lf
+*.pbip     text eol=lf
+*.pbir     text eol=lf
+*.pbism    text eol=lf
+*.platform text eol=lf
+*.dax      text eol=lf
+*.sql      text eol=lf
+*.csx      text eol=lf
+*.md       text eol=lf
+*.csv      text eol=lf
+*.svg      text eol=lf
+*.py       text eol=lf
+*.ps1      text eol=lf
+*.toml     text eol=lf
+*.lock     text eol=lf
+*.sqlfluff text eol=lf
+
+# --- Binaries: never EOL-convert (tracked) ---
+*.pbix     binary
+
+# --- Binaries: defensive future-proofing (not currently tracked) ---
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.ico      binary
+*.pdf      binary
+*.xlsx     binary
+*.zip      binary
+
+# --- Data files: leave line endings untouched (not PBIP churn sources;
+#     keeps git blame clean on the large synthetic dataset). Rule is last
+#     so it overrides the catch-all and *.csv rules above. ---
+data/*.csv -text
