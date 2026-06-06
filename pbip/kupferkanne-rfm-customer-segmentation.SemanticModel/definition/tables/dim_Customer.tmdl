@@ -133,9 +133,10 @@ table dim_Customer
 
 	column 'Recency Days'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 577b4ac1-d080-40cb-8973-b19626ff3274
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: recency_days
 
 		annotation SummarizationSetBy = Automatic
@@ -144,17 +145,19 @@ table dim_Customer
 
 	column 'Order Count'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: a0923349-5c3d-40e9-a586-a6db03cd8d99
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: order_count
 
 		annotation SummarizationSetBy = Automatic
 
 	column 'Total Spend'
 		dataType: double
+		isHidden
 		lineageTag: 6c80c9e3-5a6f-45de-b975-d8d90191de0f
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: total_spend
 
 		annotation SummarizationSetBy = Automatic
@@ -164,7 +167,7 @@ table dim_Customer
 	column 'Total Profit'
 		dataType: double
 		lineageTag: 43df5449-d58d-41d7-8f63-059ddc6fcc21
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: total_profit
 
 		annotation SummarizationSetBy = Automatic
@@ -174,7 +177,7 @@ table dim_Customer
 	column 'Margin %'
 		dataType: double
 		lineageTag: 0f8e95ff-99c2-4f3f-964b-ffdd364b2ebd
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: margin_pct
 
 		annotation SummarizationSetBy = Automatic
@@ -185,7 +188,7 @@ table dim_Customer
 		dataType: int64
 		formatString: 0
 		lineageTag: c095fed5-7c75-4b89-8f8f-e163bae292ff
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: total_units
 
 		annotation SummarizationSetBy = Automatic
@@ -193,7 +196,7 @@ table dim_Customer
 	column 'Avg Products per Order'
 		dataType: double
 		lineageTag: 7fa4a7a1-f8e7-49d5-a571-146c6f8ac590
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: avg_products_per_order
 
 		annotation SummarizationSetBy = Automatic
@@ -202,27 +205,30 @@ table dim_Customer
 
 	column 'R Score'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 04496c18-c730-487a-b061-578bed15d5d8
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: r_score
 
 		annotation SummarizationSetBy = Automatic
 
 	column 'F Score'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 547ea95e-7970-4a68-9516-448eea779168
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: f_score
 
 		annotation SummarizationSetBy = Automatic
 
 	column 'M Score'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 800db6c5-5117-4d88-ad61-c8808467dd50
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: m_score
 
 		annotation SummarizationSetBy = Automatic
@@ -237,9 +243,10 @@ table dim_Customer
 
 	column 'Health Score'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 294b8d0d-27ad-4c04-9a50-50436d91745f
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: health_score
 
 		annotation SummarizationSetBy = Automatic
