@@ -1,5 +1,5 @@
 // tools/format_summarize_by_batch.csx
-// F006: Set SummarizeBy = None on 33 non-additive numeric columns
+// F006: Set SummarizeBy = None on 32 non-additive numeric columns
 //
 // Date:   2026-05-24
 // Author: Ryszard Twardy
@@ -8,14 +8,13 @@
 //
 // References:
 //   - .checkpoints/AUDIT_FINDINGS_kupferkanne_2026-05-15.md § F006 (HIGH)
-//   - D### TBD (Logged in v10 checkpoint after apply)
+//   - BPA rule: "Do not summarize numeric columns" (enforced by this script)
 //   - R041 (BPA + docs/measures.md sync same session)
 //   - Issue: ryszard-twardy/rfm-customer-segmentation-kupferkanne#4
 //
 // Strategy:
 //   - Explicit (table, column) targets list – no pattern matching
-//   - BPA "Do not summarize numeric columns" rule scope (28 flags)
-//     + audit-canonical extras (5) = 33 total
+//   - 32 governance targets
 //
 // Safety:
 //   - dryRun=true default
