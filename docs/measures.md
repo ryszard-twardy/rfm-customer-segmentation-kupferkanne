@@ -115,7 +115,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 | # | Measure | Formula | Format | Pages |
 |---|---|---|---|---|
-| 1 | Total Revenue | `SUM(sales_curated[LineNetAmount])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
+| 1 | Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
 | 2 | Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2 |
 | 3 | Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 1 |
 | 4 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
@@ -123,15 +123,15 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | 6 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
 | 7 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | 8 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
-| 25 | Distinct Orders | `DISTINCTCOUNT(v_product_analytics[OrderID])` | # 0dp | 3 |
-| 26 | Total Profit | `SUM(sales_curated[LineProfit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
+| 25 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 3 |
+| 26 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
 | 27 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
-| **30** | **Total Products (v6)** | `DISTINCTCOUNT(v_product_performance[Product ID])` | # 0dp | 3 |
-| **31** | **Total Brands (v6)** | `DISTINCTCOUNT(v_brand_profitability[Brand])` | # 0dp | 3 |
-| **32** | **Top Brand Revenue (v6)** | `MAXX(VALUES(v_brand_profitability[Brand]), [Total Revenue])` | € Currency, display Millions | 3 |
+| **30** | **Total Products (v6)** | `DISTINCTCOUNT(dim_Product[Product ID])` | # 0dp | 3 |
+| **31** | **Total Brands (v6)** | `DISTINCTCOUNT(dim_Product[Brand])` | # 0dp | 3 |
+| **32** | **Top Brand Revenue (v6)** | `MAXX(VALUES(dim_Product[Brand]), [Line Revenue])` | € Currency, display Millions | 3 |
 | **33** | **Top Brand Name (v6)** | VAR pattern – see formula block below | Text | 3 |
-| **34** | **Avg Brand Margin % (v6)** | `AVERAGEX(VALUES(v_brand_profitability[Brand]), DIVIDE([Total Profit], [Total Revenue]))` | % 2dp | 3 |
-| **35** | **Top Category Revenue (v6)** | `MAXX(VALUES(v_product_performance[Product Category]), [Total Revenue])` | € Currency, display Millions | 3 |
+| **34** | **Avg Brand Margin % (v6)** | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | 3 |
+| **35** | **Top Category Revenue (v6)** | `MAXX(VALUES(dim_Product[Product Category]), [Line Revenue])` | € Currency, display Millions | 3 |
 | **36** | **Top Category Name (v6)** | VAR pattern – see formula block below | Text | 3 |
 
 **Weighted margin principle (R008):** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
