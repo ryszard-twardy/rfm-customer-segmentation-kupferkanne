@@ -400,22 +400,9 @@ Subtitle Page 3 =
 
 ---
 
-## Product Measures (No folder – used directly from v_product_analytics)
+## Product, brand and category measures (Page 3)
 
-These are not DAX measures. Page 3 visuals pull directly from **v_product_analytics** columns and **pre-aggregated views** (v_product_performance, v_brand_profitability, v_category_monthly_trend). The columns are:
-
-| Source Table | Column | Display Name | Used On |
-|---|---|---|---|
-| v_product_analytics | LineRevenue | Line Revenue | 3 |
-| v_product_analytics | LineProfit | Line Profit | 3 |
-| v_product_analytics | Quantity | Quantity | 3 |
-| v_product_analytics | OrderID | – (DISTINCTCOUNT for order counts) | 3 |
-| v_product_performance | total_revenue | Total Revenue | 3 |
-| v_product_performance | revenue_rank | Revenue Rank | 3 |
-| v_brand_profitability | brand_margin_pct | Brand Margin % | 3 |
-| v_brand_profitability | revenue_share | Revenue Share | 3 |
-
-**DAX tip:** For product-filtered order counts, use `DISTINCTCOUNT(v_product_analytics[OrderID])`, not `[Total Orders]`. The dim_products filter propagates through v_product_analytics but not through v_rfm_for_bi.
+Post-D060 the pre-aggregated views (`v_product_analytics`, `v_product_performance`, `v_brand_profitability`, `v_category_monthly_trend`) were removed from the model. Page 3 product, brand and category figures are now DAX measures (Folder 01), sourced from `dim_Product` as the axis or legend over the line-grain fact `v_items_for_bi` via `[Line Revenue]` and `[Line Margin %]`. See Folder 01 and the Data Model map above for the canonical definitions.
 
 ---
 
