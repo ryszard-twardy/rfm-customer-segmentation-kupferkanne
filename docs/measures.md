@@ -3,7 +3,7 @@
 ### Author: Ryszard Twardy
 ### v7 (2026-05-24) – synced with v1.0.1 BPA batch (F003 format strings, F004 hide fact cols, F006 SummarizeBy=None, F007 hide FKs, F008 remove inactive relationship) per R041 atomic invariant
 
-> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since dual-grain D026 (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `v_rfm_for_bi` retained for Customer-grain analytics only. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
+> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since dual-grain D026 (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the D060 single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
 ---
 
@@ -366,28 +366,28 @@ SWITCH(
 )
 ```
 
-**Design decision – Segment Color:** dim_SegmentOrder has a `SegmentColor` column with the same hex values. For conditional formatting, prefer the column (more performant). The Segment Color measure exists as a fallback for visuals that require a measure for color rules. Do not use both simultaneously on the same visual.
+**Design decision – Segment Color:** dim_Segment has a `SegmentColor` column with the same hex values. For conditional formatting, prefer the column (more performant). The Segment Color measure exists as a fallback for visuals that require a measure for color rules. Do not use both simultaneously on the same visual.
 
 ```dax
-Monthly Trend Title =
-"Monthly Revenue Trend (" &
-COUNTROWS(v_monthly_revenue) &
-" Complete Months)"
+Revenue Trend Chart Title =
+"Weekly Revenue Trend Across "
+    & DISTINCTCOUNT ( sales_curated[Source Month] )
+    & " Months"
 ```
 
-**Design decision – dynamic chart title:** Line chart on Page 1 uses Field Value → `[Monthly Trend Title]` bound to visual Title via fx. Auto-updates as new months arrive in v_monthly_revenue (which already filters incomplete months via SQL patch in 03_v2). Future-proof: no manual title edits when data extends.
+**Design decision – dynamic chart title:** the Page 1 revenue trend chart binds its Title to `[Revenue Trend Chart Title]` via fx (Field Value). The month count comes from `DISTINCTCOUNT ( sales_curated[Source Month] )`, so the title auto-updates as new months arrive – no manual edits when data extends.
 
 ```dax
 Subtitle Page 1 =
 "Kupferkanne – D2C E-commerce · 9 European markets · Rolling " &
-COUNTROWS(v_monthly_revenue) &
+DISTINCTCOUNT ( sales_curated[Source Month] ) &
 " months"
 ```
 
 ```dax
 Subtitle Page 2 = 
 "RFM profile comparison across " & 
-DISTINCTCOUNT(dim_SegmentOrder[Segment]) & 
+DISTINCTCOUNT(dim_Segment[Segment]) & 
 " segments"
 ```
 
@@ -474,7 +474,7 @@ Modeling → New Parameter → Name: Reactivation Rate, Min: 0, Max: 50, Increme
 
 The authoritative relationship list is the **Active relationships (5)** table in the Data Model section above (post-D060: 5 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
 
-**Disconnected / standalone:** `dim_KPI_Selector` is a disconnected slicer (no relationship). Pre-aggregated views (`v_monthly_revenue`, `v_brand_profitability`, etc.) have no relationships – standalone tables used directly on specific pages.
+**Disconnected / standalone:** `dim_KPI_Selector` is a disconnected slicer (no relationship).
 
 ### Fact-to-fact joins: explicitly NOT used (F008, v7)
 
@@ -499,9 +499,9 @@ After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_
 **Created via:** Modeling → New parameter → Fields
 
 **Fields included (in order):**
-- `v_rfm_for_bi[R Score]`
-- `v_rfm_for_bi[F Score]`
-- `v_rfm_for_bi[M Score]`
+- `dim_Customer[R Score]`
+- `dim_Customer[F Score]`
+- `dim_Customer[M Score]`
 
 **Auto-generates:**
 - Parameter table `RFM Score Selector` (disconnected)
