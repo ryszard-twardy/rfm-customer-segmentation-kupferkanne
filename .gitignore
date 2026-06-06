@@ -55,7 +55,6 @@ desktop.ini
 *_cache/
 
 # === Workflow v3 (Ryszard) ===
-# Session state and personal notes — synced via OneDrive separately
 # .checkpoints/ and .personal/ already declared above
 
 # Claude Code: track shared config + hooks (cross-machine), keep local overrides private
