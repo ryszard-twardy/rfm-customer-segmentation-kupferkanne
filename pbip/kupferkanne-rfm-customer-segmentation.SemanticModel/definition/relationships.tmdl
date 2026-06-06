@@ -4,7 +4,7 @@ relationship AutoDetected_efedc1d9-d76a-4d9c-8a42-139014cc0f2e
 
 relationship AutoDetected_386e66bf-a886-4556-9399-20d2b9a7863a
 	fromColumn: v_items_for_bi.'Product ID'
-	toColumn: v_dim_products_std.'Product ID'
+	toColumn: dim_Product.'Product ID'
 
 relationship 80a8669d-c682-a9f1-8632-4e5b5a5e1256
 	fromColumn: sales_curated.'Customer ID'

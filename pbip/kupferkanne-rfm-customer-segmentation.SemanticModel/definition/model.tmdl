@@ -8,7 +8,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["dim_Customer","v_dim_products_std","dim_Date","sales_curated","v_items_for_bi"]
+annotation PBI_QueryOrder = ["dim_Customer","dim_Product","dim_Date","sales_curated","v_items_for_bi"]
 
 annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
 
@@ -19,7 +19,7 @@ annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":[]}
 annotation BestPracticeAnalyzer_ExternalRuleFiles = ["https://raw.githubusercontent.com/microsoft/Analysis-Services/master/BestPracticeRules/BPARules.json"]
 
 ref table dim_Customer
-ref table v_dim_products_std
+ref table dim_Product
 ref table dim_Date
 ref table _Measures
 ref table dim_Segment

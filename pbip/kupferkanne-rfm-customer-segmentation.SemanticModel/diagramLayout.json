@@ -13,7 +13,7 @@
             "x": 1129.8855157414696,
             "y": 697.00537225741925
           },
-          "nodeIndex": "v_dim_products_std",
+          "nodeIndex": "dim_Product",
           "nodeLineageTag": "16c1ff24-1f36-449a-8526-2689831d69d7",
           "size": {
             "height": 415.0542352569496,
@@ -157,7 +157,7 @@
             "x": 261,
             "y": 761
           },
-          "nodeIndex": "v_dim_products_std",
+          "nodeIndex": "dim_Product",
           "nodeLineageTag": "16c1ff24-1f36-449a-8526-2689831d69d7",
           "size": {
             "height": 248,

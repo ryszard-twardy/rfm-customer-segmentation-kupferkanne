@@ -1,4 +1,4 @@
-table v_dim_products_std
+table dim_Product
 	lineageTag: 16c1ff24-1f36-449a-8526-2689831d69d7
 
 	column 'Product ID'
@@ -66,15 +66,15 @@ table v_dim_products_std
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	partition v_dim_products_std = m
+	partition dim_Product = m
 		mode: import
 		source =
 				let
 				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
 				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
 				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
-				    v_dim_products_std_View = sales_Schema{[Name="v_dim_products_std",Kind="View"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(v_dim_products_std_View,{{"ProductName", "Product Name"}, {"RetailPrice", "Retail Price"}, {"UnitCost", "Unit Cost"}, {"MarginPct", "Margin %"}, {"ProductCategory", "Product Category"}, {"ProductID", "Product ID"}})
+				    dim_Product_View = sales_Schema{[Name="v_dim_products_std",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(dim_Product_View,{{"ProductName", "Product Name"}, {"RetailPrice", "Retail Price"}, {"UnitCost", "Unit Cost"}, {"MarginPct", "Margin %"}, {"ProductCategory", "Product Category"}, {"ProductID", "Product ID"}})
 				in
 				    #"Renamed Columns"
 

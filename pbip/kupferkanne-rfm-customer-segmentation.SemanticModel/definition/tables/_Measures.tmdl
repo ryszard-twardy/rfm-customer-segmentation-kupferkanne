@@ -386,7 +386,7 @@ table _Measures
 
 	measure 'Total Products' =
 			
-			DISTINCTCOUNT ( v_dim_products_std[Product ID] )
+			DISTINCTCOUNT ( dim_Product[Product ID] )
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: 6afb354c-1c5b-4578-9b1d-9fc326b5b67e
@@ -394,7 +394,7 @@ table _Measures
 	measure 'Top Brand Revenue' =
 			
 			MAXX (
-			    VALUES ( v_dim_products_std[Brand] ),
+			    VALUES ( dim_Product[Brand] ),
 			    [Line Revenue]
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
@@ -406,7 +406,7 @@ table _Measures
 	measure 'Avg Brand Margin %' =
 			
 			AVERAGEX (
-			    VALUES ( v_dim_products_std[Brand] ),
+			    VALUES ( dim_Product[Brand] ),
 			    [Line Margin %]
 			)
 		formatString: 0.00%
@@ -418,7 +418,7 @@ table _Measures
 	measure 'Top Category Revenue' =
 			
 			MAXX (
-			    VALUES ( v_dim_products_std[Product Category] ),
+			    VALUES ( dim_Product[Product Category] ),
 			    [Line Revenue]
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
@@ -442,14 +442,14 @@ table _Measures
 			VAR TopCategory =
 			    TOPN (
 			        1,
-			        VALUES ( v_dim_products_std[Product Category] ),
+			        VALUES ( dim_Product[Product Category] ),
 			        [Line Revenue], DESC,
-			        v_dim_products_std[Product Category], ASC
+			        dim_Product[Product Category], ASC
 			    )
 			RETURN
 			    MAXX (
 			        TopCategory,
-			        v_dim_products_std[Product Category]
+			        dim_Product[Product Category]
 			    )
 		displayFolder: 01 - Core KPIs
 		lineageTag: 1a023e34-320e-4b22-9e58-bf013592f9c5
@@ -466,14 +466,14 @@ table _Measures
 			VAR TopBrand =
 			    TOPN (
 			        1,
-			        VALUES ( v_dim_products_std[Brand] ),
+			        VALUES ( dim_Product[Brand] ),
 			        [Line Revenue], DESC,
-			        v_dim_products_std[Brand], ASC
+			        dim_Product[Brand], ASC
 			    )
 			RETURN
 			    MAXX (
 			        TopBrand,
-			        v_dim_products_std[Brand]
+			        dim_Product[Brand]
 			    )
 		displayFolder: 01 - Core KPIs
 		lineageTag: 4b359491-7e06-41d1-8ba9-31a29d578273
@@ -520,7 +520,7 @@ table _Measures
 
 	measure 'Total Brands' =
 			
-			DISTINCTCOUNT ( v_dim_products_std[Brand] )
+			DISTINCTCOUNT ( dim_Product[Brand] )
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: 651b4502-be94-4783-827b-0c30a3a3fc73

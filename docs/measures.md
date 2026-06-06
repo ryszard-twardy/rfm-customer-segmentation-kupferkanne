@@ -16,7 +16,7 @@
 | v_rfm_for_bi | `v_rfm_for_bi` (VIEW) | 1 row per customer | customer_id, total_spend, order_count, recency_days, r/f/m_score, health_score, segment |
 | v_product_analytics | `v_product_analytics` (VIEW) | 1 row per order×product | OrderID, ProductID, LineRevenue, LineProfit, Quantity |
 | v_dim_customers_std | `v_dim_customers_std` (VIEW) | 1 row per customer | CustomerID, FullName, Email, Phone |
-| v_dim_products_std | `v_dim_products_std` (VIEW) | 1 row per product | ProductID, ProductName, Brand, MarginPct |
+| dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | ProductID, ProductName, Brand, MarginPct |
 | v_monthly_revenue | `v_monthly_revenue` (VIEW) | 1 row per month | order_month, total_revenue, total_profit |
 | v_product_performance | `v_product_performance` (VIEW) | 1 row per product | Product ID, Product Name, Product Category, total_revenue |
 | v_brand_profitability | `v_brand_profitability` (VIEW) | 1 row per brand | Brand, total_revenue, brand_margin_pct |
@@ -34,7 +34,7 @@
 - sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
-- v_items_for_bi[Product ID] → v_dim_products_std[Product ID] | M:1 | Single
+- v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
 - dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **R3′, re-pointed onto merged dim_Segment (S4)**
 
 **S3 / D060 (retire `v_rfm_for_bi`):** dropped the table and its 3 relationships — `[Customer ID] ↔ dim_Customer` (Fix-A bidirectional, D046, superseded by D060), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via R3′ (`dim_Customer[Segment] → dim_SegmentOrder[Segment]`). Bidirectional count: 2 → **1**.
