@@ -13,20 +13,13 @@
 |---|---|---|---|
 | **sales_curated** | `sales_curated` (TABLE) | **1 row per order (~169K)** | OrderID, CustomerID, OrderDate, OrderValue, OrderCost, OrderProfit, OrderMarginPct, Country, DominantCategory, DominantBrand |
 | **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~275K)** | OrderID, ProductID, CustomerID, OrderDate, Quantity, UnitPrice, LineNetAmount, LineCost, LineProfit, Brand, ProductCategory |
-| v_rfm_for_bi | `v_rfm_for_bi` (VIEW) | 1 row per customer | customer_id, total_spend, order_count, recency_days, r/f/m_score, health_score, segment |
-| v_product_analytics | `v_product_analytics` (VIEW) | 1 row per order×product | OrderID, ProductID, LineRevenue, LineProfit, Quantity |
-| v_dim_customers_std | `v_dim_customers_std` (VIEW) | 1 row per customer | CustomerID, FullName, Email, Phone |
+| dim_Customer | `v_dim_customers_for_bi` (VIEW) | 1 row per customer | Customer ID, Full Name, Email, Country, Segment, Recency Days, Order Count, Total Spend, R Score, F Score, M Score, Health Score, Action |
 | dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | ProductID, ProductName, Brand, MarginPct |
-| v_monthly_revenue | `v_monthly_revenue` (VIEW) | 1 row per month | order_month, total_revenue, total_profit |
-| v_product_performance | `v_product_performance` (VIEW) | 1 row per product | Product ID, Product Name, Product Category, total_revenue |
-| v_brand_profitability | `v_brand_profitability` (VIEW) | 1 row per brand | Brand, total_revenue, brand_margin_pct |
-| v_regional_performance | `v_regional_performance` (VIEW) | 1 row per country/state/city | Country, total_revenue, arpu |
-| v_category_monthly_trend | `v_category_monthly_trend` (VIEW) | 1 row per category×brand×month | Product Category, category_revenue |
-| v_country_summary | `v_country_summary` (VIEW) | 1 row per country | Country, revenue, profit, arpu |
 | dim_Date | DAX CALENDAR | 1 row per day | Date, Year, Month, Year-Month |
 | dim_Segment | DAX DATATABLE | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder, SegmentColor |
 | dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI Name (disconnected) |
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
+*Model also contains `_Measures` (measure container) and `RFM Score Selector` (Field Parameter) - neither has a SQL source. Total model tables: 10.*
 
 **v6 architecture rule (R026):** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
