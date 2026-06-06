@@ -310,7 +310,7 @@ SWITCH(
 | 21 | Health Indicator | Status text from health_score | Text | 1, 6 |
 | 22 | ARPU by Country | Revenue per customer (context-aware) | € 2dp | 5 |
 | 23 | Country Revenue Share | Country share of total revenue | % 1dp | 5 |
-| 24 | Segment Color | Hex color per segment (SWITCH) – **USE ONLY IF dim_SegmentOrder[SegmentColor] column is not used for conditional formatting** | Hex text | All |
+| 24 | Segment Color | Hex color per segment (SWITCH) – **USE ONLY IF dim_Segment[SegmentColor] column is not used for conditional formatting** | Hex text | All |
 | 28 | Monthly Trend Title | Dynamic line chart title with live month count | Text | 1 |
 | 29 | **Subtitle Page 1** (renamed from Executive Summary Subtitle, v6) | Dynamic Page 1 subtitle with live month count | Text | 1 |
 | **37** | **Subtitle Page 2 (v6)** | Dynamic Page 2 subtitle with live segment count | Text | 2 |
