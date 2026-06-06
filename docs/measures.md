@@ -37,7 +37,7 @@
 - v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
 - dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **R3′, re-pointed onto merged dim_Segment (S4)**
 
-**S3 / D060 (retire `v_rfm_for_bi`):** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (Fix-A bidirectional, D046, superseded by D060), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via R3′ (`dim_Customer[Segment] → dim_SegmentOrder[Segment]`). Bidirectional count: 2 → **1**.
+**S3 / D060 (retire `v_rfm_for_bi`):** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (Fix-A bidirectional, D046, superseded by D060), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via R3′ (`dim_Customer[Segment] → dim_Segment[Segment]`). Bidirectional count: 2 → **1**.
 
 **S4 / D060 (merge segment dims):** `dim_SegmentOrder` + `dim_SegmentActions` merged into a single `dim_Segment` (DAX DATATABLE, D074), and R3′ re-pointed onto `dim_Segment[Segment]`. The 1:1 bidirectional was dropped. Bidirectional count: 1 → **0** (D060 end state).
 
@@ -484,23 +484,17 @@ Modeling → New Parameter → Name: Reactivation Rate, Min: 0, Max: 50, Increme
 
 ---
 
-## Relationships (5 total)
+## Relationships
 
-| From | To | Cardinality | Cross-filter |
-|---|---|---|---|
-| v_rfm_for_bi[last_order_date] | dim_Date[Date] | Many:1 | Single |
-| v_rfm_for_bi[segment] | dim_SegmentOrder[Segment] | Many:1 | Single |
-| v_rfm_for_bi[customer_id] | v_dim_customers_std[CustomerID] | Many:1 | Single |
-| v_product_analytics[OrderDate] | dim_Date[Date] | Many:1 | Single |
-| v_product_analytics[ProductID] | v_dim_products_std[ProductID] | Many:1 | Single |
+The authoritative relationship list is the **Active relationships (5)** table in the Data Model section above (post-D060: 5 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
 
-**No relationship** between v_rfm_for_bi and v_product_analytics (different granularity). No relationship for dim_KPI_Selector (disconnected slicer). Pre-aggregated views (v_monthly_revenue, v_brand_profitability, etc.) have **no relationships** – they are standalone tables used directly on specific pages.
+**Disconnected / standalone:** `dim_KPI_Selector` is a disconnected slicer (no relationship). Pre-aggregated views (`v_monthly_revenue`, `v_brand_profitability`, etc.) have no relationships – standalone tables used directly on specific pages.
 
 ### Fact-to-fact joins: explicitly NOT used (F008, v7)
 
 After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_curated[Order ID]` was removed. The model now has **zero inactive relationships**. The deliberate design choice – consistent with Kimball star-schema discipline and the dual-grain D026 architecture – is that fact tables never join directly to other fact tables. Instead:
 
-- **Cross-fact filter propagation** flows through shared dimensions (`v_dim_customers_std`, `v_dim_products_std`, `dim_Date`)
+- **Cross-fact filter propagation** flows through shared dimensions (`dim_Customer`, `dim_Product`, `dim_Date`)
 - **Order-grain ↔ line-grain reconciliation** is done via measure math, not a relationship. The `[Grain Reconciliation]` measure computes `[Total Revenue] − [Line Revenue]` and is invariant at zero. If it ever drifts from zero, the dimension-mediated join has broken – that's the signal, not a relationship line in the model
 - **USERELATIONSHIP**: no DAX expression in the model uses `USERELATIONSHIP()` to activate a fact-to-fact join. The removed `Order ID` relationship had zero callers, confirming the inactive-and-unused pattern that BPA flags
 
