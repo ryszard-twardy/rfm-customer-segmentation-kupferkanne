@@ -13,14 +13,14 @@
 //   - Issue: ryszard-twardy/rfm-customer-segmentation-kupferkanne#4
 //
 // Strategy:
-//   - Explicit (table, column) targets list — no pattern matching
+//   - Explicit (table, column) targets list – no pattern matching
 //   - BPA "Do not summarize numeric columns" rule scope (28 flags)
 //     + audit-canonical extras (5) = 33 total
 //
 // Safety:
 //   - dryRun=true default
 //   - Idempotent: skip if SummarizeBy already None
-//   - Per-target try/catch — log missing cols, continue (defensive against
+//   - Per-target try/catch – log missing cols, continue (defensive against
 //     column rename / table reorg drift)
 //   - Uses KeyValuePair<string,string> for targets (TE2 Roslyn pre-C# 7.0,
 //     value tuples not supported per F006 first-paste compile errors)
@@ -30,25 +30,24 @@
 bool dryRun = true;
 
 var targets = new List<KeyValuePair<string, string>> {
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Recency Days"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Order Count"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Total Spend"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Total Profit"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Margin %"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Avg Order Value"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Total Units"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Avg Products per Order"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "R Score"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "F Score"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "M Score"),
-    new KeyValuePair<string, string>("v_rfm_for_bi", "Health Score"),
+    new KeyValuePair<string, string>("dim_Customer", "Recency Days"),
+    new KeyValuePair<string, string>("dim_Customer", "Order Count"),
+    new KeyValuePair<string, string>("dim_Customer", "Total Spend"),
+    new KeyValuePair<string, string>("dim_Customer", "Total Profit"),
+    new KeyValuePair<string, string>("dim_Customer", "Margin %"),
+    new KeyValuePair<string, string>("dim_Customer", "Total Units"),
+    new KeyValuePair<string, string>("dim_Customer", "Avg Products per Order"),
+    new KeyValuePair<string, string>("dim_Customer", "R Score"),
+    new KeyValuePair<string, string>("dim_Customer", "F Score"),
+    new KeyValuePair<string, string>("dim_Customer", "M Score"),
+    new KeyValuePair<string, string>("dim_Customer", "Health Score"),
     new KeyValuePair<string, string>("dim_Date", "Year"),
     new KeyValuePair<string, string>("dim_Date", "Month"),
     new KeyValuePair<string, string>("dim_Date", "Week of Year"),
     new KeyValuePair<string, string>("dim_Date", "Day"),
     new KeyValuePair<string, string>("dim_Date", "Day Number"),
     new KeyValuePair<string, string>("dim_Date", "Year-Month-Number"),
-    new KeyValuePair<string, string>("dim_SegmentActions", "SortOrder"),
+    new KeyValuePair<string, string>("dim_Segment", "SortOrder"),
     new KeyValuePair<string, string>("sales_curated", "Order Discount %"),
     new KeyValuePair<string, string>("sales_curated", "Basket Item Count"),
     new KeyValuePair<string, string>("sales_curated", "Order Value"),
@@ -100,10 +99,10 @@ foreach (var target in targets) {
 }
 
 // Output summary (grouped by reason)
-string mode = dryRun ? "DRY RUN (no changes applied — flip dryRun=false to apply)" : "APPLIED";
+string mode = dryRun ? "DRY RUN (no changes applied – flip dryRun=false to apply)" : "APPLIED";
 
 var sb = new System.Text.StringBuilder();
-sb.AppendLine("=== F006 SummarizeBy Batch — " + mode + " ===");
+sb.AppendLine("=== F006 SummarizeBy Batch – " + mode + " ===");
 sb.AppendLine(string.Format("Targets: {0}", targets.Count));
 sb.AppendLine(string.Format("Changed: {0}", changes.Count));
 sb.AppendLine(string.Format("Skipped: {0}", skipped.Count));
