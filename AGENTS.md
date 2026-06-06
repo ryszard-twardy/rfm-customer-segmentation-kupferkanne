@@ -49,7 +49,7 @@ Single-context – `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/dom
 
 ## Conventions
 
-- **Typography**: en-dash `–` (never em-dash `—`), ASCII quotes only, backticks for code/paths/identifiers.
+- **Typography**: en-dash `–` (never em-dash `U+2014`), ASCII quotes only, backticks for code/paths/identifiers.
 - **Filesystem**: dot-prefix everywhere. `_checkpoints/` is legacy and must not appear.
 - **Backups**: `$env:PROJECTS_ROOT\.backups\rfm-customer-segmentation-kupferkanne\` (outside repo, per-machine).
 - **Cross-machine**: this repo syncs via git.

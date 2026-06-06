@@ -1,5 +1,5 @@
 # ============================================================
-# .gitignore — kupferkanne-rfm-customer-segmentation
+# .gitignore - kupferkanne-rfm-customer-segmentation
 # ============================================================
 
 # Working / private folders (NOT for public repo) -----------
@@ -14,7 +14,7 @@ _backups/
 logs/
 _sqlfluff_*.txt
 
-# PBI binaries — track only canonical -----------------------
+# PBI binaries - track only canonical -----------------------
 pbix/*
 !pbix/Kupferkanne-rfm-customer-segmentation.pbix
 *.pbix.bak
@@ -62,7 +62,7 @@ desktop.ini
 !.claude/settings.json
 !.claude/hooks/
 
-# Per-device transient state — not synced anywhere
+# Per-device transient state - not synced anywhere
 .scratch/
 .backups/
 
@@ -82,7 +82,7 @@ desktop.ini
 .pbi/
 LocalCache/
 
-# Credentials (workflow v3 data stack — variants beyond service_account*.json above)
+# Credentials (workflow v3 data stack - variants beyond service_account*.json above)
 service-account*.json
 credentials*.json
 *.pem
