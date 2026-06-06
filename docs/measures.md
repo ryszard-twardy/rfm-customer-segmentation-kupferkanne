@@ -143,30 +143,36 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 ### Top Brand Name / Top Category Name – full formula
 
 ```dax
-Top Brand Name = 
-VAR maxRev = [Top Brand Revenue]
+Top Brand Name =
+VAR TopBrand =
+    TOPN (
+        1,
+        VALUES ( dim_Product[Brand] ),
+        [Line Revenue], DESC,
+        dim_Product[Brand], ASC
+    )
 RETURN
-    CALCULATE(
-        MAX(v_brand_profitability[Brand]),
-        FILTER(
-            VALUES(v_brand_profitability[Brand]),
-            [Total Revenue] = maxRev
-        )
+    MAXX (
+        TopBrand,
+        dim_Product[Brand]
     )
 
-Top Category Name = 
-VAR maxRev = [Top Category Revenue]
+Top Category Name =
+VAR TopCategory =
+    TOPN (
+        1,
+        VALUES ( dim_Product[Product Category] ),
+        [Line Revenue], DESC,
+        dim_Product[Product Category], ASC
+    )
 RETURN
-    CALCULATE(
-        MAX(v_product_performance[Product Category]),
-        FILTER(
-            VALUES(v_product_performance[Product Category]),
-            [Total Revenue] = maxRev
-        )
+    MAXX (
+        TopCategory,
+        dim_Product[Product Category]
     )
 ```
 
-**Edge case:** ties in revenue resolve alphabetically last (MAX text ordering). Acceptable for KPI cards – display only.
+**Edge case:** ties in revenue resolve alphabetically first (TOPN ASC tiebreak on the name column). Acceptable for KPI cards – display only.
 
 ---
 
