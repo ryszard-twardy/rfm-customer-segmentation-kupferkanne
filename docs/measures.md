@@ -125,26 +125,32 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 ## Folder: 01 – Core KPIs
 
-| # | Measure | Formula | Format | Pages |
-|---|---|---|---|---|
-| 1 | Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
-| 2 | Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2 |
-| 3 | Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 1 |
-| 4 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
-| 5 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | 1 |
-| 6 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
-| 7 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
-| 8 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
-| 25 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 3 |
-| 26 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
-| 27 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
-| **30** | **Total Products (v6)** | `DISTINCTCOUNT(dim_Product[Product ID])` | # 0dp | 3 |
-| **31** | **Total Brands (v6)** | `DISTINCTCOUNT(dim_Product[Brand])` | # 0dp | 3 |
-| **32** | **Top Brand Revenue (v6)** | `MAXX(VALUES(dim_Product[Brand]), [Line Revenue])` | € Currency, display Millions | 3 |
-| **33** | **Top Brand Name (v6)** | VAR pattern – see formula block below | Text | 3 |
-| **34** | **Avg Brand Margin % (v6)** | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | 3 |
-| **35** | **Top Category Revenue (v6)** | `MAXX(VALUES(dim_Product[Product Category]), [Line Revenue])` | € Currency, display Millions | 3 |
-| **36** | **Top Category Name (v6)** | VAR pattern – see formula block below | Text | 3 |
+| Measure | Formula | Format | Pages |
+|---|---|---|---|
+| Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
+| Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2 |
+| Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 1 |
+| Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
+| Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | 1 |
+| Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
+| Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
+| Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
+| Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 3 |
+| Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
+| Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
+| Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | – |
+| Line Profit | `SUM(v_items_for_bi[Line Profit])` | € Currency, 2dp | – |
+| Line Margin % | `DIVIDE([Line Profit], [Line Revenue], 0)` | % 2dp | – |
+| Grain Reconciliation | `[Total Revenue] - [Line Revenue]` | € Currency, 2dp | – |
+| Total Products | `DISTINCTCOUNT(dim_Product[Product ID])` | # 0dp | 3 |
+| Total Brands | `DISTINCTCOUNT(dim_Product[Brand])` | # 0dp | 3 |
+| Top Brand Revenue | `MAXX(VALUES(dim_Product[Brand]), [Line Revenue])` | € Currency, display Millions | 3 |
+| Top Brand Name | VAR pattern – see formula block below | Text | 3 |
+| Avg Brand Margin % | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | 3 |
+| Top Category Revenue | `MAXX(VALUES(dim_Product[Product Category]), [Line Revenue])` | € Currency, display Millions | 3 |
+| Top Category Name | VAR pattern – see formula block below | Text | 3 |
+
+**Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand/category measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
 
 **Weighted margin principle (R008):** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
@@ -190,22 +196,22 @@ RETURN
 
 ## Folder: 02 – RFM Scores
 
-| # | Measure | Formula | Format | Pages |
-|---|---|---|---|---|
-| 9 | Avg R Score | `AVERAGE(dim_Customer[R Score])` | Dec 1dp | 2, 6 |
-| 10 | Avg F Score | `AVERAGE(dim_Customer[F Score])` | Dec 1dp | 2, 6 |
-| 11 | Avg M Score | `AVERAGE(dim_Customer[M Score])` | Dec 1dp | 2, 6 |
-| 12 | Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 1, 2, 4 |
+| Measure | Formula | Format | Pages |
+|---|---|---|---|
+| Avg R Score | `AVERAGE(dim_Customer[R Score])` | Dec 1dp | 2, 6 |
+| Avg F Score | `AVERAGE(dim_Customer[F Score])` | Dec 1dp | 2, 6 |
+| Avg M Score | `AVERAGE(dim_Customer[M Score])` | Dec 1dp | 2, 6 |
+| Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 1, 2, 4 |
 
 ---
 
 ## Folder: 03 – Segment Analysis
 
-| # | Measure | Format | Pages |
-|---|---|---|---|
-| 13 | Segment % of Total | % 1dp | 1, 2 |
-| 14 | Revenue % of Total | % 1dp | 2 |
-| 15 | Revenue at Risk | € 0dp | 1, 4 |
+| Measure | Format | Pages |
+|---|---|---|
+| Segment % of Total | % 1dp | 1, 2 |
+| Revenue % of Total | % 1dp | 2 |
+| Revenue at Risk | € 0dp | 1, 4 |
 
 ```dax
 Segment % of Total =
@@ -248,11 +254,11 @@ CALCULATE(
 
 ## Folder: 04 – Time Intelligence (Recency Buckets)
 
-| # | Measure | Format | Pages |
-|---|---|---|---|
-| 16 | Revenue Active (0–90d) | € 0dp | 4 |
-| 17 | Revenue Cooling (91–180d) | € 0dp | 4 |
-| 18 | Revenue Dormant (180d+) | € 0dp | 4 |
+| Measure | Format | Pages |
+|---|---|---|
+| Revenue Active (0–90d) | € 0dp | 4 |
+| Revenue Cooling (91–180d) | € 0dp | 4 |
+| Revenue Dormant (180d+) | € 0dp | 4 |
 
 ```dax
 Revenue Active =
@@ -279,10 +285,11 @@ CALCULATE(
 
 ## Folder: 05 – Dynamic & What-If
 
-| # | Measure | Format | Pages |
-|---|---|---|---|
-| 19 | What-If Revenue Impact | € 0dp | 4 |
-| 20 | Dynamic KPI Selector | varies | 2 |
+| Measure | Format | Pages |
+|---|---|---|
+| What-If Revenue Impact | € 0dp | 4 |
+| Dynamic KPI Selector | varies | 2 |
+| Dynamic KPI Label | Text | 2 |
 
 ```dax
 What-If Revenue Impact =
@@ -313,20 +320,25 @@ SWITCH(
 )
 ```
 
+**What-If parameter measure (no display folder):** `Reactivation Rate Value` = `SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)` (format `0`) lives on the `Reactivation Rate` what-if parameter table, not in a display folder. It is the auto-generated parameter value; `[What-If Revenue Impact]` consumes the parameter. Not bound to any visual.
+
 ---
 
 ## Folder: 06 – Formatting & Regional
 
-| # | Measure | Purpose | Format | Pages |
-|---|---|---|---|---|
-| 21 | Health Indicator | Status text from health_score | Text | 1, 6 |
-| 22 | ARPU by Country | Revenue per customer (context-aware) | € 2dp | 5 |
-| 23 | Country Revenue Share | Country share of total revenue | % 1dp | 5 |
-| 24 | Segment Color | Hex color per segment (SWITCH) – **USE ONLY IF dim_Segment[SegmentColor] column is not used for conditional formatting** | Hex text | All |
-| 28 | Monthly Trend Title | Dynamic line chart title with live month count | Text | 1 |
-| 29 | **Subtitle Page 1** (renamed from Executive Summary Subtitle, v6) | Dynamic Page 1 subtitle with live month count | Text | 1 |
-| **37** | **Subtitle Page 2 (v6)** | Dynamic Page 2 subtitle with live segment count | Text | 2 |
-| **38** | **Subtitle Page 3 (v6)** | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
+| Measure | Purpose | Format | Pages |
+|---|---|---|---|
+| Health Indicator | Status text from health_score | Text | 1, 6 |
+| ARPU by Country | Revenue per customer (context-aware) | € 2dp | 5 |
+| Country Revenue Share | Country share of total revenue | % 1dp | 5 |
+| Segment Color | Hex color per segment (SWITCH) – USE ONLY IF dim_Segment[SegmentColor] column is not used for conditional formatting | Hex text | All |
+| Revenue Trend Chart Title | Dynamic line chart title with live month count | Text | 1 |
+| Subtitle Page 1 | Dynamic Page 1 subtitle with live month count | Text | 1 |
+| Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
+| Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
+| R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
+| M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
+| F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 
 ```dax
 Health Indicator =
