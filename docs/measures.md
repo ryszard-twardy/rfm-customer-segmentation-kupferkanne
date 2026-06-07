@@ -447,30 +447,34 @@ in
 
 After load: Mark as Date Table (Date column). Sort by Column: Month Name → Month. Sort by Column: Day Name → Day Sort.
 
-### dim_SegmentOrder – DAX DATATABLE
+### dim_Segment – DAX DATATABLE
 
 ```dax
-dim_SegmentOrder =
+dim_Segment =
 DATATABLE (
     "Segment", STRING,
+    "Email Cadence", STRING,
+    "Loyalty Tier", STRING,
+    "Discount Approach", STRING,
+    "Budget Allocation", STRING,
     "SortOrder", INTEGER,
     "SegmentColor", STRING,
     {
-        { "Champions", 1, "#4A7AA0" },
-        { "Loyal Customers", 2, "#7BA8B8" },
-        { "Potential Loyalists", 3, "#8FA87E" },
-        { "Recent Customers", 4, "#D4A762" },
-        { "At Risk", 5, "#A05A55" },
-        { "Hibernating", 6, "#A5A29A" }
+        { "Champions", "Monthly newsletter", "VIP Tier", "None - full price", "High (40%)", 1, "#4A7AA0" },
+        { "Loyal Customers", "Bi-weekly", "Standard tier", "Selective 5%", "Medium (25%)", 2, "#7BA8B8" },
+        { "Potential Loyalists", "Weekly nurture", "Eligibility offer", "Welcome 10%", "Medium (15%)", 3, "#8FA87E" },
+        { "Recent Customers", "Weekly onboarding", "Eligibility offer", "First-buy 10%", "Low (10%)", 4, "#D4A762" },
+        { "At Risk", "Bi-weekly re-engage", "Re-engagement", "Win-back 15%", "Low (7%)", 5, "#A05A55" },
+        { "Hibernating", "Quarterly", "None", "Win-back 20%", "Minimal (3%)", 6, "#A5A29A" }
     }
 )
 ```
 
-After load: Sort by Column: Segment → SortOrder. Relationship: v_rfm_for_bi[segment] → dim_SegmentOrder[Segment] (Many:1).
+After load: Sort by Column: Segment → SortOrder. Relationship: dim_Customer[Segment] → dim_Segment[Segment] (Many:1, single-direction).
 
-**Note (F028, 2026-05-22):** DATATABLE expression reformatted per SQLBI / daxformatter.com gold standard – spaces inside parens, padded braces. Documented in audit findings.
+**Note (D074):** `dim_Segment` is a static DAX DATATABLE (no Power Query) that merges the former `dim_SegmentOrder` (sort order + color) and `dim_SegmentActions` (CRM attributes: email cadence, loyalty tier, discount approach, budget allocation) into one 7-column dimension, per the D060 single-direction refactor. `SortOrder` is hidden; `Segment` is the displayed key, sorted by `SortOrder`.
 
-**Note:** ActionPriority is NOT included here. The `action` column already exists in v_rfm_for_bi (from SQL: `recommended_action AS action`). No duplication needed.
+**Note:** the recommended-action column is not held here – it lives on `dim_Customer` (SQL: `recommended_action AS action`), the customer-grain dimension. No duplication.
 
 ### dim_KPI_Selector – Enter Data
 
