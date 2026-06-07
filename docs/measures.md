@@ -313,8 +313,8 @@ SWITCH(
     Selected,
     "Total Revenue",    [Total Revenue],
     "Total Customers",  [Total Customers],
-    "Avg Order Value",  [Avg Order Value],
-    "Avg Recency",      [Avg Recency Days],
+    "Average Order Value",  [Avg Order Value],
+    "Average Recency Days",      [Avg Recency Days],
     "Revenue at Risk",  [Revenue at Risk],
     [Total Revenue]
 )
@@ -436,7 +436,7 @@ Post-D060 the pre-aggregated views (`v_product_analytics`, `v_product_performanc
 
 ```m
 let
-    Source = #date(2022, 1, 1),
+    Source = #date(2023, 1, 1),
     EndDate = Date.EndOfMonth(DateTime.Date(DateTime.LocalNow())),
     DayCount = Duration.Days(EndDate - Source) + 1,
     ListOfDates = List.Dates(Source, DayCount, #duration(1, 0, 0, 0)),
@@ -452,12 +452,13 @@ let
     #"Inserted Start of Week" = Table.AddColumn(#"Inserted Week of Year", "Start of Week", each Date.StartOfWeek([Date], Day.Monday), type date),
     #"Inserted Day" = Table.AddColumn(#"Inserted Start of Week", "Day", each Date.Day([Date]), Int64.Type),
     #"Inserted Day Name" = Table.AddColumn(#"Inserted Day", "Day Name", each Date.DayOfWeekName([Date]), type text),
-    #"Inserted Day Sort" = Table.AddColumn(#"Inserted Day Name", "Day Sort", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type)
+    #"Inserted Day Number" = Table.AddColumn(#"Inserted Day Name", "Day Number", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
+    #"Added Year-Month-Number" = Table.AddColumn(#"Inserted Day Number", "Year-Month-Number", each [Year] * 100 + [Month], Int64.Type)
 in
-    #"Inserted Day Sort"
+    #"Added Year-Month-Number"
 ```
 
-After load: Mark as Date Table (Date column). Sort by Column: Month Name → Month. Sort by Column: Day Name → Day Sort.
+After load: Mark as Date Table (Date column). Sort by Column: Month Name → Month. Sort by Column: Day Name → Day Number.
 
 ### dim_Segment – DAX DATATABLE
 
@@ -488,9 +489,24 @@ After load: Sort by Column: Segment → SortOrder. Relationship: dim_Customer[Se
 
 **Note:** the recommended-action column is not held here – it lives on `dim_Customer` (SQL: `recommended_action AS action`), the customer-grain dimension. No duplication.
 
-### dim_KPI_Selector – Enter Data
+### dim_KPI_Selector – DAX DATATABLE
 
-5 rows, 1 column (`KPI Name`): Total Revenue, Total Customers, Avg Order Value, Avg Recency, Revenue at Risk. **Disconnected** – no relationship to any table.
+```dax
+dim_KPI_Selector =
+DATATABLE (
+    "KPI", STRING,
+    "SortOrder", INTEGER,
+    {
+        { "Total Revenue", 1 },
+        { "Total Customers", 2 },
+        { "Average Order Value", 3 },
+        { "Average Recency Days", 4 },
+        { "Revenue at Risk", 5 }
+    }
+)
+```
+
+After load: Sort by Column: KPI → SortOrder. **Disconnected** – no relationship to any table; drives `[Dynamic KPI Selector]` and `[Dynamic KPI Label]` via `SELECTEDVALUE`.
 
 ### Reactivation Rate – What-If Parameter
 
