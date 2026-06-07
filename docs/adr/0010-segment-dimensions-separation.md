@@ -1,7 +1,8 @@
 # 0010 – Segment Dimensions Separation
 
-**Status**: Accepted  
-**Date**: 2026-05-28
+**Status**: Superseded by [ADR 0013](0013-unified-segment-dimension.md)  
+**Date**: 2026-05-28  
+**Superseded**: 2026-06-07  
 
 ## Context
 

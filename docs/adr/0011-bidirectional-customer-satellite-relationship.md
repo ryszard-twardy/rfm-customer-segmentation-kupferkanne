@@ -1,7 +1,8 @@
 # 0011 – Bidirectional Customer-Satellite Relationship
 
-**Status**: Accepted  
-**Date**: 2026-05-28
+**Status**: Superseded by [ADR 0012](0012-single-direction-customer-topology.md)  
+**Date**: 2026-05-28  
+**Superseded**: 2026-06-07  
 
 ## Context
 
