@@ -1,5 +1,5 @@
 # DAX Measures Reference
-## Kupferkanne – 36 Measures in 6 Folders + 3 Subtitle Measures + Field Parameter
+## Kupferkanne – 47 DAX Measures (46 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 ### v7 (2026-05-24) – synced with v1.0.1 BPA batch (F003 format strings, F004 hide fact cols, F006 SummarizeBy=None, F007 hide FKs, F008 remove inactive relationship) per R041 atomic invariant
 
@@ -156,7 +156,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 **Equal-weight benchmark (R025, NEW v6):** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
 
-**Fact-grain principle (R026 + R028 dual-grain naming):** measures #1 (Total Revenue) and #26 (Total Profit) refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
+**Fact-grain principle (R026 + R028 dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
 
 ### Top Brand Name / Top Category Name – full formula
 
@@ -299,7 +299,7 @@ VAR AtRiskRev =
         dim_Customer[Segment] IN {"At Risk", "Hibernating"}
     )
 VAR Rate =
-    SELECTEDVALUE('Reactivation Rate'[Reactivation Rate Value], 10) / 100
+    SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10) / 100
 RETURN
 AtRiskRev * Rate
 ```
@@ -307,7 +307,7 @@ AtRiskRev * Rate
 ```dax
 Dynamic KPI Selector =
 VAR Selected =
-    SELECTEDVALUE(dim_KPI_Selector[KPI Name], "Total Revenue")
+    SELECTEDVALUE(dim_KPI_Selector[KPI], "Total Revenue")
 RETURN
 SWITCH(
     Selected,
@@ -516,9 +516,7 @@ After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_
 
 ---
 
-## Total: 29 measures in 6 display folders + 1 Field Parameter. No orphans. No redundant calculations.
-
-*(Note: total measure count is the v3-era tally. Actual v6 inventory is 36 base measures + 3 Subtitle measures + 1 Field Parameter – see Changelog. v7 batch did not change measure inventory; all changes were metadata-only.)*
+## Total: 47 measures – 46 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No orphans, no redundant calculations.
 
 ---
 
