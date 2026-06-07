@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 47 DAX Measures (46 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v7 (2026-05-24) – synced with v1.0.1 BPA batch (F003 format strings, F004 hide fact cols, F006 SummarizeBy=None, F007 hide FKs, F008 remove inactive relationship) per R041 atomic invariant
+### v8 (2026-06-06) – reconciled to the post-D060 single-direction model: RFM payload on `dim_Customer`, merged `dim_Segment`, 47 name-keyed measures. Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since dual-grain D026 (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the D060 single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -17,7 +17,7 @@
 | dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | ProductID, ProductName, Brand, MarginPct |
 | dim_Date | DAX CALENDAR | 1 row per day | Date, Year, Month, Year-Month |
 | dim_Segment | DAX DATATABLE | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder, SegmentColor |
-| dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI Name (disconnected) |
+| dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI (disconnected) |
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
 *Model also contains `_Measures` (measure container) and `RFM Score Selector` (Field Parameter) - neither has a SQL source. Total model tables: 10.*
 
@@ -559,11 +559,21 @@ After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_
 - Cleaner than 3 separate charts + bookmarks
 - Row-context issues make SELECTEDVALUE-based approaches return BLANK on score axis
 
-**v7 note (F007):** the three score columns referenced by this Field Parameter (`R Score`, `F Score`, `M Score`) are explicitly NOT in scope for F007 FK-hide. Per D028 dual-grain customer satellite exception, they remain visible because they ARE the analytic payload of `v_rfm_for_bi`, not foreign keys.
+**Note (D060):** the three score columns this Field Parameter references (`R Score`, `F Score`, `M Score`) live on `dim_Customer` and are hidden – part of the RFM analytic payload merged from the former `v_rfm_for_bi` satellite. Field parameters resolve hidden source columns, so the slicer works while the raw columns stay out of the Fields pane (see Model Hygiene → Foreign Key & Surrogate Key Visibility). The pre-D060 D028 satellite-visibility exception no longer applies.
 
 ---
 
 ## Changelog
+
+### v8 (2026-06-06)
+- **D060 docs-sync (Phase 3, issue #13):** reconciled this document to the post-D060 single-direction model – RFM payload folded onto `dim_Customer`, segment dimensions merged into `dim_Segment`, pre-aggregated views retired. Documentation-only; no measure logic changed.
+- **Relationships + data model map** rewritten to the live topology (5 active relationships, 0 bidirectional; 10 tables; phantom view rows removed).
+- **Model Hygiene** (F003/F004/F006/F007) inventories synced to live: F006 = 32 columns, hidden inventory = 20 columns, `D044` relocated to F003. The D028 satellite-visibility exception retired – the RFM payload on `dim_Customer` is hidden, surfaced via measures and the Page-2 Field Parameter.
+- **Segment dimension:** `dim_SegmentOrder` block replaced by the merged 7-column `dim_Segment` DATATABLE (D074).
+- **Measure inventory** rebuilt to the live **47 measures**: ordinal `#` column dropped (name-keyed); 9 measures added (`Line Revenue`/`Line Profit`/`Line Margin %`, `Grain Reconciliation`, `Dynamic KPI Label`, `R`/`M`/`F Label`, plus a `Reactivation Rate Value` note); `Monthly Trend Title` renamed `Revenue Trend Chart Title`; header and total reconciled to 47.
+- **DAX / source blocks** synced to live: `dim_Date` (M), `dim_KPI_Selector` (DATATABLE), `[Dynamic KPI Selector]` SWITCH literals and column refs.
+- **Field Parameter note** corrected: R/F/M Score columns are hidden on `dim_Customer`, not visible per the retired D028 exception.
+- **Deferred / tracked separately:** `[Segment Color]` measure realign to Muted Earth (#15); Pages-column reconciliation (live report = 7 pages); optional cosmetic SQLBI-formatting normalization of DAX blocks.
 
 ### v7 (2026-05-24)
 - **v1.0.1 BPA-batch sync per R041** (atomic invariant: BPA + docs same session). All four findings landed across two sessions (2026-05-22, 2026-05-24), all in `main` at HEAD `40f57f3`
