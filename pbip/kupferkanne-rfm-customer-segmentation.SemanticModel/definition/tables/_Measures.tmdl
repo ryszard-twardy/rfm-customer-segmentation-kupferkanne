@@ -1,6 +1,7 @@
 table _Measures
 	lineageTag: a3a134bb-f7a7-4964-8501-b8188dcbce0a
 
+	/// Total order-grain revenue from sales_curated; the P&L revenue figure (EUR).
 	measure 'Total Revenue' =
 			
 			SUM ( sales_curated[Order Value] )
@@ -10,6 +11,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Distinct customers with at least one order; excludes never-ordered records.
 	measure 'Total Customers' =
 			
 			CALCULATE (
@@ -20,6 +22,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: f5bf0588-f124-4262-8ba2-497f9c4f00d1
 
+	/// Total order count, summed from dim_Customer[Order Count].
 	measure 'Total Orders' =
 			
 			SUM ( dim_Customer[Order Count] )
@@ -27,6 +30,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: c588885a-88aa-4b8e-a349-0984f195d34b
 
+	/// Average revenue per order: Total Revenue / Total Orders.
 	measure 'Avg Order Value' =
 			
 			DIVIDE (
@@ -40,6 +44,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average lifetime revenue per customer: Total Revenue / Total Customers.
 	measure 'Avg Customer LTV' =
 			
 			DIVIDE (
@@ -53,6 +58,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average days since last order across customers.
 	measure 'Avg Recency Days' =
 			
 			AVERAGE ( dim_Customer[Recency Days] )
@@ -60,6 +66,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 58ad69cb-a3ec-4f15-8ae2-eb328a14c005
 
+	/// Average number of orders per customer (frequency RFM input).
 	measure 'Avg Frequency' =
 			
 			AVERAGE ( dim_Customer[Order Count] )
@@ -69,6 +76,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average total spend per customer (monetary RFM input).
 	measure 'Avg Monetary' =
 			
 			AVERAGE ( dim_Customer[Total Spend] )
@@ -76,6 +84,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: be1e02a6-8844-4058-b879-a189bbb07172
 
+	/// Average Recency (R) score across customers; 1–5 NTILE scale, higher = more recent.
 	measure 'Avg R Score' =
 			
 			AVERAGE ( dim_Customer[R Score] )
@@ -85,6 +94,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average Frequency (F) score across customers; 1–5 NTILE scale, higher = more frequent.
 	measure 'Avg F Score' =
 			
 			AVERAGE ( dim_Customer[F Score] )
@@ -94,6 +104,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average Monetary (M) score across customers; 1–5 NTILE scale, higher = more spend.
 	measure 'Avg M Score' =
 			
 			AVERAGE ( dim_Customer[M Score] )
@@ -103,6 +114,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average customer health score (R+F+M combined), out of 15.
 	measure 'Avg Health Score' =
 			
 			AVERAGE ( dim_Customer[Health Score] )
@@ -112,6 +124,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Share of ordering customers in the current segment vs all ordering customers.
 	measure 'Segment % of Total' =
 			
 			VAR SegmentCount =
@@ -137,6 +150,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Current segment's share of total customer spend.
 	measure 'Revenue % of Total' =
 			
 			VAR SegmentRevenue =
@@ -158,6 +172,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Total spend of customers in the At Risk and Hibernating segments.
 	measure 'Revenue at Risk' =
 			
 			CALCULATE (
@@ -172,6 +187,7 @@ table _Measures
 		displayFolder: 03 - Segment Analysis
 		lineageTag: 4f673189-f4ce-4043-8765-a0cc6fe05688
 
+	/// Spend from customers active within the last 90 days.
 	measure 'Revenue Active' =
 			
 			CALCULATE (
@@ -184,6 +200,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Spend from customers with recency of 91–180 days.
 	measure 'Revenue Cooling' =
 			
 			CALCULATE (
@@ -197,6 +214,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Spend from customers with recency over 180 days.
 	measure 'Revenue Dormant' =
 			
 			CALCULATE (
@@ -209,6 +227,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Projected recovered revenue: at-risk spend times the selected reactivation rate.
 	measure 'What-If Revenue Impact' =
 			
 			VAR AtRiskRev =
@@ -233,6 +252,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Returns the KPI chosen in the dim_KPI_Selector slicer via SWITCH; format inherited from the selected measure.
 	measure 'Dynamic KPI Selector' =
 			
 			VAR Selected =
@@ -255,6 +275,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Status text (Healthy / Monitor / Critical) derived from the average Health Score.
 	measure 'Health Indicator' =
 			
 			VAR Score =
@@ -269,6 +290,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: f24d00f6-2062-46ef-8efc-f87ad9402310
 
+	/// Average revenue per ordering customer, evaluated within the current country context.
 	measure 'ARPU by Country' =
 			
 			DIVIDE (
@@ -285,6 +307,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Selected country's share of total customer spend.
 	measure 'Country Revenue Share' =
 			
 			DIVIDE (
@@ -301,6 +324,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Hex color per segment (SWITCH fallback); prefer the dim_Segment[SegmentColor] column for conditional formatting, do not use both on one visual.
 	measure 'Segment Color' =
 			
 			SWITCH (
@@ -316,6 +340,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: b1dd26eb-576c-4894-9ad0-48832a062fde
 
+	/// Distinct order count from sales_curated[Order ID]; product-filter safe for Page 3.
 	measure 'Distinct Orders' =
 			
 			DISTINCTCOUNT ( sales_curated[Order ID] )
@@ -323,6 +348,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: c7cee83f-8a00-41f5-9790-5d3bee388ed0
 
+	/// Total order-grain gross profit from sales_curated; the P&L profit figure (EUR).
 	measure 'Total Profit' =
 			
 			SUM ( sales_curated[Order Profit] )
@@ -330,6 +356,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 44e2e694-8394-489c-b49d-d59a51f77217
 
+	/// Revenue-weighted margin: Total Profit / Total Revenue; P&L truth, never average of percentages.
 	measure 'Profit Margin %' =
 			
 			DIVIDE (
@@ -341,6 +368,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 828d7382-58dc-49e2-8560-93bd20b21132
 
+	/// Dynamic Page 1 chart title with live month count from sales_curated[Source Month].
 	measure 'Revenue Trend Chart Title' =
 			
 			"Weekly Revenue Trend Across "
@@ -349,6 +377,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 6325ebe8-f042-412f-95f9-4d291e5db17f
 
+	/// Dynamic Page 1 subtitle with live rolling month count.
 	measure 'Subtitle Page 1' =
 			
 			"Kupferkanne – D2C E-commerce · 9 European markets · Rolling "
@@ -357,6 +386,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: d675d5e4-55c3-4696-a70c-01092b4406ec
 
+	/// Text label naming the KPI currently selected in dim_KPI_Selector.
 	measure 'Dynamic KPI Label' =
 			
 			SELECTEDVALUE (
@@ -366,24 +396,28 @@ table _Measures
 		displayFolder: 05 - Dynamic & What-If
 		lineageTag: 2660f964-e1a9-4876-921d-8e29254effea
 
+	/// Static axis caption for the RFM Score Selector Field Parameter (Recency).
 	measure 'R Label' =
 			
 			"R"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 03cf0f79-27a3-48a0-9392-81f81c28892b
 
+	/// Static axis caption for the RFM Score Selector Field Parameter (Monetary).
 	measure 'M Label' =
 			
 			"M"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: f7611bd9-444e-4a53-b702-9ac8b2d975e5
 
+	/// Static axis caption for the RFM Score Selector Field Parameter (Frequency).
 	measure 'F Label' =
 			
 			"F"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 491a01f9-dcfd-4b9a-8cdf-e690b05a6458
 
+	/// Distinct product count from dim_Product.
 	measure 'Total Products' =
 			
 			DISTINCTCOUNT ( dim_Product[Product ID] )
@@ -391,6 +425,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 6afb354c-1c5b-4578-9b1d-9fc326b5b67e
 
+	/// Line revenue of the highest-revenue brand in the current filter context.
 	measure 'Top Brand Revenue' =
 			
 			MAXX (
@@ -403,6 +438,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Equal-weight average of per-brand margins; benchmark semantic, not P&L – label as Average Brand Margin.
 	measure 'Avg Brand Margin %' =
 			
 			AVERAGEX (
@@ -415,6 +451,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Line revenue of the highest-revenue product category in context.
 	measure 'Top Category Revenue' =
 			
 			MAXX (
@@ -427,6 +464,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Dynamic Page 3 subtitle with live product and brand counts.
 	measure 'Subtitle Page 3' =
 			
 			"Profitability across "
@@ -437,6 +475,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 458efd47-dc70-4f08-a853-b9c5f88dd665
 
+	/// Name of the highest-revenue product category; revenue ties resolve alphabetically.
 	measure 'Top Category Name' =
 			
 			VAR TopCategory =
@@ -454,6 +493,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 1a023e34-320e-4b22-9e58-bf013592f9c5
 
+	/// Dynamic Page 2 subtitle with live segment count.
 	measure 'Subtitle Page 2' =
 			
 			"RFM profile comparison across "
@@ -461,6 +501,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 50e22469-7d24-4b4d-8799-fd8fd3a7749a
 
+	/// Name of the highest-revenue brand; revenue ties resolve alphabetically.
 	measure 'Top Brand Name' =
 			
 			VAR TopBrand =
@@ -478,6 +519,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 4b359491-7e06-41d1-8ba9-31a29d578273
 
+	/// Line-grain gross profit from v_items_for_bi; building block for brand/category measures.
 	measure 'Line Profit' =
 			
 			SUM ( v_items_for_bi[Line Profit] )
@@ -487,6 +529,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Line-grain net revenue from v_items_for_bi; building block for brand/category measures, not visual-bound.
 	measure 'Line Revenue' =
 			
 			SUM ( v_items_for_bi[Line Net Amount] )
@@ -496,6 +539,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Line-grain margin: Line Profit / Line Revenue.
 	measure 'Line Margin %' =
 			
 			DIVIDE (
@@ -509,6 +553,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// QA invariant: Total Revenue minus Line Revenue; expected 0 when grains agree.
 	measure 'Grain Reconciliation' =
 			
 			[Total Revenue] - [Line Revenue]
@@ -518,6 +563,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Distinct brand count from dim_Product.
 	measure 'Total Brands' =
 			
 			DISTINCTCOUNT ( dim_Product[Brand] )
