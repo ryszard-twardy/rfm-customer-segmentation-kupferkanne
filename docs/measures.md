@@ -386,7 +386,7 @@ SWITCH(
     "Recent Customers",     "#D4A762",
     "At Risk",              "#A05A55",
     "Hibernating",          "#A5A29A",
-    "#A5A29A"
+    "#94A3B8"
 )
 ```
 
