@@ -329,13 +329,13 @@ table _Measures
 			
 			SWITCH (
 			    SELECTEDVALUE ( dim_Customer[Segment] ),
-			    "Champions", "#2563EB",
-			    "Loyal Customers", "#0891B2",
-			    "Potential Loyalists", "#059669",
-			    "Recent Customers", "#D97706",
-			    "At Risk", "#A32638",
-			    "Hibernating", "#6B7280",
-			    "#94A3B8"
+			    "Champions", "#4A7AA0",
+			    "Loyal Customers", "#7BA8B8",
+			    "Potential Loyalists", "#8FA87E",
+			    "Recent Customers", "#D4A762",
+			    "At Risk", "#A05A55",
+			    "Hibernating", "#A5A29A",
+			    "#A5A29A"
 			)
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: b1dd26eb-576c-4894-9ad0-48832a062fde
