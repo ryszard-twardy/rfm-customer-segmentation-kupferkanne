@@ -29,3 +29,5 @@ Scope stays narrow (one business problem, six dashboard pages, ~440K records) so
 - **Public dataset (Kaggle, UCI Online Retail II)** – rejected. Such datasets are pre-cleaned, eliminating the cleaning pipeline's purpose as a working processing step.
 - **Quick exploratory dashboards without full pipeline** – rejected. Kupferkanne's question set requires reproducibility (audit trail, recovery from upstream changes, regenerable training data). A notebook-style approach loses these properties.
 - **Multiple smaller analytical exercises** – rejected. One end-to-end platform demonstrates integration discipline that disconnected exercises cannot.
+
+Note (2026-06-09): the report now has 7 pages (Customer Lifecycle Intelligence added at page 5). Canonical page list: methodology.md.

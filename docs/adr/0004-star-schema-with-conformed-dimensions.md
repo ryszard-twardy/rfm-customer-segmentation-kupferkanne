@@ -29,3 +29,5 @@ Standardisation views (`v_dim_customers_std`, `v_dim_products_std`) wrap the raw
 - **Snowflake schema** – rejected: extra joins for normalised attributes (e.g., separate brand/category tables) provide no benefit at this scale and slow Power BI's query folding.
 - **One Big Table (OBT)** – rejected: loses the analytical clarity of separating "who" (dim) from "what happened" (fact); harder to maintain measures across grains.
 - **Data Vault** – rejected: appropriate for enterprise-scale ingestion, overkill for a single-source analytics dataset at this scale.
+
+Note (2026-06-09): report page numbering and counts changed after this ADR – 7 pages (Customer Lifecycle Intelligence inserted at page 5; Regional Analysis now page 6, Customer Drillthrough page 7); DAX measure count now 47. Canonical: methodology.md, measures.md.
