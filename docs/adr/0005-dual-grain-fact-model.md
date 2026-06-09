@@ -35,3 +35,5 @@ The naming rule lets a reader immediately tell which grain is being aggregated, 
 - **Single line-grain fact only** – rejected: every order-level measure would need a `DISTINCTCOUNT(OrderID)` workaround, and customer-segmentation joins become awkward.
 - **Single order-grain fact only** – rejected: no product detail possible at all; entire Product page would be unbuildable.
 - **One fact, with a degenerate "level" column** – rejected: encourages grain-mixing bugs; SQLBI strongly recommends separate facts when grains genuinely differ.
+
+Note (2026-06-09): report page numbering changed after this ADR – Customer Lifecycle Intelligence inserted at page 5; Regional Analysis is now page 6, Customer Drillthrough page 7. Canonical page list: methodology.md.

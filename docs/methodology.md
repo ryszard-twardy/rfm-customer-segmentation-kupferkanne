@@ -76,13 +76,14 @@ In addition to the pre/post-clean audits, three cross-checks run during transfor
 
 ## Power BI consumption
 
-The dashboard uses Import mode with the dual-grain semantic layer described in [data_model.md](data_model.md). Six pages cover:
+The dashboard uses Import mode with the dual-grain semantic layer described in [data_model.md](data_model.md). Seven pages cover:
 
 1. Executive Summary – KPIs and time-series.
 2. Segment Deep Dive – segment behaviour and migration.
-3. Product / Brand Analysis – line-grain product performance.
-4. Churn What-If – reactivation modelling.
-5. Regional Performance – country and city breakdown.
-6. Customer Drillthrough – individual customer inspection.
+3. Product & Brand – line-grain product performance.
+4. Churn Risk & What-If – reactivation modelling.
+5. Customer Lifecycle Intelligence – RFM-space position, revenue concentration, cohort retention and segment migration.
+6. Regional Analysis – country and city breakdown.
+7. Customer Drillthrough – individual customer inspection.
 
 All DAX measures are formatted via [daxformatter.com](https://www.daxformatter.com/) and catalogued in [measures.md](measures.md).

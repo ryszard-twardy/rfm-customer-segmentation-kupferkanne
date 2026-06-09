@@ -35,3 +35,5 @@ For transparency, two complementary measures are exposed in the dashboard toolti
 - **Equal-weight average everywhere** – rejected: misleading, contradicts standard finance practice.
 - **Only weighted, no equal-weight at all** – rejected: showing both side-by-side in the tooltip is a small cost and supports finance team trust in headline numbers.
 - **Margin per customer (LTV-style)** – out of scope: would require a separate measure and conflate revenue-share with profitability.
+
+Note (2026-06-09): report page numbering changed after this ADR – Customer Lifecycle Intelligence inserted at page 5; Regional Analysis is now page 6, Customer Drillthrough page 7. Canonical page list: methodology.md.
