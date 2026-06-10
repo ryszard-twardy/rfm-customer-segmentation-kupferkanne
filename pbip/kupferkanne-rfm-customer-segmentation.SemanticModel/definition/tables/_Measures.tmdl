@@ -497,7 +497,8 @@ table _Measures
 	measure 'Subtitle Page 2' =
 			
 			"RFM profile comparison across "
-			    & DISTINCTCOUNT ( dim_Segment[Segment] ) & " segments"
+			    & DISTINCTCOUNT ( dim_Segment[Segment] )
+			    & " segments"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 50e22469-7d24-4b4d-8799-fd8fd3a7749a
 
