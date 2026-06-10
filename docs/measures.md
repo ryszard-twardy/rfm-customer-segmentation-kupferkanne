@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 47 DAX Measures (46 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v9 (2026-06-10) – synced to the snake_case BigQuery rename (issue #9): BigQuery curated columns are `snake_case`, remapped at import to the unchanged model column names; the source-mapping table now lists model columns. Full history in the Changelog.
+### v10 (2026-06-10) – reconciled to the post-hygiene model: `[Total Spend]` is now visible to match `[Total Profit]` (#18); `Country`/`State`/`City` removed from the `sales_curated` import, leaving `dim_Customer` as the sole geography owner (#19); `[Distinct Orders]` documented as order-grain and not slice-able by `dim_Product` (#20). Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -11,7 +11,7 @@
 
 | Power BI Table | BigQuery Object | Granularity | Key Columns |
 |---|---|---|---|
-| **sales_curated** | `sales_curated` (TABLE) | **1 row per order (~169K)** | Order ID, Customer ID, Order Date, Order Value, Order Cost, Order Profit, Order Margin %, Country, Dominant Category, Dominant Brand |
+| **sales_curated** | `sales_curated` (TABLE) | **1 row per order (~169K)** | Order ID, Customer ID, Order Date, Order Value, Order Cost, Order Profit, Order Margin %, Dominant Category, Dominant Brand |
 | **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~275K)** | Order ID, Product ID, Customer ID, Order Date, Quantity, Line Net Amount, Line Profit, Line Margin % |
 | dim_Customer | `v_dim_customers_for_bi` (VIEW) | 1 row per customer | Customer ID, Full Name, Email, Country, Segment, Recency Days, Order Count, Total Spend, R Score, F Score, M Score, Health Score, Action |
 | dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | Product ID, Product Name, Brand, Margin % |
@@ -80,7 +80,7 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 
 **Batch script:** `tools/format_summarize_by_batch.csx` (explicit `(table, column)` targets list – no pattern matching, per audit precision). Uses `KeyValuePair<string,string>` for TE2 Roslyn pre-C# 7.0 compatibility. BPA delta: 28 → 0 violations.
 
-`SummarizeBy = None` and `isHidden` are independent properties – a column can be `SummarizeBy = None` and still visible (`dim_Date[Year]`), or both `SummarizeBy = None` and hidden (`dim_Customer[Total Spend]`).
+`SummarizeBy = None` and `isHidden` are independent properties – a column can be `SummarizeBy = None` and still visible (`dim_Date[Year]`), or both `SummarizeBy = None` and hidden (`dim_Customer[Order Count]`).
 
 ### Foreign Key & Surrogate Key Visibility
 
@@ -104,7 +104,7 @@ Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema U
 
 Visible keys: `dim_Date[Date]` and `dim_Segment[Segment]` – user-facing attributes, not pure plumbing.
 
-**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Recency Days`, `Order Count`, `Total Spend` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible.
+**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Recency Days`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
 
 **What does NOT change after hiding the keys:**
 - Relationships remain functional – the engine resolves keys even when hidden
@@ -119,7 +119,7 @@ Four fact-source value columns are hidden so users reach them only through the c
 
 These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]`, `[Line Profit]`, which reference the columns explicitly in DAX.
 
-**Total hidden across the model: 20 columns** – 8 relationship/degenerate keys, 4 fact-source value columns, 7 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`).
+**Total hidden across the model: 19 columns** – 8 relationship/degenerate keys, 4 fact-source value columns, 6 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`).
 
 ---
 
@@ -135,7 +135,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
-| Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 3 |
+| Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | – |
 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
 | Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | – |
@@ -151,6 +151,8 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Top Category Name | VAR pattern – see formula block below | Text | 3 |
 
 **Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand/category measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
+
+**`[Distinct Orders]` (Pages = –):** order-grain distinct order count from `sales_curated[Order ID]`. Not slice-able by `dim_Product` – `sales_curated` has no relationship path to `dim_Product` in the single-direction star, so a product slice returns the unfiltered grand total. Currently bound to no visual; do not place on a product axis.
 
 **Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
@@ -564,6 +566,12 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v10 (2026-06-10)
+- **Model-hygiene docs-sync (#18, #19, #20):** reconciled this document to the live post-hygiene model. `[Total Spend]` unhidden to match `[Total Profit]` (#18); the hidden inventory, recounted from TMDL, is now **19 columns** (6 RFM payload on `dim_Customer`, down from 7).
+- **Geography de-duplication (#19):** `Country`/`State`/`City` removed from the `sales_curated` import (BigQuery table unchanged); `dim_Customer` is the sole geography owner. Dropped `Country` from the `sales_curated` Key Columns row.
+- **`[Distinct Orders]` clarified (#20):** documented as order-grain (`sales_curated[Order ID]`), not slice-able by `dim_Product` (no relationship path); Pages corrected 3 → –. Measure DAX unchanged; only the description metadata reworded.
+- Documentation-only; no measure logic, names, or counts changed (47 measures intact, topology unchanged).
 
 ### v9 (2026-06-10)
 - **snake_case rename sync (issue #9):** BigQuery curated columns renamed PascalCase → snake_case across the SQL layer; Power BI remaps at import (Power Query `Table.RenameColumns`) to the unchanged model column names. No measure logic, names, or relationships changed – 47 measures intact, topology unchanged (5 active / 0 bidirectional).

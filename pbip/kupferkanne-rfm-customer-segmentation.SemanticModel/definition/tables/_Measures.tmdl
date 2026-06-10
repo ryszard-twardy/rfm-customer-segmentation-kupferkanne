@@ -340,7 +340,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: b1dd26eb-576c-4894-9ad0-48832a062fde
 
-	/// Distinct order count from sales_curated[Order ID]; product-filter safe for Page 3.
+	/// Order-grain distinct order count from sales_curated[Order ID]; not slice-able by dim_Product (no relationship path); do not place on a product axis.
 	measure 'Distinct Orders' =
 			
 			DISTINCTCOUNT ( sales_curated[Order ID] )
