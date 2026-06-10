@@ -31,30 +31,6 @@ table sales_curated
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	column Country
-		dataType: string
-		lineageTag: 54429a11-ec67-4895-be96-a9b4e42cad2e
-		summarizeBy: none
-		sourceColumn: Country
-
-		annotation SummarizationSetBy = Automatic
-
-	column State
-		dataType: string
-		lineageTag: 0e02e350-a5b3-47a5-9e75-6a8fbf6373e8
-		summarizeBy: none
-		sourceColumn: State
-
-		annotation SummarizationSetBy = Automatic
-
-	column City
-		dataType: string
-		lineageTag: 4b4c906d-4830-42ad-9b8e-5fafb52e9e6d
-		summarizeBy: none
-		sourceColumn: City
-
-		annotation SummarizationSetBy = Automatic
-
 	column 'Order Discount %'
 		dataType: double
 		lineageTag: 957f2990-bc97-4179-a6bc-7616389f56ac
@@ -167,8 +143,9 @@ table sales_curated
 				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
 				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
 				    sales_curated_Table = sales_Schema{[Name="sales_curated",Kind="Table"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(sales_curated_Table,{{"customer_id", "Customer ID"}, {"distinct_products", "Distinct Products"}, {"dominant_brand", "Dominant Brand"}, {"dominant_category", "Dominant Category"}, {"order_cost", "Order Cost"}, {"order_date", "Order Date"}, {"order_discount_pct", "Order Discount %"}, {"order_id", "Order ID"}, {"order_margin_pct", "Order Margin %"}, {"order_profit", "Order Profit"}, {"order_value", "Order Value"}, {"total_units", "Total Units"}, {"source_month", "Source Month"}, {"basket_item_count", "Basket Item Count"}, {"country", "Country"}, {"state", "State"}, {"city", "City"}}),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Source Month", Int64.Type}})
+				    #"Renamed Columns" = Table.RenameColumns(sales_curated_Table,{{"customer_id", "Customer ID"}, {"distinct_products", "Distinct Products"}, {"dominant_brand", "Dominant Brand"}, {"dominant_category", "Dominant Category"}, {"order_cost", "Order Cost"}, {"order_date", "Order Date"}, {"order_discount_pct", "Order Discount %"}, {"order_id", "Order ID"}, {"order_margin_pct", "Order Margin %"}, {"order_profit", "Order Profit"}, {"order_value", "Order Value"}, {"total_units", "Total Units"}, {"source_month", "Source Month"}, {"basket_item_count", "Basket Item Count"}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"country", "state", "city"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"Source Month", Int64.Type}})
 				in
 				    #"Changed Type"
 
