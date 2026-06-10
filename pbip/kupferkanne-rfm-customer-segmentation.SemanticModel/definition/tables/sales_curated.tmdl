@@ -167,7 +167,7 @@ table sales_curated
 				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
 				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
 				    sales_curated_Table = sales_Schema{[Name="sales_curated",Kind="Table"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(sales_curated_Table,{{"CustomerID", "Customer ID"}, {"DistinctProducts", "Distinct Products"}, {"DominantBrand", "Dominant Brand"}, {"DominantCategory", "Dominant Category"}, {"OrderCost", "Order Cost"}, {"OrderDate", "Order Date"}, {"OrderDiscountPct", "Order Discount %"}, {"OrderID", "Order ID"}, {"OrderMarginPct", "Order Margin %"}, {"OrderProfit", "Order Profit"}, {"OrderValue", "Order Value"}, {"TotalUnits", "Total Units"}, {"source_month", "Source Month"}, {"BasketItemCount", "Basket Item Count"}}),
+				    #"Renamed Columns" = Table.RenameColumns(sales_curated_Table,{{"customer_id", "Customer ID"}, {"distinct_products", "Distinct Products"}, {"dominant_brand", "Dominant Brand"}, {"dominant_category", "Dominant Category"}, {"order_cost", "Order Cost"}, {"order_date", "Order Date"}, {"order_discount_pct", "Order Discount %"}, {"order_id", "Order ID"}, {"order_margin_pct", "Order Margin %"}, {"order_profit", "Order Profit"}, {"order_value", "Order Value"}, {"total_units", "Total Units"}, {"source_month", "Source Month"}, {"basket_item_count", "Basket Item Count"}, {"country", "Country"}, {"state", "State"}, {"city", "City"}}),
 				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Source Month", Int64.Type}})
 				in
 				    #"Changed Type"

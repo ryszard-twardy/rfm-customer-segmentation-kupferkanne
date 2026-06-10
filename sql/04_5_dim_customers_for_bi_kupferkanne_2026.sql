@@ -10,7 +10,7 @@
 --   dimension to fact in a single direction, retiring the need for a
 --   bidirectional satellite relationship downstream.
 --
--- Grain: one row per CustomerID (parity with v_dim_customers_std).
+-- Grain: one row per customer_id (parity with v_dim_customers_std).
 --
 -- Construction:
 --   v_dim_customers_std LEFT JOIN v_rfm_for_bi on the customer key.
@@ -29,11 +29,11 @@
 -- ============================================================================
 -- EXCEPT list rationale:
 --   BigQuery resolves identifiers case-insensitively, so two columns that
---   differ only in case collide in the same SELECT list. The two source
+--   collide by name in the same SELECT list. The two source
 --   views share four such collisions:
---     * v_dim_customers_std.CustomerID vs v_rfm_for_bi.customer_id
+--     * v_dim_customers_std.customer_id vs v_rfm_for_bi.customer_id
 --       (the join key; identical values after the join).
---     * v_dim_customers_std.Country / State / City vs v_rfm_for_bi.country /
+--     * v_dim_customers_std.country / state / city vs v_rfm_for_bi.country /
 --       state / city (customer master geo from the dimension vs
 --       latest-order-derived geo from the RFM snapshot).
 --   Keep the conformed-dimension casing and master geo from v_dim_customers_std;
@@ -51,5 +51,5 @@ SELECT
     r.* EXCEPT (customer_id, country, state, city)
 FROM `kupferkanne-2026.sales.v_dim_customers_std` AS s
 LEFT JOIN `kupferkanne-2026.sales.v_rfm_for_bi` AS r
-    ON s.CustomerID = r.customer_id;
+    ON s.customer_id = r.customer_id;
 -- noqa: enable=AM04

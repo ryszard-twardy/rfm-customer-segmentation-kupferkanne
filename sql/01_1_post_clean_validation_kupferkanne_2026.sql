@@ -25,15 +25,15 @@ items_clean AS (
 ),
 
 dim_c AS (
-    SELECT DISTINCT CustomerID AS id
+    SELECT DISTINCT customer_id AS id
     FROM `kupferkanne-2026.sales.v_dim_customers_std`
-    WHERE CustomerID IS NOT NULL
+    WHERE customer_id IS NOT NULL
 ),
 
 dim_p AS (
-    SELECT DISTINCT ProductID AS id
+    SELECT DISTINCT product_id AS id
     FROM `kupferkanne-2026.sales.v_dim_products_std`
-    WHERE ProductID IS NOT NULL
+    WHERE product_id IS NOT NULL
 ),
 
 item_order_counts AS (
@@ -51,7 +51,7 @@ ib AS (SELECT COUNT(*) AS n FROM items_clean),
 c01 AS (
     SELECT
         1 AS seq,
-        'NULL OrderID' AS chk,
+        'NULL order_id' AS chk,
         'stg_orders_validated.order_id' AS col,
         COUNTIF(order_id IS NULL) AS cnt,
         (SELECT n FROM ob) AS tot,
@@ -63,7 +63,7 @@ c01 AS (
 c02 AS (
     SELECT
         2,
-        'NULL CustomerID',
+        'NULL customer_id',
         'stg_orders_validated.customer_id',
         COUNTIF(customer_id IS NULL),
         (SELECT n FROM ob),
@@ -75,7 +75,7 @@ c02 AS (
 c03 AS (
     SELECT
         3,
-        'Orphan CustomerID',
+        'Orphan customer_id',
         'stg_orders_validated.customer_id',
         COUNTIF(customer_id IS NOT NULL AND customer_id NOT IN (SELECT id FROM dim_c)),
         (SELECT n FROM ob),
@@ -87,7 +87,7 @@ c03 AS (
 c04 AS (
     SELECT
         4,
-        'NULL OrderDate',
+        'NULL order_date',
         'stg_orders_validated.order_date',
         COUNTIF(order_date IS NULL),
         (SELECT n FROM ob),
@@ -99,7 +99,7 @@ c04 AS (
 c05 AS (
     SELECT
         5,
-        'Future OrderDate',
+        'Future order_date',
         'stg_orders_validated.order_date',
         COUNTIF(order_date > CURRENT_DATE()),
         (SELECT n FROM ob),
@@ -111,7 +111,7 @@ c05 AS (
 c06 AS (
     SELECT
         6,
-        'Duplicate OrderID',
+        'Duplicate order_id',
         'stg_orders_validated.order_id',
         COUNT(*) - COUNT(DISTINCT order_id),
         (SELECT n FROM ob),
@@ -162,7 +162,7 @@ c09 AS (
 c10 AS (
     SELECT
         10,
-        'NULL OrderID',
+        'NULL order_id',
         'stg_items_validated.order_id',
         COUNTIF(order_id IS NULL),
         (SELECT n FROM ib),
@@ -174,7 +174,7 @@ c10 AS (
 c11 AS (
     SELECT
         11,
-        'NULL ProductID',
+        'NULL product_id',
         'stg_items_validated.product_id',
         COUNTIF(product_id IS NULL),
         (SELECT n FROM ib),
@@ -186,7 +186,7 @@ c11 AS (
 c12 AS (
     SELECT
         12,
-        'Orphan ProductID',
+        'Orphan product_id',
         'stg_items_validated.product_id',
         COUNTIF(product_id IS NOT NULL AND product_id NOT IN (SELECT id FROM dim_p)),
         (SELECT n FROM ib),
@@ -210,7 +210,7 @@ c13 AS (
 c14 AS (
     SELECT
         14,
-        'NULL Quantity',
+        'NULL quantity',
         'stg_items_validated.quantity',
         COUNTIF(quantity IS NULL),
         (SELECT n FROM ib),
@@ -222,7 +222,7 @@ c14 AS (
 c15 AS (
     SELECT
         15,
-        'Non-positive Quantity',
+        'Non-positive quantity',
         'stg_items_validated.quantity',
         COUNTIF(quantity <= 0),
         (SELECT n FROM ib),
@@ -234,7 +234,7 @@ c15 AS (
 c16 AS (
     SELECT
         16,
-        'NULL UnitPrice',
+        'NULL unit_price',
         'stg_items_validated.unit_price',
         COUNTIF(unit_price IS NULL),
         (SELECT n FROM ib),
@@ -246,7 +246,7 @@ c16 AS (
 c17 AS (
     SELECT
         17,
-        'Non-positive UnitPrice',
+        'Non-positive unit_price',
         'stg_items_validated.unit_price',
         COUNTIF(unit_price <= 0),
         (SELECT n FROM ib),
@@ -258,7 +258,7 @@ c17 AS (
 c18 AS (
     SELECT
         18,
-        'NULL LineNetAmount',
+        'NULL line_net_amount',
         'stg_items_validated.line_net_amount',
         COUNTIF(line_net_amount IS NULL),
         (SELECT n FROM ib),
@@ -270,7 +270,7 @@ c18 AS (
 c19 AS (
     SELECT
         19,
-        'Non-positive LineNetAmount',
+        'Non-positive line_net_amount',
         'stg_items_validated.line_net_amount',
         COUNTIF(line_net_amount <= 0),
         (SELECT n FROM ib),
@@ -295,8 +295,8 @@ c21 AS (
     SELECT
         21,
         'NULL customer standard key',
-        'v_dim_customers_std.CustomerID',
-        COUNTIF(CustomerID IS NULL),
+        'v_dim_customers_std.customer_id',
+        COUNTIF(customer_id IS NULL),
         COUNT(*),
         'HIGH',
         'Standardised customer keys should be present'
@@ -307,21 +307,21 @@ c22 AS (
     SELECT
         22,
         'Duplicate customer standard key',
-        'v_dim_customers_std.CustomerID',
-        COUNT(*) - COUNT(DISTINCT CustomerID),
+        'v_dim_customers_std.customer_id',
+        COUNT(*) - COUNT(DISTINCT customer_id),
         COUNT(*),
         'HIGH',
         'Standardised customer keys should be unique'
     FROM `kupferkanne-2026.sales.v_dim_customers_std`
-    WHERE CustomerID IS NOT NULL
+    WHERE customer_id IS NOT NULL
 ),
 
 c23 AS (
     SELECT
         23,
         'NULL product standard key',
-        'v_dim_products_std.ProductID',
-        COUNTIF(ProductID IS NULL),
+        'v_dim_products_std.product_id',
+        COUNTIF(product_id IS NULL),
         COUNT(*),
         'HIGH',
         'Standardised product keys should be present'
@@ -332,21 +332,21 @@ c24 AS (
     SELECT
         24,
         'Duplicate product standard key',
-        'v_dim_products_std.ProductID',
-        COUNT(*) - COUNT(DISTINCT ProductID),
+        'v_dim_products_std.product_id',
+        COUNT(*) - COUNT(DISTINCT product_id),
         COUNT(*),
         'HIGH',
         'Standardised product keys should be unique'
     FROM `kupferkanne-2026.sales.v_dim_products_std`
-    WHERE ProductID IS NOT NULL
+    WHERE product_id IS NOT NULL
 ),
 
 c25 AS (
     SELECT
         25,
-        'NULL UnitCost in product lookup',
-        'v_dim_products_std.UnitCost',
-        COUNTIF(UnitCost IS NULL),
+        'NULL unit_cost in product lookup',
+        'v_dim_products_std.unit_cost',
+        COUNTIF(unit_cost IS NULL),
         COUNT(*),
         'HIGH',
         'Unit cost is required for profit calculations in Step 02'

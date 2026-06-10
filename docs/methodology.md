@@ -27,7 +27,7 @@ Eight EDA views run on cleaned staging data **before** any segmentation transfor
 - **`eda_country_breakdown`** – market concentration and per-country AOV.
 - **`eda_monthly_temporal_pattern`** – seasonality, growth trajectory, gap detection.
 - **`eda_customer_frequency_distribution`** – validates that Frequency has enough variation for NTILE(5).
-- **`eda_recency_distribution`** – confirms the choice of `MAX(OrderDate)` as recency anchor over `CURRENT_DATE()`.
+- **`eda_recency_distribution`** – confirms the choice of `MAX(order_date)` as recency anchor over `CURRENT_DATE()`.
 - **`eda_pareto_concentration`** – revenue share by customer decile (the "80/20 test").
 - **`eda_basket_composition`** – cross-validation of line-grain join against order-grain expectations.
 
@@ -37,9 +37,9 @@ EDA runs before RFM, not after, so segmentation decisions are evidence-based rat
 
 For each customer, three behavioural scores are computed on the order-grain fact `sales_curated`:
 
-- **Recency**: days since most recent order, anchored on the dataset's `MAX(OrderDate)`.
+- **Recency**: days since most recent order, anchored on the dataset's `MAX(order_date)`.
 - **Frequency**: total order count over the 39-month window.
-- **Monetary**: total spend (`SUM(OrderValue)`).
+- **Monetary**: total spend (`SUM(order_value)`).
 
 Each dimension is bucketed 1–5 using `NTILE(5)` quintiles. The composite RFM score (range 3–15) is the sum of the three component scores. Six business-meaningful segments are derived from threshold bands on the composite:
 
@@ -52,7 +52,7 @@ Each dimension is bucketed 1–5 using `NTILE(5)` quintiles. The composite RFM s
 | 5–6 | At Risk | Win-back campaign and incentives |
 | 3–4 | Hibernating | Deep discount or sunset |
 
-The choice of `NTILE(5)` over alternatives (k-means clustering, single composite score) is documented in [ADR 0006](adr/0006-rfm-segmentation-with-ntile.md). The choice of `MAX(OrderDate)` as recency anchor – rather than `CURRENT_DATE()` – is covered in the same ADR, since using current date would inflate all recency values uniformly when the dataset ends in the past.
+The choice of `NTILE(5)` over alternatives (k-means clustering, single composite score) is documented in [ADR 0006](adr/0006-rfm-segmentation-with-ntile.md). The choice of `MAX(order_date)` as recency anchor – rather than `CURRENT_DATE()` – is covered in the same ADR, since using current date would inflate all recency values uniformly when the dataset ends in the past.
 
 ## Margin calculation
 

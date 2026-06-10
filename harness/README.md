@@ -13,10 +13,10 @@ line-grain view `v_items_for_bi`):
 
 | KPI | Definition | Expected (production) |
 |---|---|---|
-| `total_revenue` | `ROUND(SUM(OrderValue), 2)` | 8531365.52 |
-| `total_profit` | `ROUND(SUM(OrderProfit), 2)` | 5100089.72 |
-| `distinct_customers` | `COUNT(DISTINCT CustomerID)` | 14967 |
-| `distinct_orders` | `COUNT(DISTINCT OrderID)` | 168777 |
+| `total_revenue` | `ROUND(SUM(order_value), 2)` | 8531365.52 |
+| `total_profit` | `ROUND(SUM(order_profit), 2)` | 5100089.72 |
+| `distinct_customers` | `COUNT(DISTINCT customer_id)` | 14967 |
+| `distinct_orders` | `COUNT(DISTINCT order_id)` | 168777 |
 | `grain_parity` | orders present on exactly one grain (order vs line aggregated to order) | 0 |
 
 Derived (computed at comparison time, not stored as primitives):

@@ -6,10 +6,10 @@ Project and dataset are injected at run time from environment variables (see
 config.py); nothing here hardcodes a BigQuery project or dataset id.
 
 Column provenance (verified against the real DDL):
-  sales_curated.OrderValue   = ROUND(SUM(line_net_amount), 2)              -> revenue
-  sales_curated.OrderProfit  = ROUND(SUM(line_net_amount) - SUM(qty*cost)) -> profit
-  sales_curated.CustomerID, sales_curated.OrderID                          -> identity
-  v_items_for_bi.OrderID                                                   -> line grain key
+  sales_curated.order_value   = ROUND(SUM(line_net_amount), 2)              -> revenue
+  sales_curated.order_profit  = ROUND(SUM(line_net_amount) - SUM(qty*cost)) -> profit
+  sales_curated.customer_id, sales_curated.order_id                          -> identity
+  v_items_for_bi.order_id                                                   -> line grain key
 """
 
 from __future__ import annotations
@@ -50,25 +50,25 @@ KPI_DEFS: tuple[KpiDef, ...] = (
     KpiDef(
         name="total_revenue",
         kind=KIND_CURRENCY,
-        sql_template="SELECT ROUND(SUM(OrderValue), 2) AS value FROM `{sales_curated}`",
+        sql_template="SELECT ROUND(SUM(order_value), 2) AS value FROM `{sales_curated}`",
         sources=(SALES_CURATED,),
     ),
     KpiDef(
         name="total_profit",
         kind=KIND_CURRENCY,
-        sql_template="SELECT ROUND(SUM(OrderProfit), 2) AS value FROM `{sales_curated}`",
+        sql_template="SELECT ROUND(SUM(order_profit), 2) AS value FROM `{sales_curated}`",
         sources=(SALES_CURATED,),
     ),
     KpiDef(
         name="distinct_customers",
         kind=KIND_COUNT,
-        sql_template="SELECT COUNT(DISTINCT CustomerID) AS value FROM `{sales_curated}`",
+        sql_template="SELECT COUNT(DISTINCT customer_id) AS value FROM `{sales_curated}`",
         sources=(SALES_CURATED,),
     ),
     KpiDef(
         name="distinct_orders",
         kind=KIND_COUNT,
-        sql_template="SELECT COUNT(DISTINCT OrderID) AS value FROM `{sales_curated}`",
+        sql_template="SELECT COUNT(DISTINCT order_id) AS value FROM `{sales_curated}`",
         sources=(SALES_CURATED,),
     ),
     # Grain parity: order-grain order set vs line-grain aggregated to order
@@ -78,13 +78,13 @@ KPI_DEFS: tuple[KpiDef, ...] = (
         kind=KIND_GRAIN,
         sql_template=(
             "SELECT COUNT(*) AS value FROM (\n"
-            "  SELECT o.OrderID AS o_order, l.OrderID AS l_order\n"
-            "  FROM (SELECT OrderID FROM `{sales_curated}` GROUP BY OrderID) AS o\n"
+            "  SELECT o.order_id AS o_order, l.order_id AS l_order\n"
+            "  FROM (SELECT order_id FROM `{sales_curated}` GROUP BY order_id) AS o\n"
             "  FULL OUTER JOIN (\n"
-            "    SELECT OrderID FROM `{v_items_for_bi}` GROUP BY OrderID\n"
+            "    SELECT order_id FROM `{v_items_for_bi}` GROUP BY order_id\n"
             "  ) AS l\n"
-            "    ON o.OrderID = l.OrderID\n"
-            "  WHERE o.OrderID IS NULL OR l.OrderID IS NULL\n"
+            "    ON o.order_id = l.order_id\n"
+            "  WHERE o.order_id IS NULL OR l.order_id IS NULL\n"
             ")"
         ),
         sources=(SALES_CURATED, V_ITEMS_FOR_BI),

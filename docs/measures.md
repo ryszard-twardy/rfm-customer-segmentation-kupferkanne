@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 47 DAX Measures (46 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v8 (2026-06-06) – reconciled to the post-D060 single-direction model: RFM payload on `dim_Customer`, merged `dim_Segment`, 47 name-keyed measures. Full history in the Changelog.
+### v9 (2026-06-10) – synced to the snake_case BigQuery rename (issue #9): BigQuery curated columns are `snake_case`, remapped at import to the unchanged model column names; the source-mapping table now lists model columns. Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since dual-grain D026 (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the D060 single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -11,11 +11,11 @@
 
 | Power BI Table | BigQuery Object | Granularity | Key Columns |
 |---|---|---|---|
-| **sales_curated** | `sales_curated` (TABLE) | **1 row per order (~169K)** | OrderID, CustomerID, OrderDate, OrderValue, OrderCost, OrderProfit, OrderMarginPct, Country, DominantCategory, DominantBrand |
-| **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~275K)** | OrderID, ProductID, CustomerID, OrderDate, Quantity, UnitPrice, LineNetAmount, LineCost, LineProfit, Brand, ProductCategory |
+| **sales_curated** | `sales_curated` (TABLE) | **1 row per order (~169K)** | Order ID, Customer ID, Order Date, Order Value, Order Cost, Order Profit, Order Margin %, Country, Dominant Category, Dominant Brand |
+| **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~275K)** | Order ID, Product ID, Customer ID, Order Date, Quantity, Line Net Amount, Line Profit, Line Margin % |
 | dim_Customer | `v_dim_customers_for_bi` (VIEW) | 1 row per customer | Customer ID, Full Name, Email, Country, Segment, Recency Days, Order Count, Total Spend, R Score, F Score, M Score, Health Score, Action |
-| dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | ProductID, ProductName, Brand, MarginPct |
-| dim_Date | DAX CALENDAR | 1 row per day | Date, Year, Month, Year-Month |
+| dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | Product ID, Product Name, Brand, Margin % |
+| dim_Date | Power Query (M) calendar | 1 row per day | Date, Year, Month, Year-Month |
 | dim_Segment | DAX DATATABLE | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder, SegmentColor |
 | dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI (disconnected) |
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
@@ -564,6 +564,12 @@ After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_
 ---
 
 ## Changelog
+
+### v9 (2026-06-10)
+- **snake_case rename sync (issue #9):** BigQuery curated columns renamed PascalCase → snake_case across the SQL layer; Power BI remaps at import (Power Query `Table.RenameColumns`) to the unchanged model column names. No measure logic, names, or relationships changed – 47 measures intact, topology unchanged (5 active / 0 bidirectional).
+- **Table → SQL Source Mapping:** Key Columns now list Power BI model column names (`Order ID`, `Order Value`, …) consistently across all rows; stale `UnitPrice`/`LineCost`/`Brand`/`ProductCategory` removed from the `v_items_for_bi` row (those columns are not part of the imported view).
+- **`dim_Date` source label** corrected: Power Query (M) generated calendar, not DAX.
+- Changelog entries v2–v8 are historical record and intentionally retain the column names current at the time they were written.
 
 ### v8 (2026-06-06)
 - **D060 docs-sync (Phase 3, issue #13):** reconciled this document to the post-D060 single-direction model – RFM payload folded onto `dim_Customer`, segment dimensions merged into `dim_Segment`, pre-aggregated views retired. Documentation-only; no measure logic changed.

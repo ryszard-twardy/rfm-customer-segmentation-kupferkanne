@@ -88,7 +88,11 @@ table v_items_for_bi
 				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
 				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
 				    v_items_for_bi_View = sales_Schema{[Name="v_items_for_bi",Kind="View"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(v_items_for_bi_View,{{"CustomerID", "Customer ID"}, {"LineMarginPct", "Line Margin %"}, {"LineNetAmount", "Line Net Amount"}, {"LineProfit", "Line Profit"}, {"OrderDate", "Order Date"}, {"OrderID", "Order ID"}, {"ProductID", "Product ID"}})
+				    #"Renamed Columns" = Table.RenameColumns(v_items_for_bi_View,{{"customer_id", "Customer ID"}, {"line_margin_pct", "Line Margin %"}, {"line_net_amount", "Line Net Amount"}, {"line_profit", "Line Profit"}, {"order_date", "Order Date"}, {"order_id", "Order ID"}, {"product_id", "Product ID"}, {"quantity", "Quantity"}})
 				in
 				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
 

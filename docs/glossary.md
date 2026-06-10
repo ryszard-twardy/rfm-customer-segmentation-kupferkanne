@@ -16,7 +16,7 @@ Domain and technical terms used across the project.
 | **Kimball dimensional model** | A star-schema approach to data warehousing with denormalised dimensions and central fact tables. See [ADR 0004](adr/0004-star-schema-with-conformed-dimensions.md). |
 | **`NTILE(n)`** | SQL window function dividing rows into n approximately equal-sized buckets, useful for percentile-based segmentation. See [ADR 0006](adr/0006-rfm-segmentation-with-ntile.md). |
 | **Quintile** | One-fifth slice of a distribution; the bucket produced by `NTILE(5)`. |
-| **Recency anchor** | The reference date from which "days since last order" is measured. This project uses `MAX(OrderDate)` rather than `CURRENT_DATE()`, so segmentation is reproducible on the bounded historical dataset. |
+| **Recency anchor** | The reference date from which "days since last order" is measured. This project uses `MAX(order_date)` rather than `CURRENT_DATE()`, so segmentation is reproducible on the bounded historical dataset. |
 | **RFM** | Recency, Frequency, Monetary – a customer segmentation framework based on observed transaction behaviour. |
 | **Sharding (BigQuery)** | Splitting a logical table across many physically-named tables (`orders202301`, `orders202302`, ...). BigQuery scans them via wildcard syntax (`orders20*`). |
 | **`sales_curated`** | The order-grain curated fact table (~169K rows) used by five of the six Power BI pages. See [ADR 0005](adr/0005-dual-grain-fact-model.md). |

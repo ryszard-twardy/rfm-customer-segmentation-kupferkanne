@@ -312,11 +312,10 @@ table dim_Customer
 				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
 				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
 				    v_dim_customers_std_View = sales_Schema{[Name="v_dim_customers_for_bi",Kind="View"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(v_dim_customers_std_View,{{"SignupDate", "Signup Date"}, {"FullName", "Full Name"}, {"CustomerArchetype", "Customer Archetype"}, {"FirstName", "First Name"}, {"LastName", "Last Name"}, {"CustomerID", "Customer ID"}})
+				    #"Renamed Columns" = Table.RenameColumns(v_dim_customers_std_View,{{"signup_date", "Signup Date"}, {"full_name", "Full Name"}, {"customer_archetype", "Customer Archetype"}, {"first_name", "First Name"}, {"last_name", "Last Name"}, {"customer_id", "Customer ID"}, {"email", "Email"}, {"phone", "Phone"}, {"country", "Country"}, {"state", "State"}, {"city", "City"}, {"address", "Address"}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"avg_order_value"})
 				in
-				    #"Renamed Columns"
-
-	changedProperty = Name
+				    #"Removed Columns"
 
 	annotation PBI_ResultType = Table
 

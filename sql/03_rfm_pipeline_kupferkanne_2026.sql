@@ -12,7 +12,7 @@
 --   snapshot, and expose BI-friendly semantic views.
 --
 -- Design rationale (informed by Step 02 EDA layer):
---   * Recency anchor = MAX(OrderDate), not CURRENT_DATE
+--   * Recency anchor = MAX(order_date), not CURRENT_DATE
 --     (see eda_recency_distribution; dataset boundary is fixed).
 --   * NTILE(5) quintiles for R/F/M scores
 --     (see eda_order_value_distribution + eda_customer_frequency_distribution).
@@ -26,88 +26,89 @@ DECLARE run_date DATE DEFAULT CURRENT_DATE(tz);
 -- STEP 1: ORDER-LEVEL CURATED FACT --------------------------------------------
 DROP TABLE IF EXISTS `kupferkanne-2026.sales.sales_curated`;
 CREATE OR REPLACE TABLE `kupferkanne-2026.sales.sales_curated`
-CLUSTER BY CustomerID, OrderID AS
+CLUSTER BY customer_id, order_id AS
 SELECT
-    o.order_id AS OrderID,
-    o.customer_id AS CustomerID,
-    o.order_date AS OrderDate,
-    c.Country,
-    c.State,
-    c.City,
-    o.order_discount_pct AS OrderDiscountPct,
-    o.basket_item_count AS BasketItemCount,
-    ROUND(SUM(i.line_net_amount), 2) AS OrderValue,
-    ROUND(SUM(i.quantity * p.UnitCost), 2) AS OrderCost,
-    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), 2) AS OrderProfit,
+    o.order_id,
+    o.customer_id,
+    o.order_date,
+    c.country,
+    c.state,
+    c.city,
+    o.order_discount_pct,
+    o.basket_item_count,
+    ROUND(SUM(i.line_net_amount), 2) AS order_value,
+    ROUND(SUM(i.quantity * p.unit_cost), 2) AS order_cost,
+    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), 2) AS order_profit,
     ROUND(
-        SAFE_DIVIDE(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), SUM(i.line_net_amount)),
+        SAFE_DIVIDE(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), SUM(i.line_net_amount)),
         4
-    ) AS OrderMarginPct,
-    SUM(i.quantity) AS TotalUnits,
-    COUNT(DISTINCT i.product_id) AS DistinctProducts,
-    ARRAY_AGG(p.ProductCategory ORDER BY i.line_net_amount DESC, i.product_id ASC LIMIT 1
-    )[OFFSET(0)] AS DominantCategory,
-    ARRAY_AGG(p.Brand ORDER BY i.line_net_amount DESC, i.product_id ASC LIMIT 1
-    )[OFFSET(0)] AS DominantBrand,
+    ) AS order_margin_pct,
+    SUM(i.quantity) AS total_units,
+    COUNT(DISTINCT i.product_id) AS distinct_products,
+    ARRAY_AGG(p.product_category ORDER BY i.line_net_amount DESC, i.product_id ASC LIMIT 1
+    )[OFFSET(0)] AS dominant_category,
+    ARRAY_AGG(p.brand ORDER BY i.line_net_amount DESC, i.product_id ASC LIMIT 1
+    )[OFFSET(0)] AS dominant_brand,
     o.source_month
 FROM `kupferkanne-2026.sales.stg_orders_validated` AS o
 INNER JOIN `kupferkanne-2026.sales.stg_items_validated` AS i
     ON o.order_id = i.order_id
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
-    ON i.product_id = p.ProductID
+    ON i.product_id = p.product_id
 LEFT JOIN `kupferkanne-2026.sales.v_dim_customers_std` AS c
-    ON o.customer_id = c.CustomerID
+    ON o.customer_id = c.customer_id
 GROUP BY
     o.order_id,
     o.customer_id,
     o.order_date,
-    c.Country,
-    c.State,
-    c.City,
+    c.country,
+    c.state,
+    c.city,
     o.order_discount_pct,
     o.basket_item_count,
     o.source_month;
 
 -- STEP 2: CUSTOMER-LEVEL RFM SNAPSHOT -----------------------------------------
+DROP TABLE IF EXISTS `kupferkanne-2026.sales.rfm_customer_segments`;
 CREATE OR REPLACE TABLE `kupferkanne-2026.sales.rfm_customer_segments`
-CLUSTER BY rfm_segment, CustomerID AS
+CLUSTER BY rfm_segment, customer_id AS
 WITH data_cutoff AS (
-    SELECT MAX(OrderDate) AS data_as_of_date
+    SELECT MAX(order_date) AS data_as_of_date
     FROM `kupferkanne-2026.sales.sales_curated`
 ),
 
 customer_rfm AS (
     SELECT
-        CustomerID,
-        MAX(OrderDate) AS last_order_date,
-        DATE_DIFF((SELECT data_as_of_date FROM data_cutoff), MAX(OrderDate), DAY) AS recency_days,
-        COUNT(DISTINCT OrderID) AS frequency_orders,
-        ROUND(SUM(OrderValue), 2) AS monetary_value,
-        ROUND(SUM(OrderProfit), 2) AS total_profit,
-        ROUND(SAFE_DIVIDE(SUM(OrderProfit), SUM(OrderValue)), 4) AS avg_margin_pct,
-        ROUND(AVG(OrderValue), 2) AS avg_order_value,
-        SUM(TotalUnits) AS total_units,
-        ROUND(AVG(DistinctProducts), 1) AS avg_products_per_order,
+        customer_id,
+        MAX(order_date) AS last_order_date,
+        DATE_DIFF((SELECT data_as_of_date FROM data_cutoff), MAX(order_date), DAY) AS recency_days,
+        COUNT(DISTINCT order_id) AS frequency_orders,
+        ROUND(SUM(order_value), 2) AS monetary_value,
+        ROUND(SUM(order_profit), 2) AS total_profit,
+        ROUND(SAFE_DIVIDE(SUM(order_profit), SUM(order_value)), 4) AS avg_margin_pct,
+        ROUND(AVG(order_value), 2) AS avg_order_value,
+        SUM(total_units) AS total_units,
+        ROUND(AVG(distinct_products), 1) AS avg_products_per_order,
         ARRAY_AGG(
-            STRUCT(Country, State, City, OrderDate, OrderID)
-            ORDER BY OrderDate DESC, OrderID DESC LIMIT 1
+            STRUCT(country, state, city, order_date, order_id)
+            ORDER BY order_date DESC, order_id DESC LIMIT 1
         )[OFFSET(0)
         ] AS latest_geo
     FROM `kupferkanne-2026.sales.sales_curated`
-    GROUP BY CustomerID
+    GROUP BY customer_id
 ),
 
 scored AS (
     SELECT
         *,
-        NTILE(5) OVER (ORDER BY recency_days DESC, CustomerID ASC) AS r_score,
-        NTILE(5) OVER (ORDER BY frequency_orders ASC, CustomerID ASC) AS f_score,
-        NTILE(5) OVER (ORDER BY monetary_value ASC, CustomerID ASC) AS m_score
+        NTILE(5) OVER (ORDER BY recency_days DESC, customer_id ASC) AS r_score,
+        NTILE(5) OVER (ORDER BY frequency_orders ASC, customer_id ASC) AS f_score,
+        NTILE(5) OVER (ORDER BY monetary_value ASC, customer_id ASC) AS m_score
     FROM customer_rfm
 )
 
 SELECT
-    CustomerID,
+    customer_id,
     run_date AS snapshot_date,
     (SELECT data_as_of_date FROM data_cutoff) AS data_as_of_date,
     last_order_date,
@@ -119,9 +120,9 @@ SELECT
     avg_order_value,
     total_units,
     avg_products_per_order,
-    latest_geo.Country AS primary_country,
-    latest_geo.State AS primary_state,
-    latest_geo.City AS primary_city,
+    latest_geo.country AS primary_country,
+    latest_geo.state AS primary_state,
+    latest_geo.city AS primary_city,
     r_score,
     f_score,
     m_score,
@@ -148,7 +149,7 @@ FROM scored;
 -- STEP 3: SEMANTIC VIEWS -------------------------------------------------------
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_rfm_for_bi` AS
 SELECT
-    CustomerID AS customer_id,
+    customer_id,
     data_as_of_date AS analysis_date,
     last_order_date,
     recency_days,
@@ -173,32 +174,32 @@ FROM `kupferkanne-2026.sales.rfm_customer_segments`;
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_analytics` AS
 SELECT
-    sc.OrderID,
-    sc.CustomerID,
-    sc.OrderDate,
-    sc.Country,
-    sc.State,
-    sc.City,
-    sc.OrderDiscountPct,
-    sc.OrderValue,
-    sc.OrderCost,
-    sc.OrderProfit,
-    sc.OrderMarginPct,
-    i.product_id AS ProductID,
-    p.ProductName,
-    p.ProductCategory,
-    p.Brand,
-    p.MarginPct AS ProductMarginPct,
-    i.quantity AS `Quantity`,
-    i.unit_price AS UnitPrice,
-    i.line_net_amount AS LineRevenue,
-    ROUND(i.quantity * p.UnitCost, 2) AS LineCost,
-    ROUND(i.line_net_amount - (i.quantity * p.UnitCost), 2) AS LineProfit
+    sc.order_id,
+    sc.customer_id,
+    sc.order_date,
+    sc.country,
+    sc.state,
+    sc.city,
+    sc.order_discount_pct,
+    sc.order_value,
+    sc.order_cost,
+    sc.order_profit,
+    sc.order_margin_pct,
+    i.product_id,
+    p.product_name,
+    p.product_category,
+    p.brand,
+    p.margin_pct AS product_margin_pct,
+    i.quantity AS `quantity`,
+    i.unit_price,
+    i.line_net_amount AS line_revenue,
+    ROUND(i.quantity * p.unit_cost, 2) AS line_cost,
+    ROUND(i.line_net_amount - (i.quantity * p.unit_cost), 2) AS line_profit
 FROM `kupferkanne-2026.sales.sales_curated` AS sc
 INNER JOIN `kupferkanne-2026.sales.stg_items_validated` AS i
-    ON sc.OrderID = i.order_id
+    ON sc.order_id = i.order_id
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
-    ON i.product_id = p.ProductID;
+    ON i.product_id = p.product_id;
 
 -- STEP 4: VALIDATION -----------------------------------------------------------
 SELECT

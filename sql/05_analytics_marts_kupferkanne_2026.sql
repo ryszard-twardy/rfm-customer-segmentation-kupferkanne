@@ -26,11 +26,11 @@
 --     showed an artificial drop-off for the partial month, creating
 --     misleading "revenue collapse" visualization.
 --   * Fix: both monthly views use a shared CTE pattern that anchors on
---     MAX(OrderDate) from sales_curated (not CURRENT_DATE, consistent with
+--     MAX(order_date) from sales_curated (not CURRENT_DATE, consistent with
 --     RFM pipeline anchor policy) and filters to complete months only.
---   * Logic: if MAX(OrderDate) is month-end, include that month; otherwise,
+--   * Logic: if MAX(order_date) is month-end, include that month; otherwise,
 --     last complete month is the month BEFORE the month containing
---     MAX(OrderDate).
+--     MAX(order_date).
 --   * Pattern is idempotent – future runs automatically adapt as new data
 --     arrives. No maintenance required when months complete naturally.
 --   * Other 4 views unchanged.
@@ -46,9 +46,9 @@
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_monthly_revenue` AS
 WITH data_boundary AS (
-    -- Anchor: last OrderDate in dataset (not CURRENT_DATE)
+    -- Anchor: last order_date in dataset (not CURRENT_DATE)
     -- Same principle as RFM recency anchor – ensures reproducible output
-    SELECT MAX(OrderDate) AS last_order_date
+    SELECT MAX(order_date) AS last_order_date
     FROM `kupferkanne-2026.sales.sales_curated`
 ),
 
@@ -65,20 +65,20 @@ last_complete_month AS (
 )
 
 SELECT
-    DATE_TRUNC(sc.OrderDate, MONTH) AS order_month,
-    FORMAT_DATE('%Y-%m', sc.OrderDate) AS month_label,
-    EXTRACT(YEAR FROM sc.OrderDate) AS order_year,
-    EXTRACT(MONTH FROM sc.OrderDate) AS order_month_num,
-    COUNT(DISTINCT sc.OrderID) AS total_orders,
-    COUNT(DISTINCT sc.CustomerID) AS active_customers,
-    ROUND(SUM(sc.OrderValue), 2) AS total_revenue,
-    ROUND(SUM(sc.OrderProfit), 2) AS total_profit,
-    ROUND(SAFE_DIVIDE(SUM(sc.OrderProfit), SUM(sc.OrderValue)), 4) AS margin_pct,
-    ROUND(AVG(sc.OrderValue), 2) AS avg_order_value,
-    SUM(sc.TotalUnits) AS total_units
+    DATE_TRUNC(sc.order_date, MONTH) AS order_month,
+    FORMAT_DATE('%Y-%m', sc.order_date) AS month_label,
+    EXTRACT(YEAR FROM sc.order_date) AS order_year,
+    EXTRACT(MONTH FROM sc.order_date) AS order_month_num,
+    COUNT(DISTINCT sc.order_id) AS total_orders,
+    COUNT(DISTINCT sc.customer_id) AS active_customers,
+    ROUND(SUM(sc.order_value), 2) AS total_revenue,
+    ROUND(SUM(sc.order_profit), 2) AS total_profit,
+    ROUND(SAFE_DIVIDE(SUM(sc.order_profit), SUM(sc.order_value)), 4) AS margin_pct,
+    ROUND(AVG(sc.order_value), 2) AS avg_order_value,
+    SUM(sc.total_units) AS total_units
 FROM `kupferkanne-2026.sales.sales_curated` AS sc
 CROSS JOIN last_complete_month AS lcm
-WHERE DATE_TRUNC(sc.OrderDate, MONTH) <= lcm.cutoff_month
+WHERE DATE_TRUNC(sc.order_date, MONTH) <= lcm.cutoff_month
 GROUP BY 1, 2, 3, 4;
 
 -- ============================================================================
@@ -87,20 +87,20 @@ GROUP BY 1, 2, 3, 4;
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_performance` AS
 SELECT
-    p.ProductID,
-    p.ProductName,
-    p.ProductCategory,
-    p.Brand,
-    p.RetailPrice,
-    p.UnitCost,
-    p.MarginPct AS product_margin_pct,
+    p.product_id,
+    p.product_name,
+    p.product_category,
+    p.brand,
+    p.retail_price,
+    p.unit_cost,
+    p.margin_pct AS product_margin_pct,
     COUNT(DISTINCT i.order_id) AS orders_containing,
     SUM(i.quantity) AS units_sold,
     ROUND(SUM(i.line_net_amount), 2) AS total_revenue,
-    ROUND(SUM(i.quantity * p.UnitCost), 2) AS total_cost,
-    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), 2) AS total_profit,
+    ROUND(SUM(i.quantity * p.unit_cost), 2) AS total_cost,
+    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), 2) AS total_profit,
     ROUND(
-        SAFE_DIVIDE(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), SUM(i.line_net_amount)),
+        SAFE_DIVIDE(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), SUM(i.line_net_amount)),
         4
     ) AS realized_margin_pct,
     ROUND(AVG(i.line_net_amount), 2) AS avg_line_revenue,
@@ -108,29 +108,35 @@ SELECT
     RANK() OVER (ORDER BY SUM(i.line_net_amount) DESC) AS revenue_rank,
     RANK() OVER (ORDER BY SUM(i.quantity) DESC) AS units_rank,
     RANK()
-        OVER (PARTITION BY p.ProductCategory ORDER BY SUM(i.line_net_amount) DESC)
+        OVER (PARTITION BY p.product_category ORDER BY SUM(i.line_net_amount) DESC)
         AS rank_within_category
 FROM `kupferkanne-2026.sales.stg_items_validated` AS i
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
-    ON i.product_id = p.ProductID
+    ON i.product_id = p.product_id
 GROUP BY
-    p.ProductID, p.ProductName, p.ProductCategory, p.Brand, p.RetailPrice, p.UnitCost, p.MarginPct;
+    p.product_id,
+    p.product_name,
+    p.product_category,
+    p.brand,
+    p.retail_price,
+    p.unit_cost,
+    p.margin_pct;
 
 -- ============================================================================
--- VIEW 3: Brand Profitability (unchanged)
+-- VIEW 3: brand Profitability (unchanged)
 -- ============================================================================
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_brand_profitability` AS
 SELECT
-    p.Brand,
-    COUNT(DISTINCT p.ProductID) AS product_count,
+    p.brand,
+    COUNT(DISTINCT p.product_id) AS product_count,
     COUNT(DISTINCT i.order_id) AS orders_containing,
     SUM(i.quantity) AS units_sold,
     ROUND(SUM(i.line_net_amount), 2) AS total_revenue,
-    ROUND(SUM(i.quantity * p.UnitCost), 2) AS total_cost,
-    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), 2) AS total_profit,
+    ROUND(SUM(i.quantity * p.unit_cost), 2) AS total_cost,
+    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), 2) AS total_profit,
     ROUND(
-        SAFE_DIVIDE(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), SUM(i.line_net_amount)),
+        SAFE_DIVIDE(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), SUM(i.line_net_amount)),
         4
     ) AS brand_margin_pct,
     ROUND(SAFE_DIVIDE(SUM(i.line_net_amount), SUM(i.quantity)), 2) AS revenue_per_unit,
@@ -138,8 +144,8 @@ SELECT
         AS revenue_share
 FROM `kupferkanne-2026.sales.stg_items_validated` AS i
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
-    ON i.product_id = p.ProductID
-GROUP BY p.Brand;
+    ON i.product_id = p.product_id
+GROUP BY p.brand;
 
 -- ============================================================================
 -- VIEW 4: Regional Performance (unchanged)
@@ -147,20 +153,20 @@ GROUP BY p.Brand;
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_regional_performance` AS
 SELECT
-    Country,
-    State,
-    City,
-    COUNT(DISTINCT CustomerID) AS customer_count,
-    COUNT(DISTINCT OrderID) AS order_count,
-    ROUND(SUM(OrderValue), 2) AS total_revenue,
-    ROUND(SUM(OrderProfit), 2) AS total_profit,
-    ROUND(SAFE_DIVIDE(SUM(OrderProfit), SUM(OrderValue)), 4) AS margin_pct,
-    ROUND(SAFE_DIVIDE(SUM(OrderValue), COUNT(DISTINCT CustomerID)), 2) AS arpu,
-    ROUND(AVG(OrderValue), 2) AS avg_order_value,
-    ROUND(SAFE_DIVIDE(SUM(OrderValue), SUM(SUM(OrderValue)) OVER ()), 4) AS revenue_share
+    country,
+    state,
+    city,
+    COUNT(DISTINCT customer_id) AS customer_count,
+    COUNT(DISTINCT order_id) AS order_count,
+    ROUND(SUM(order_value), 2) AS total_revenue,
+    ROUND(SUM(order_profit), 2) AS total_profit,
+    ROUND(SAFE_DIVIDE(SUM(order_profit), SUM(order_value)), 4) AS margin_pct,
+    ROUND(SAFE_DIVIDE(SUM(order_value), COUNT(DISTINCT customer_id)), 2) AS arpu,
+    ROUND(AVG(order_value), 2) AS avg_order_value,
+    ROUND(SAFE_DIVIDE(SUM(order_value), SUM(SUM(order_value)) OVER ()), 4) AS revenue_share
 FROM `kupferkanne-2026.sales.sales_curated`
-WHERE Country IS NOT NULL
-GROUP BY Country, State, City;
+WHERE country IS NOT NULL
+GROUP BY country, state, city;
 
 -- ============================================================================
 -- VIEW 5: Category Monthly Trend
@@ -173,7 +179,7 @@ GROUP BY Country, State, City;
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_category_monthly_trend` AS
 WITH data_boundary AS (
-    SELECT MAX(OrderDate) AS last_order_date
+    SELECT MAX(order_date) AS last_order_date
     FROM `kupferkanne-2026.sales.sales_curated`
 ),
 
@@ -188,45 +194,45 @@ last_complete_month AS (
 )
 
 SELECT
-    p.ProductCategory,
-    p.Brand,
-    DATE_TRUNC(sc.OrderDate, MONTH) AS order_month,
-    FORMAT_DATE('%Y-%m', sc.OrderDate) AS month_label,
-    COUNT(DISTINCT sc.OrderID) AS order_count,
+    p.product_category,
+    p.brand,
+    DATE_TRUNC(sc.order_date, MONTH) AS order_month,
+    FORMAT_DATE('%Y-%m', sc.order_date) AS month_label,
+    COUNT(DISTINCT sc.order_id) AS order_count,
     SUM(i.quantity) AS units_sold,
     ROUND(SUM(i.line_net_amount), 2) AS category_revenue,
-    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost), 2) AS category_profit,
+    ROUND(SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost), 2) AS category_profit,
     ROUND(SAFE_DIVIDE(
-        SUM(i.line_net_amount) - SUM(i.quantity * p.UnitCost),
+        SUM(i.line_net_amount) - SUM(i.quantity * p.unit_cost),
         SUM(i.line_net_amount)
     ), 4) AS category_margin_pct
 FROM `kupferkanne-2026.sales.sales_curated` AS sc
 INNER JOIN `kupferkanne-2026.sales.stg_items_validated` AS i
-    ON sc.OrderID = i.order_id
+    ON sc.order_id = i.order_id
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
-    ON i.product_id = p.ProductID
+    ON i.product_id = p.product_id
 CROSS JOIN last_complete_month AS lcm
-WHERE DATE_TRUNC(sc.OrderDate, MONTH) <= lcm.cutoff_month
+WHERE DATE_TRUNC(sc.order_date, MONTH) <= lcm.cutoff_month
 GROUP BY 1, 2, 3, 4;
 
 -- ============================================================================
--- VIEW 6: Country Summary (unchanged)
+-- VIEW 6: country Summary (unchanged)
 -- ============================================================================
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_country_summary` AS
 SELECT
-    Country,
-    COUNT(DISTINCT CustomerID) AS customers,
-    COUNT(DISTINCT OrderID) AS orders,
-    ROUND(SUM(OrderValue), 2) AS revenue,
-    ROUND(SUM(OrderProfit), 2) AS profit,
-    ROUND(SAFE_DIVIDE(SUM(OrderProfit), SUM(OrderValue)), 4) AS margin_pct,
-    ROUND(SAFE_DIVIDE(SUM(OrderValue), COUNT(DISTINCT CustomerID)), 2) AS arpu,
-    ROUND(AVG(OrderValue), 2) AS avg_order_value,
-    ROUND(SAFE_DIVIDE(SUM(OrderValue), SUM(SUM(OrderValue)) OVER ()), 4) AS revenue_share
+    country,
+    COUNT(DISTINCT customer_id) AS customers,
+    COUNT(DISTINCT order_id) AS orders,
+    ROUND(SUM(order_value), 2) AS revenue,
+    ROUND(SUM(order_profit), 2) AS profit,
+    ROUND(SAFE_DIVIDE(SUM(order_profit), SUM(order_value)), 4) AS margin_pct,
+    ROUND(SAFE_DIVIDE(SUM(order_value), COUNT(DISTINCT customer_id)), 2) AS arpu,
+    ROUND(AVG(order_value), 2) AS avg_order_value,
+    ROUND(SAFE_DIVIDE(SUM(order_value), SUM(SUM(order_value)) OVER ()), 4) AS revenue_share
 FROM `kupferkanne-2026.sales.sales_curated`
-WHERE Country IS NOT NULL
-GROUP BY Country;
+WHERE country IS NOT NULL
+GROUP BY country;
 
 -- ============================================================================
 -- VALIDATION: row counts per view + incomplete-month sanity check

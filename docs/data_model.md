@@ -72,10 +72,11 @@ The dual-grain approach prevents aggregation errors that would arise from joinin
 
 ## Naming conventions
 
-- Source column casing preserved (`CustomerID`, `OrderDate`, `LineNetAmount`).
-- BigQuery tables and views: `snake_case`.
-- Power BI measures: Title Case for multi-word labels; ID fields in camelCase.
-- All identifiers verbatim across SQL → DAX → documentation. No abbreviation drift.
+- Raw source tables (`dim_customers`, `dim_products`, `orders20*`, `items20*`): original PascalCase headers preserved (`CustomerID`, `OrderDate`, `LineNetAmount`); raw shapes are never edited in place.
+- Curated layer (standardisation views, staging, and everything downstream): `snake_case` columns (`customer_id`, `order_date`, `line_net_amount`). The casing flip happens exactly once, at the standardisation/staging boundary (`v_dim_*_std`, `stg_*` intake).
+- BigQuery tables and views: `snake_case` names.
+- Power BI: imported columns are remapped at the consumption point (Power Query `Table.RenameColumns`) to Title Case with spaces for multi-word labels (`Order Value`) and `Customer ID`-style for IDs. Measures: Title Case.
+- Identifiers are verbatim within each layer across SQL → M remap → DAX → documentation. No abbreviation drift.
 
 ## Schema contract
 
@@ -87,7 +88,7 @@ The dual-grain approach prevents aggregation errors that would arise from joinin
 
 | Field | Type | Source |
 |---|---|---|
-| `CustomerID` | STRING | Joined to `dim_customers` |
+| `customer_id` | STRING | Joined to `dim_customers` |
 | `r_score`, `f_score`, `m_score` | INT64 | `NTILE(5)` per dimension |
 | `composite_score` | INT64 | Sum 3–15 |
 | `segment` | STRING | Champions, Loyal Customers, Potential Loyalists, Recent Customers, At Risk, Hibernating |

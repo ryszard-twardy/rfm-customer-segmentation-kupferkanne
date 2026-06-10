@@ -74,9 +74,11 @@ table dim_Product
 				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
 				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
 				    dim_Product_View = sales_Schema{[Name="v_dim_products_std",Kind="View"]}[Data],
-				    #"Renamed Columns" = Table.RenameColumns(dim_Product_View,{{"ProductName", "Product Name"}, {"RetailPrice", "Retail Price"}, {"UnitCost", "Unit Cost"}, {"MarginPct", "Margin %"}, {"ProductCategory", "Product Category"}, {"ProductID", "Product ID"}})
+				    #"Renamed Columns" = Table.RenameColumns(dim_Product_View,{{"product_name", "Product Name"}, {"retail_price", "Retail Price"}, {"unit_cost", "Unit Cost"}, {"margin_pct", "Margin %"}, {"product_category", "Product Category"}, {"product_id", "Product ID"}, {"brand", "Brand"}})
 				in
 				    #"Renamed Columns"
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
 

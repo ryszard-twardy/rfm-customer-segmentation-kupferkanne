@@ -3,7 +3,7 @@
 -- STEP 04: LINE-GRAIN FACT FOR POWER BI
 -- ============================================================================
 -- Purpose:
---   Expose line-grain fact denormalized with OrderDate + CustomerID so Power BI
+--   Expose line-grain fact denormalized with order_date + customer_id so Power BI
 --   can relate directly to dim_products, dim_Date, dim_customers without
 --   bidirectional cross-filter via sales_curated.
 --
@@ -12,26 +12,26 @@
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_items_for_bi` AS
 SELECT
-    i.order_id AS OrderID,
-    i.product_id AS ProductID,
-    sc.CustomerID,
-    sc.OrderDate,
-    i.quantity AS `Quantity`,
-    ROUND(i.line_net_amount, 2) AS LineNetAmount,
-    ROUND(i.line_net_amount - (i.quantity * p.UnitCost), 2) AS LineProfit,
+    i.order_id,
+    i.product_id,
+    sc.customer_id,
+    sc.order_date,
+    i.quantity AS `quantity`,
+    ROUND(i.line_net_amount, 2) AS line_net_amount,
+    ROUND(i.line_net_amount - (i.quantity * p.unit_cost), 2) AS line_profit,
     ROUND(SAFE_DIVIDE(
-        i.line_net_amount - (i.quantity * p.UnitCost),
+        i.line_net_amount - (i.quantity * p.unit_cost),
         i.line_net_amount
-    ), 4) AS LineMarginPct
+    ), 4) AS line_margin_pct
 FROM `kupferkanne-2026.sales.stg_items_validated` AS i
 INNER JOIN `kupferkanne-2026.sales.sales_curated` AS sc
-    ON i.order_id = sc.OrderID
+    ON i.order_id = sc.order_id
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
-    ON i.product_id = p.ProductID;
+    ON i.product_id = p.product_id;
 
--- Validation: row count ~275K, SUM(LineNetAmount) ≈ €8.53M (header parity)
+-- Validation: row count ~275K, SUM(line_net_amount) ≈ €8.53M (header parity)
 SELECT
     COUNT(*) AS line_rows,
-    ROUND(SUM(LineNetAmount), 2) AS total_revenue,
-    ROUND(SUM(LineProfit), 2) AS total_profit
+    ROUND(SUM(line_net_amount), 2) AS total_revenue,
+    ROUND(SUM(line_profit), 2) AS total_profit
 FROM `kupferkanne-2026.sales.v_items_for_bi`;

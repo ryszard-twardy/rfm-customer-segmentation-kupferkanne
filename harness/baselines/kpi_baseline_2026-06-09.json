@@ -1,7 +1,7 @@
 {
   "bq_dataset_env": "KK_BQ_DATASET",
   "bq_project_env": "KK_BQ_PROJECT",
-  "captured_at_utc": "2026-06-09T07:59:11Z",
+  "captured_at_utc": "2026-06-09T14:48:13Z",
   "derived": {
     "aov": 50.55,
     "margin_pct": 59.78
@@ -15,32 +15,32 @@
   },
   "queries": {
     "distinct_customers": {
-      "sha256": "b28d01b185f9e9889083805559aadce075478e86cae137dd2828381c1ca91a48",
+      "sha256": "ca177a8b1a3fc0af7a6036627cef1fdaf368336a47b9005487655feaa7b87e65",
       "sources": [
         "sales_curated"
       ]
     },
     "distinct_orders": {
-      "sha256": "36fffbec0d01b656f5a1937dc5c92135bbff9029345c231ccedc30c545a7a548",
+      "sha256": "748dca4bbd3ea18c01e139a770095f7a4edaae8bf3fea2020bad691b1534a2f5",
       "sources": [
         "sales_curated"
       ]
     },
     "grain_parity": {
-      "sha256": "81b6ace159dbe5cedcc85d3e2184e7150d04a81d1b982f5cebfea470da8412f4",
+      "sha256": "70ac723c5aa39433ce714bb8281436bf59afa94f03c7b42409887378cf3fe196",
       "sources": [
         "sales_curated",
         "v_items_for_bi"
       ]
     },
     "total_profit": {
-      "sha256": "a8dbe7e0fc9ec13caf80735e807de63e22eab2b4be19d9262f6fcc17f03c6b17",
+      "sha256": "55b55347fa31eb43dc8d25f75bbbd775d6ba7bfbbed43cb4f403257121627518",
       "sources": [
         "sales_curated"
       ]
     },
     "total_revenue": {
-      "sha256": "f3ffcd5c5048d8ebfcaf7268fe083772311e79af36badc4a679e681ff48e56ed",
+      "sha256": "00715545cbb3bd83486acb2808d46583f4f7ba0a957f0a54cc88aeb0ab630406",
       "sources": [
         "sales_curated"
       ]
