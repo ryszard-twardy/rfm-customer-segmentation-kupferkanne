@@ -3,7 +3,7 @@
 ### Author: Ryszard Twardy
 ### v9 (2026-06-10) – synced to the snake_case BigQuery rename (issue #9): BigQuery curated columns are `snake_case`, remapped at import to the unchanged model column names; the source-mapping table now lists model columns. Full history in the Changelog.
 
-> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since dual-grain D026 (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the D060 single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
+> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
 ---
 
@@ -21,28 +21,28 @@
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
 *Model also contains `_Measures` (measure container) and `RFM Score Selector` (Field Parameter) - neither has a SQL source. Total model tables: 10.*
 
-**v6 architecture rule (R026):** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
+**v6 architecture rule:** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
-**Active relationships (5) - verified against `relationships.tmdl`, post-S4 / D060:**
+**Active relationships (5) - verified against `relationships.tmdl`, after the single-direction refactor:**
 - sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
-- dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **R3′, re-pointed onto merged dim_Segment (S4)**
+- dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **re-pointed onto the merged dim_Segment**
 
-**S3 / D060 (retire `v_rfm_for_bi`):** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (Fix-A bidirectional, D046, superseded by D060), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via R3′ (`dim_Customer[Segment] → dim_Segment[Segment]`). Bidirectional count: 2 → **1**.
+**Retiring `v_rfm_for_bi`:** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (a former bidirectional join, since superseded), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via `dim_Customer[Segment] → dim_Segment[Segment]`. Bidirectional count: 2 → **1**.
 
-**S4 / D060 (merge segment dims):** `dim_SegmentOrder` + `dim_SegmentActions` merged into a single `dim_Segment` (DAX DATATABLE, D074), and R3′ re-pointed onto `dim_Segment[Segment]`. The 1:1 bidirectional was dropped. Bidirectional count: 1 → **0** (D060 end state).
+**Merging the segment dimensions:** `dim_SegmentOrder` + `dim_SegmentActions` merged into a single `dim_Segment` (DAX DATATABLE), and the segment relationship re-pointed onto `dim_Segment[Segment]`. The 1:1 bidirectional was dropped. Bidirectional count: 1 → **0** (end state).
 
 ---
 
 ## Model Hygiene (v1.0.1 BPA batch, v7)
 
-The conventions below are model-wide metadata policies established during the v1.0.1 BPA batch (sessions 2026-05-22 and 2026-05-24, commits `43e4241`, `56eba2c`, `9679a4d`, `0491ed0`, `40f57f3`) and carried forward through the D060 single-direction refactor. They change no measure expressions and no display-folder structure. Every measure and column in this document conforms to them.
+The conventions below are model-wide metadata policies established during the v1.0.1 BPA batch (sessions 2026-05-22 and 2026-05-24) and carried forward through the single-direction refactor. They change no measure expressions and no display-folder structure. Every measure and column in this document conforms to them.
 
-### Format String Standards (F003, D044)
+### Format String Standards
 
-Per BPA rule **"Provide format string for measures"**, every numeric measure carries an explicit `FormatString`. Conventions (commit `43e4241`):
+Per BPA rule **"Provide format string for measures"**, every numeric measure carries an explicit `FormatString`. Conventions:
 
 | Semantic | FormatString | Example measures |
 |---|---|---|
@@ -59,15 +59,15 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
 
-**Batch script:** `tools/format_string_batch.csx` (R043 hygiene: `dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13; all 13 remaining are intentional (12 text + 1 `SWITCH`-format).
+**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13; all 13 remaining are intentional (12 text + 1 `SWITCH`-format).
 
-### Column Behavior: SummarizeBy = None (F006)
+### Column Behavior: SummarizeBy = None
 
-Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measure pattern (audit finding F006, issue #4), every non-additive numeric column on the fact and dimension tables has `SummarizeBy = None`. Users cannot drag a column onto a visual and get an implicit `SUM`, `COUNT`, or `AVERAGE` – they must select a named measure.
+Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measure pattern (issue #4), every non-additive numeric column on the fact and dimension tables has `SummarizeBy = None`. Users cannot drag a column onto a visual and get an implicit `SUM`, `COUNT`, or `AVERAGE` – they must select a named measure.
 
 **Why:** implicit aggregations have no `FormatString`, no documentation, no name. They drift silently as schemas evolve. Forcing explicit measures keeps the semantic layer honest and visible in the Fields pane.
 
-**Scope – 32 columns (commit `9679a4d`); authoritative target list in `tools/format_summarize_by_batch.csx`:**
+**Scope – 32 columns; authoritative target list in `tools/format_summarize_by_batch.csx`:**
 
 | Table | Cols | Columns |
 |---|---|---|
@@ -82,16 +82,16 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 
 `SummarizeBy = None` and `isHidden` are independent properties – a column can be `SummarizeBy = None` and still visible (`dim_Date[Year]`), or both `SummarizeBy = None` and hidden (`dim_Customer[Total Spend]`).
 
-### Foreign Key & Surrogate Key Visibility (F007)
+### Foreign Key & Surrogate Key Visibility
 
 Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema UX (Russo + Ferrari, *Definitive Guide to DAX*; Kimball, *Data Warehouse Toolkit*), keys that exist only to wire relationships are hidden; keys that double as user-facing attributes stay visible on their dimension.
 
 **Why (three rationales):**
 1. **Remove plumbing from the Fields pane** – `Customer ID` and `Product ID` are surrogate keys users never filter on directly (they filter by `Full Name`, `Country`, `Brand`, `Product Category`). Both are hidden on every table that carries them, fact and dimension alike. Keys that are themselves attributes – `Order Date` → `dim_Date[Date]`, `Segment` → `dim_Segment[Segment]` – stay visible so users can use them.
 2. **Enforce correct filter propagation** – in a single-direction star, filters flow from dimensions to facts. Dragging an FK from a fact creates a one-table-only filter context. Hiding the fact-side FK forces use of the dimension column, so a `dim_Customer` filter propagates to both `sales_curated` and `v_items_for_bi`.
-3. **Block implicit COUNT measures** – FK columns are Int/Text/DateTime. Hiding them pairs with F006 `SummarizeBy = None` and the force-explicit-measure pattern to fully block implicit aggregations.
+3. **Block implicit COUNT measures** – FK columns are Int/Text/DateTime. Hiding them pairs with the `SummarizeBy = None` policy and the force-explicit-measure pattern to fully block implicit aggregations.
 
-**Hidden – relationship & degenerate keys (commit `0491ed0`, retopologised in D060):**
+**Hidden – relationship & degenerate keys (retopologised in the single-direction refactor):**
 
 | Table | Hidden key column(s) | Class |
 |---|---|---|
@@ -100,20 +100,20 @@ Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema U
 | `sales_curated` | `Customer ID`, `Order Date` | FK → `dim_Customer`, `dim_Date` |
 | `sales_curated` | `Order ID` | degenerate dimension (no relationship) |
 | `v_items_for_bi` | `Customer ID`, `Product ID` | FK → `dim_Customer`, `dim_Product` |
-| `v_items_for_bi` | `Order ID` | degenerate dimension (inactive relationship removed, F008) |
+| `v_items_for_bi` | `Order ID` | degenerate dimension (inactive relationship removed) |
 
 Visible keys: `dim_Date[Date]` and `dim_Segment[Segment]` – user-facing attributes, not pure plumbing.
 
-**RFM analytic payload on `dim_Customer` (D060):** the D060 refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Recency Days`, `Order Count`, `Total Spend` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Pre-D060 these stayed visible under the D028 dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible.
+**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Recency Days`, `Order Count`, `Total Spend` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible.
 
-**What does NOT change after F007:**
+**What does NOT change after hiding the keys:**
 - Relationships remain functional – the engine resolves keys even when hidden
 - Existing measures unaffected – explicit DAX references columns regardless of `isHidden`
 - Storage / query performance unchanged – `isHidden` is UI-only
 
-### Hidden Fact Columns (F004, D043)
+### Hidden Fact Columns
 
-Per audit decision D043, four fact-source value columns are hidden so users reach them only through the canonical measures (commit `56eba2c`):
+Four fact-source value columns are hidden so users reach them only through the canonical measures:
 - `sales_curated[Order Value]`, `[Order Profit]`
 - `v_items_for_bi[Line Net Amount]`, `[Line Profit]`
 
@@ -152,11 +152,11 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 **Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand/category measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
 
-**Weighted margin principle (R008):** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
+**Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
-**Equal-weight benchmark (R025, NEW v6):** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
+**Equal-weight benchmark (new in v6):** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
 
-**Fact-grain principle (R026 + R028 dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
+**Fact-grain principle (dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
 
 ### Top Brand Name / Top Category Name – full formula
 
@@ -420,13 +420,13 @@ Subtitle Page 3 =
 "Profitability across " & [Total Products] & " products and " & [Total Brands] & " brands"
 ```
 
-**Design decision – Subtitle Page N convention (D022, R027, NEW v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
+**Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
 
 ---
 
 ## Product, brand and category measures (Page 3)
 
-Post-D060 the pre-aggregated views (`v_product_analytics`, `v_product_performance`, `v_brand_profitability`, `v_category_monthly_trend`) were removed from the model. Page 3 product, brand and category figures are now DAX measures (Folder 01), sourced from `dim_Product` as the axis or legend over the line-grain fact `v_items_for_bi` via `[Line Revenue]` and `[Line Margin %]`. See Folder 01 and the Data Model map above for the canonical definitions.
+After the single-direction refactor, the pre-aggregated views (`v_product_analytics`, `v_product_performance`, `v_brand_profitability`, `v_category_monthly_trend`) were removed from the model. Page 3 product, brand and category figures are now DAX measures (Folder 01), sourced from `dim_Product` as the axis or legend over the line-grain fact `v_items_for_bi` via `[Line Revenue]` and `[Line Margin %]`. See Folder 01 and the Data Model map above for the canonical definitions.
 
 ---
 
@@ -485,7 +485,7 @@ DATATABLE (
 
 After load: Sort by Column: Segment → SortOrder. Relationship: dim_Customer[Segment] → dim_Segment[Segment] (Many:1, single-direction).
 
-**Note (D074):** `dim_Segment` is a static DAX DATATABLE (no Power Query) that merges the former `dim_SegmentOrder` (sort order + color) and `dim_SegmentActions` (CRM attributes: email cadence, loyalty tier, discount approach, budget allocation) into one 7-column dimension, per the D060 single-direction refactor. `SortOrder` is hidden; `Segment` is the displayed key, sorted by `SortOrder`.
+**Note:** `dim_Segment` is a static DAX DATATABLE (no Power Query) that merges the former `dim_SegmentOrder` (sort order + color) and `dim_SegmentActions` (CRM attributes: email cadence, loyalty tier, discount approach, budget allocation) into one 7-column dimension, per the single-direction refactor. `SortOrder` is hidden; `Segment` is the displayed key, sorted by `SortOrder`.
 
 **Note:** the recommended-action column is not held here – it lives on `dim_Customer` (SQL: `recommended_action AS action`), the customer-grain dimension. No duplication.
 
@@ -516,13 +516,13 @@ Modeling → New Parameter → Name: Reactivation Rate, Min: 0, Max: 50, Increme
 
 ## Relationships
 
-The authoritative relationship list is the **Active relationships (5)** table in the Data Model section above (post-D060: 5 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
+The authoritative relationship list is the **Active relationships (5)** table in the Data Model section above (after the single-direction refactor: 5 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
 
 **Disconnected / standalone:** `dim_KPI_Selector` is a disconnected slicer (no relationship).
 
-### Fact-to-fact joins: explicitly NOT used (F008, v7)
+### Fact-to-fact joins: explicitly NOT used (v7)
 
-After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_curated[Order ID]` was removed. The model now has **zero inactive relationships**. The deliberate design choice – consistent with Kimball star-schema discipline and the dual-grain D026 architecture – is that fact tables never join directly to other fact tables. Instead:
+The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_curated[Order ID]` was removed. The model now has **zero inactive relationships**. The deliberate design choice – consistent with Kimball star-schema discipline and the dual-grain architecture – is that fact tables never join directly to other fact tables. Instead:
 
 - **Cross-fact filter propagation** flows through shared dimensions (`dim_Customer`, `dim_Product`, `dim_Date`)
 - **Order-grain ↔ line-grain reconciliation** is done via measure math, not a relationship. The `[Grain Reconciliation]` measure computes `[Total Revenue] − [Line Revenue]` and is invariant at zero. If it ever drifts from zero, the dimension-mediated join has broken – that's the signal, not a relationship line in the model
@@ -559,7 +559,7 @@ After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_
 - Cleaner than 3 separate charts + bookmarks
 - Row-context issues make SELECTEDVALUE-based approaches return BLANK on score axis
 
-**Note (D060):** the three score columns this Field Parameter references (`R Score`, `F Score`, `M Score`) live on `dim_Customer` and are hidden – part of the RFM analytic payload merged from the former `v_rfm_for_bi` satellite. Field parameters resolve hidden source columns, so the slicer works while the raw columns stay out of the Fields pane (see Model Hygiene → Foreign Key & Surrogate Key Visibility). The pre-D060 D028 satellite-visibility exception no longer applies.
+**Note:** the three score columns this Field Parameter references (`R Score`, `F Score`, `M Score`) live on `dim_Customer` and are hidden – part of the RFM analytic payload merged from the former `v_rfm_for_bi` satellite. Field parameters resolve hidden source columns, so the slicer works while the raw columns stay out of the Fields pane (see Model Hygiene → Foreign Key & Surrogate Key Visibility). The earlier satellite-visibility exception no longer applies.
 
 ---
 
@@ -572,34 +572,34 @@ After F008 (commit `40f57f3`), the auto-detected inactive relationship `v_items_
 - Changelog entries v2–v8 are historical record and intentionally retain the column names current at the time they were written.
 
 ### v8 (2026-06-06)
-- **D060 docs-sync (Phase 3, issue #13):** reconciled this document to the post-D060 single-direction model – RFM payload folded onto `dim_Customer`, segment dimensions merged into `dim_Segment`, pre-aggregated views retired. Documentation-only; no measure logic changed.
+- **Single-direction docs-sync (issue #13):** reconciled this document to the post-refactor single-direction model – RFM payload folded onto `dim_Customer`, segment dimensions merged into `dim_Segment`, pre-aggregated views retired. Documentation-only; no measure logic changed.
 - **Relationships + data model map** rewritten to the live topology (5 active relationships, 0 bidirectional; 10 tables; phantom view rows removed).
-- **Model Hygiene** (F003/F004/F006/F007) inventories synced to live: F006 = 32 columns, hidden inventory = 20 columns, `D044` relocated to F003. The D028 satellite-visibility exception retired – the RFM payload on `dim_Customer` is hidden, surfaced via measures and the Page-2 Field Parameter.
-- **Segment dimension:** `dim_SegmentOrder` block replaced by the merged 7-column `dim_Segment` DATATABLE (D074).
+- **Model Hygiene** inventories synced to live: the SummarizeBy policy covers 32 columns, hidden inventory = 20 columns, the format-string conventions consolidated into one section. The earlier satellite-visibility exception retired – the RFM payload on `dim_Customer` is hidden, surfaced via measures and the Page-2 Field Parameter.
+- **Segment dimension:** `dim_SegmentOrder` block replaced by the merged 7-column `dim_Segment` DATATABLE.
 - **Measure inventory** rebuilt to the live **47 measures**: ordinal `#` column dropped (name-keyed); 9 measures added (`Line Revenue`/`Line Profit`/`Line Margin %`, `Grain Reconciliation`, `Dynamic KPI Label`, `R`/`M`/`F Label`, plus a `Reactivation Rate Value` note); `Monthly Trend Title` renamed `Revenue Trend Chart Title`; header and total reconciled to 47.
 - **DAX / source blocks** synced to live: `dim_Date` (M), `dim_KPI_Selector` (DATATABLE), `[Dynamic KPI Selector]` SWITCH literals and column refs.
-- **Field Parameter note** corrected: R/F/M Score columns are hidden on `dim_Customer`, not visible per the retired D028 exception.
+- **Field Parameter note** corrected: R/F/M Score columns are hidden on `dim_Customer`, not visible per the retired satellite exception.
 - **Deferred / tracked separately:** `[Segment Color]` measure realign to Muted Earth (#15); Pages-column reconciliation (live report = 7 pages); optional cosmetic SQLBI-formatting normalization of DAX blocks.
 
 ### v7 (2026-05-24)
-- **v1.0.1 BPA-batch sync per R041** (atomic invariant: BPA + docs same session). All four findings landed across two sessions (2026-05-22, 2026-05-24), all in `main` at HEAD `40f57f3`
-- **F003 (commit `43e4241`):** 32 measures normalized FormatStrings per SQLBI gold standard. New **Format String Standards** section documents conventions (currency, percent, count, decimal, date, text). Batch script `tools/format_string_batch.csx` introduced per R043 hygiene (dryRun + manual-override + `INFO.VIEW.*` pre-flight)
-- **F004 (commit `56eba2c`):** 4 critical fact-source columns hidden (`sales_curated[Order Value]/[Order Profit]`, `v_items_for_bi[Line Net Amount]/[Line Profit]`). Documented in new **Hidden Fact Columns** section. BPA "Hide fact table columns" rule retains 8 intentional flags (Recency Days, Order Count, Total Spend, R/F/M/Health Scores, Source Month) – all used in Field Parameters / slicers / visuals
-- **F006 (commit `9679a4d`):** 33 columns `SummarizeBy=None` per D044 force-explicit-measure pattern. New **Column Behavior** section explains why implicit aggregations are blocked. Batch script `tools/format_summarize_by_batch.csx` (explicit targets list, KeyValuePair pattern for TE2 Roslyn pre-C# 7.0). BPA delta: 28 → 0
-- **F007 (commit `0491ed0`):** 10 FK columns hidden per Kimball / SQLBI defensive star-schema UX. New **Foreign Key Visibility** section with three rationales (eliminate duplicate fields, enforce filter propagation, prevent implicit COUNT). D028 dual-grain customer satellite documented as exception: `v_rfm_for_bi` non-FK analytic columns remain visible. BPA delta: 10 → 0
-- **F008 (commit `40f57f3`):** removed auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_curated[Order ID]`. **Relationships** section updated with explicit "fact-to-fact joins NOT used" policy and grain-reconciliation-via-measure-math (Grain Reconciliation invariant = 0). BPA delta: 1 → 0
-- **F028 (RESOLVED 2026-05-22):** `dim_SegmentOrder` DATATABLE expression reformatted per SQLBI / daxformatter.com gold standard (spaces inside parens, padded braces). Reflected in the dim_SegmentOrder DAX block above
+- **v1.0.1 BPA-batch sync** (atomic invariant: BPA + docs same session). All four findings landed across two sessions (2026-05-22, 2026-05-24), all in `main`.
+- **Format strings:** 32 measures normalized FormatStrings per SQLBI gold standard. New **Format String Standards** section documents conventions (currency, percent, count, decimal, date, text). Batch script `tools/format_string_batch.csx` introduced (dryRun + manual-override + `INFO.VIEW.*` pre-flight)
+- **Hidden fact columns:** 4 critical fact-source columns hidden (`sales_curated[Order Value]/[Order Profit]`, `v_items_for_bi[Line Net Amount]/[Line Profit]`). Documented in new **Hidden Fact Columns** section. BPA "Hide fact table columns" rule retains 8 intentional flags (Recency Days, Order Count, Total Spend, R/F/M/Health Scores, Source Month) – all used in Field Parameters / slicers / visuals
+- **SummarizeBy policy:** 33 columns `SummarizeBy=None` per the force-explicit-measure pattern. New **Column Behavior** section explains why implicit aggregations are blocked. Batch script `tools/format_summarize_by_batch.csx` (explicit targets list, KeyValuePair pattern for TE2 Roslyn pre-C# 7.0). BPA delta: 28 → 0
+- **Foreign-key visibility:** 10 FK columns hidden per Kimball / SQLBI defensive star-schema UX. New **Foreign Key Visibility** section with three rationales (eliminate duplicate fields, enforce filter propagation, prevent implicit COUNT). The dual-grain customer satellite documented as exception: `v_rfm_for_bi` non-FK analytic columns remain visible. BPA delta: 10 → 0
+- **Fact-to-fact join removed:** removed auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_curated[Order ID]`. **Relationships** section updated with explicit "fact-to-fact joins NOT used" policy and grain-reconciliation-via-measure-math (Grain Reconciliation invariant = 0). BPA delta: 1 → 0
+- **DATATABLE formatting (resolved 2026-05-22):** `dim_SegmentOrder` DATATABLE expression reformatted per SQLBI / daxformatter.com gold standard (spaces inside parens, padded braces). Reflected in the dim_SegmentOrder DAX block above
 - **No measure inventory change.** All v1.0.1 batch findings were metadata operations (FormatString / Hidden / SummarizeBy / relationship removal). Folder structure, measure definitions, and counts unchanged from v6. Stale `Total: 29` tally line preserved with a note pointing to actual v6 inventory (36 + 3 Subtitle + Field Parameter)
-- **F005 (Float → Fixed Decimal type change) deferred to v1.1** per O1 – type change has measure-recompute and storage-format implications, warrants its own session with full regression suite
+- **Float → Fixed Decimal type change deferred to v1.1** – type change has measure-recompute and storage-format implications, warrants its own session with full regression suite
 
 ### v6 (2026-04-24)
 - **sales_curated imported as primary fact table** – order-grain curated table (~169K rows). 3 new relationships to dim_customers, dim_products, dim_Date
 - **Measure #1 `Total Revenue` refactored:** `SUM(v_rfm_for_bi[total_spend])` → `SUM(sales_curated[LineNetAmount])`. Resolves Top 15 Products bar chart bug (filter context didn't propagate from product Y-axis to Customer-grain measure)
 - **Measure #26 `Total Profit` refactored:** `SUM(v_rfm_for_bi[total_profit])` → `SUM(sales_curated[LineProfit])`
 - **+7 Page 3 measures (#30-#36):** Total Products, Total Brands, Top Brand Revenue, Top Brand Name, Avg Brand Margin %, Top Category Revenue, Top Category Name
-- **Subtitle Page N convention (D022, R027):** Measure #29 renamed `Executive Summary Subtitle` → `Subtitle Page 1`. Added #37 `Subtitle Page 2` (refactored from static text to dynamic) and #38 `Subtitle Page 3` (new for Page 3 build)
-- **Two-tier margin (R025, D023):** `Profit Margin %` (weighted, P&L truth, 59.78%) + `Avg Brand Margin %` (equal-weight, benchmarking, 51.88%). Both legitimate, qualifying labels mandatory
-- **Architecture rule R026:** `[Total Revenue]`/`[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only
+- **Subtitle Page N convention:** Measure #29 renamed `Executive Summary Subtitle` → `Subtitle Page 1`. Added #37 `Subtitle Page 2` (refactored from static text to dynamic) and #38 `Subtitle Page 3` (new for Page 3 build)
+- **Two-tier margin:** `Profit Margin %` (weighted, P&L truth, 59.78%) + `Avg Brand Margin %` (equal-weight, benchmarking, 51.88%). Both legitimate, qualifying labels mandatory
+- **Architecture rule:** `[Total Revenue]`/`[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only
 - Total measure count: 36 + 3 Subtitle (Pages 1-3) + Field Parameter
 
 ### v5 (2026-04-22)

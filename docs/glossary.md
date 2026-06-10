@@ -19,7 +19,7 @@ Domain and technical terms used across the project.
 | **Recency anchor** | The reference date from which "days since last order" is measured. This project uses `MAX(order_date)` rather than `CURRENT_DATE()`, so segmentation is reproducible on the bounded historical dataset. |
 | **RFM** | Recency, Frequency, Monetary – a customer segmentation framework based on observed transaction behaviour. |
 | **Sharding (BigQuery)** | Splitting a logical table across many physically-named tables (`orders202301`, `orders202302`, ...). BigQuery scans them via wildcard syntax (`orders20*`). |
-| **`sales_curated`** | The order-grain curated fact table (~169K rows) used by five of the six Power BI pages. See [ADR 0005](adr/0005-dual-grain-fact-model.md). |
+| **`sales_curated`** | The order-grain curated fact table (~169K rows) used by most of the Power BI report pages. See [ADR 0005](adr/0005-dual-grain-fact-model.md). |
 | **Star schema** | Database design with central fact tables surrounded by dimension tables, enabling simple SQL joins and fast aggregation. |
 | **`v_items_for_bi`** | The line-grain BI view (~275K rows) used by the Product page. |
 | **Weighted margin** | `SUM(profit) / SUM(revenue)`, contrasted with `AVG(margin_per_order)` which double-weights small orders. See [ADR 0007](adr/0007-two-tier-margin-calculation.md). |
