@@ -18,3 +18,7 @@ relationship 3a69b719-44af-4a10-b02a-23df85e87aa7
 	fromColumn: dim_Customer.Segment
 	toColumn: dim_Segment.Segment
 
+relationship 3feead27-c33e-4a2b-abd0-f4928dcefe00
+	fromColumn: v_items_for_bi.'Order Date'
+	toColumn: dim_Date.Date
+

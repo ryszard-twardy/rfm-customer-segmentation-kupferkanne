@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 47 DAX Measures (46 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v10 (2026-06-10) – reconciled to the post-hygiene model: `[Total Spend]` is now visible to match `[Total Profit]` (#18); `Country`/`State`/`City` removed from the `sales_curated` import, leaving `dim_Customer` as the sole geography owner (#19); `[Distinct Orders]` documented as order-grain and not slice-able by `dim_Product` (#20). Full history in the Changelog.
+### v11 (2026-06-11) – model change: added the active single-direction relationship `v_items_for_bi[Order Date]` → `dim_Date[Date]` (M:1), making the line-grain measures (`[Line Revenue]`, `[Line Margin %]`) slice-able by `dim_Date` for the Page 3 category-trend visual; topology 6 active / 0 bidirectional. Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -23,11 +23,12 @@
 
 **v6 architecture rule:** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
-**Active relationships (5) - verified against `relationships.tmdl`, after the single-direction refactor:**
+**Active relationships (6) - verified against `relationships.tmdl`, after the single-direction refactor:**
 - sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
+- v_items_for_bi[Order Date] → dim_Date[Date] | M:1 | Single - **added in v11: date-slicing for the line-grain measures (Page 3 build)**
 - dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **re-pointed onto the merged dim_Segment**
 
 **Retiring `v_rfm_for_bi`:** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (a former bidirectional join, since superseded), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via `dim_Customer[Segment] → dim_Segment[Segment]`. Bidirectional count: 2 → **1**.
@@ -99,7 +100,7 @@ Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema U
 | `dim_Product` | `Product ID` | PK / target of `v_items_for_bi` FK |
 | `sales_curated` | `Customer ID`, `Order Date` | FK → `dim_Customer`, `dim_Date` |
 | `sales_curated` | `Order ID` | degenerate dimension (no relationship) |
-| `v_items_for_bi` | `Customer ID`, `Product ID` | FK → `dim_Customer`, `dim_Product` |
+| `v_items_for_bi` | `Customer ID`, `Product ID`, `Order Date` | FK → `dim_Customer`, `dim_Product`, `dim_Date` |
 | `v_items_for_bi` | `Order ID` | degenerate dimension (inactive relationship removed) |
 
 Visible keys: `dim_Date[Date]` and `dim_Segment[Segment]` – user-facing attributes, not pure plumbing.
@@ -119,7 +120,7 @@ Four fact-source value columns are hidden so users reach them only through the c
 
 These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]`, `[Line Profit]`, which reference the columns explicitly in DAX.
 
-**Total hidden across the model: 19 columns** – 8 relationship/degenerate keys, 4 fact-source value columns, 6 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`).
+**Total hidden across the model: 20 columns** – 9 relationship/degenerate keys, 4 fact-source value columns, 6 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`).
 
 ---
 
@@ -518,7 +519,7 @@ Modeling → New Parameter → Name: Reactivation Rate, Min: 0, Max: 50, Increme
 
 ## Relationships
 
-The authoritative relationship list is the **Active relationships (5)** table in the Data Model section above (after the single-direction refactor: 5 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
+The authoritative relationship list is the **Active relationships (6)** table in the Data Model section above (after the single-direction refactor and the v11 date-join addition: 6 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
 
 **Disconnected / standalone:** `dim_KPI_Selector` is a disconnected slicer (no relationship).
 
@@ -566,6 +567,13 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v11 (2026-06-11)
+- **Relationship added (model change):** `v_items_for_bi[Order Date]` → `dim_Date[Date]` | M:1 | Single – active, single cross-filter direction, mirroring the existing `sales_curated[Order Date]` → `dim_Date[Date]` join. Enables date-slicing of the line-grain measures (`[Line Revenue]`, `[Line Margin %]`) for the Page 3 category-trend visual.
+- **Topology:** 5 → **6 active relationships**, 0 bidirectional (unchanged); all M:1 single-direction, dimension → fact only. No new ambiguous or cyclic filter path – `dim_Date` now filters both facts directly and still has no path to `dim_Customer`.
+- **Active relationships** list (Data Model section) and the **Relationships** section updated 5 → 6, re-verified against `relationships.tmdl`.
+- No measure logic, names, or counts changed – 47 measures intact.
+- **`v_items_for_bi[Order Date]` hidden** – the column became a relationship FK, so the FK-visibility policy applies (hidden inventory 19 → 20; relationship/degenerate keys 8 → 9). The BPA "integer data type for relationship columns" flag on date joins is accepted, consistent with the existing `sales_curated[Order Date]` → `dim_Date[Date]` join.
 
 ### v10 (2026-06-10)
 - **Model-hygiene docs-sync (#18, #19, #20):** reconciled this document to the live post-hygiene model. `[Total Spend]` unhidden to match `[Total Profit]` (#18); the hidden inventory, recounted from TMDL, is now **19 columns** (6 RFM payload on `dim_Customer`, down from 7).
