@@ -63,7 +63,7 @@ table dim_Segment
 	partition dim_Segment = calculated
 		mode: import
 		source = ```
-
+				
 				DATATABLE (
 				    "Segment", STRING,
 				    "Email Cadence", STRING,
@@ -81,7 +81,8 @@ table dim_Segment
 				        { "Hibernating", "Quarterly", "None", "Win-back 20%", "Minimal (3%)", 6, "#A5A29A" }
 				    }
 				)
-
+				
 				```
 
 	annotation PBI_Id = f73a9414a7614ec3b6a24a06acb85a56
+

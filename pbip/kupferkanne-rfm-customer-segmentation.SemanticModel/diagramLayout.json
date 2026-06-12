@@ -10,26 +10,26 @@
       "nodes": [
         {
           "location": {
-            "x": 1129.8855157414696,
-            "y": 697.00537225741925
+            "x": 981.89115967491011,
+            "y": 0
           },
           "nodeIndex": "dim_Product",
           "nodeLineageTag": "16c1ff24-1f36-449a-8526-2689831d69d7",
           "size": {
-            "height": 415.0542352569496,
+            "height": 263.69637109796855,
             "width": 234
           },
           "zIndex": 10
         },
         {
           "location": {
-            "x": 0,
+            "x": 1.1211693641405986,
             "y": 0
           },
           "nodeIndex": "dim_Date",
           "nodeLineageTag": "78a8554d-0a78-42cf-ba12-d6fd9828b172",
           "size": {
-            "height": 412.11693641406021,
+            "height": 558.9901231164788,
             "width": 234
           },
           "zIndex": 12
@@ -75,8 +75,8 @@
         },
         {
           "location": {
-            "x": 386.21155986132811,
-            "y": 35.877419652499221
+            "x": 628.38414251569793,
+            "y": 0
           },
           "nodeIndex": "dim_Segment",
           "nodeLineageTag": "621bf52c-3cb6-4bce-b4f0-689ad9630086",
@@ -101,38 +101,39 @@
         },
         {
           "location": {
-            "x": 4.4846774565623946,
-            "y": 650.873032938537
+            "x": 0,
+            "y": 703.56799305314507
           },
           "nodeIndex": "sales_curated",
           "nodeLineageTag": "e0136b96-5a72-4e68-aedd-e60e9d130abe",
           "size": {
-            "height": 562.32967186477481,
+            "height": 461.42442909212082,
             "width": 234
           },
           "zIndex": 11
         },
         {
           "location": {
-            "x": 786.33014275558844,
-            "y": 712.41637123795715
+            "x": 782.96663466316659,
+            "y": 697.84116950412931
           },
           "nodeIndex": "v_items_for_bi",
           "nodeLineageTag": "7d5271c9-b37f-40b8-97c4-4763500a711a",
           "size": {
-            "height": 391.96512196304423,
+            "height": 486.14334855085474,
             "width": 234
           },
           "zIndex": 9
         },
         {
           "location": {
-            "x": 396.634542335626,
-            "y": 616.759564421981
+            "x": 324.87970303062752,
+            "y": 0
           },
           "nodeIndex": "dim_Customer",
+          "nodeLineageTag": "a65f55b2-508b-41d2-bef5-6163e47086a2",
           "size": {
-            "height": 407.73066406134444,
+            "height": 564.69437504102859,
             "width": 234
           },
           "zIndex": 0

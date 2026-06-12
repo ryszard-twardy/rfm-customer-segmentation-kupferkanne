@@ -22,12 +22,12 @@ ref table dim_Customer
 ref table dim_Product
 ref table dim_Date
 ref table _Measures
-ref table dim_Segment
 ref table dim_KPI_Selector
 ref table 'Reactivation Rate'
 ref table 'RFM Score Selector'
 ref table sales_curated
 ref table v_items_for_bi
+ref table dim_Segment
 
 ref cultureInfo en-US
 
