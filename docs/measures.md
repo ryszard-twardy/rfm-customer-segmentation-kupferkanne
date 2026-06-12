@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 47 DAX Measures (46 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 49 DAX Measures (48 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v11 (2026-06-11) – model change: added the active single-direction relationship `v_items_for_bi[Order Date]` → `dim_Date[Date]` (M:1), making the line-grain measures (`[Line Revenue]`, `[Line Margin %]`) slice-able by `dim_Date` for the Page 3 category-trend visual; topology 6 active / 0 bidirectional. Full history in the Changelog.
+### v13 (2026-06-12) – Page 3 rebuild support (#24): added `[Combo Chart Title]` (text measure bound via fx to the Page 3 combo chart title; inventory 48 → 49); `dim_Date` extended with `Start of Month` / `Start of Quarter` / `Start of Year` (type date) and the **Calendar Drill** hierarchy (replacing `Date Hierarchy`); `[Subtitle Page 3]` currently unbound. Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -15,7 +15,7 @@
 | **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~275K)** | Order ID, Product ID, Customer ID, Order Date, Quantity, Line Net Amount, Line Profit, Line Margin % |
 | dim_Customer | `v_dim_customers_for_bi` (VIEW) | 1 row per customer | Customer ID, Full Name, Email, Country, Segment, Recency Days, Order Count, Total Spend, R Score, F Score, M Score, Health Score, Action |
 | dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | Product ID, Product Name, Brand, Margin % |
-| dim_Date | Power Query (M) calendar | 1 row per day | Date, Year, Month, Year-Month |
+| dim_Date | Power Query (M) calendar | 1 row per day | Date, Year, Month, Year-Month, Start of Week/Month/Quarter/Year |
 | dim_Segment | DAX DATATABLE | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder, SegmentColor |
 | dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI (disconnected) |
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 34 of 47 measures carry an explicit `FormatString`. The 13 without: 12 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 35 of 49 measures carry an explicit `FormatString`. The 14 without: 13 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -142,6 +142,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | – |
 | Line Profit | `SUM(v_items_for_bi[Line Profit])` | € Currency, 2dp | – |
 | Line Margin % | `DIVIDE([Line Profit], [Line Revenue], 0)` | % 2dp | – |
+| Line Quantity | `SUM(v_items_for_bi[Quantity])` | # 0dp | 3 |
 | Grain Reconciliation | `[Total Revenue] - [Line Revenue]` | € Currency, 2dp | – |
 | Total Products | `DISTINCTCOUNT(dim_Product[Product ID])` | # 0dp | 3 |
 | Total Brands | `DISTINCTCOUNT(dim_Product[Brand])` | # 0dp | 3 |
@@ -338,10 +339,11 @@ SWITCH(
 | Revenue Trend Chart Title | Dynamic line chart title with live month count | Text | 1 |
 | Subtitle Page 1 | Dynamic Page 1 subtitle with live month count | Text | 1 |
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
-| Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
+| Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts – **currently unbound** (see note below) | Text | – |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
+| Combo Chart Title | Dynamic Page 3 combo chart title with top brand name + revenue | Text | 3 |
 
 ```dax
 Health Indicator =
@@ -425,6 +427,18 @@ Subtitle Page 3 =
 
 **Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
 
+**Status as of v13:** `[Subtitle Page 3]` is **currently unbound** – the rebuilt Page 3 (#24) subtitle text box uses a static literal. The measure is kept; rebind is planned in the B.4 cross-page dynamic-subtitle slice.
+
+```dax
+Combo Chart Title =
+"Brand Revenue x Margin % - top brand "
+    & [Top Brand Name]
+    & " drives "
+    & FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )
+```
+
+**Design decision – dynamic combo title (new in v13):** the Page 3 brand combo chart binds its Title to `[Combo Chart Title]` via fx (Field value), following the `[Revenue Trend Chart Title]` pattern. The headline brand and its compact-formatted revenue come from `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`, so the title auto-updates under slicer context – no manual edits as the leader changes.
+
 ---
 
 ## Product, brand and category measures (Page 3)
@@ -456,12 +470,18 @@ let
     #"Inserted Day" = Table.AddColumn(#"Inserted Start of Week", "Day", each Date.Day([Date]), Int64.Type),
     #"Inserted Day Name" = Table.AddColumn(#"Inserted Day", "Day Name", each Date.DayOfWeekName([Date]), type text),
     #"Inserted Day Number" = Table.AddColumn(#"Inserted Day Name", "Day Number", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
-    #"Added Year-Month-Number" = Table.AddColumn(#"Inserted Day Number", "Year-Month-Number", each [Year] * 100 + [Month], Int64.Type)
+    #"Added Year-Month-Number" = Table.AddColumn(#"Inserted Day Number", "Year-Month-Number", each [Year] * 100 + [Month], Int64.Type),
+    #"Inserted Start of Month" = Table.AddColumn(#"Added Year-Month-Number", "Start of Month", each Date.StartOfMonth([Date]), type date),
+    #"Inserted Start of Quarter" = Table.AddColumn(#"Inserted Start of Month", "Start of Quarter", each Date.StartOfQuarter([Date]), type date),
+    #"Inserted Start of Year" = Table.AddColumn(#"Inserted Start of Quarter", "Start of Year", each Date.StartOfYear([Date]), type date),
+    #"Reordered Columns" = Table.ReorderColumns(#"Inserted Start of Year",{"Date", "Year", "Month", "Month Name", "Year-Month", "Quarter", "Week of Year", "Day", "Day Name", "Year-Month-Number", "Day Number", "Start of Week", "Start of Month", "Start of Quarter", "Start of Year"})
 in
-    #"Added Year-Month-Number"
+    #"Reordered Columns"
 ```
 
 After load: Mark as Date Table (Date column). Sort by Column: Month Name → Month. Sort by Column: Day Name → Day Number.
+
+**Hierarchy – Calendar Drill (new in v13):** `Start of Year` > `Start of Quarter` > `Start of Month` > `Start of Week` > `Date`. All `Start of *` levels are date-typed (`type date` in M, `UnderlyingDateTimeDataType = Date`), so drill levels render on a continuous axis. Built for the Page 3 category-trend line chart (#24), which sits at the `Start of Month` level. Replaces the former `Date Hierarchy` (`Date`, `Year-Month`), removed in v13; its single consumer, a temporary Page 4 trend visual, was deleted in the same change.
 
 ### dim_Segment – DAX DATATABLE
 
@@ -535,7 +555,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 47 measures – 46 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No orphans, no redundant calculations.
+## Total: 49 measures – 48 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. One known unbound measure: `[Subtitle Page 3]` (kept; rebind planned in the B.4 cross-page dynamic-subtitle slice). No redundant calculations.
 
 ---
 
@@ -567,6 +587,17 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v13 (2026-06-12)
+- **`[Combo Chart Title]` added** – text measure, folder `06 - Formatting & Regional`, no FormatString (text-measure convention); bound via fx (Field value) to the Page 3 brand combo chart title (#24). Composes `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`.
+- **Measure inventory 48 → 49** (48 in 6 display folders + 1 What-If parameter measure); header, FormatString coverage (35 of 49; the 14 without = 13 intentional text measures + `[Dynamic KPI Selector]`), and the Total line reconciled.
+- **`dim_Date` extended (model change):** new columns `Start of Month`, `Start of Quarter`, `Start of Year` – M steps `Date.StartOfMonth/StartOfQuarter/StartOfYear`, `type date`, `SummarizeBy: None`; a `Reordered Columns` step groups them with `Start of Week` at the end of the column list. M-code block synced to the live partition query.
+- **Hierarchy `Calendar Drill` added** (`Start of Year` > `Start of Quarter` > `Start of Month` > `Start of Week` > `Date`) for the Page 3 category-trend line chart, active at the `Start of Month` level. The former `Date Hierarchy` (`Date`, `Year-Month`) was **removed**; its single consumer – a temporary Page 4 trend visual – was deleted in the same change (#24). The `Year-Month` column itself remains.
+- **`[Subtitle Page 3]` currently unbound** – the rebuilt Page 3 subtitle text box uses a static literal. Measure kept; rebind planned in the B.4 cross-page dynamic-subtitle slice.
+
+### v12 (2026-06-11)
+- **`[Line Quantity]` added** – `SUM ( v_items_for_bi[Quantity] )`, format `#,##0`, folder `01 - Core KPIs`, no PBI_FormatHint (integer-format convention); placed with the other `[Line *]` measures. Needed for the Page 3 product detail table (#24); an explicit measure is required because F006 disables implicit aggregation (`SummarizeBy: none`) on `Quantity`.
+- **Measure inventory 47 → 48** (47 in 6 display folders + 1 What-If parameter measure); header, FormatString coverage (35 of 48), and the Total line reconciled. No other measure logic, names, or relationships changed.
 
 ### v11 (2026-06-11)
 - **Relationship added (model change):** `v_items_for_bi[Order Date]` → `dim_Date[Date]` | M:1 | Single – active, single cross-filter direction, mirroring the existing `sales_curated[Order Date]` → `dim_Date[Date]` join. Enables date-slicing of the line-grain measures (`[Line Revenue]`, `[Line Margin %]`) for the Page 3 category-trend visual.

@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "5ac3f064d31318c019a3",
+  "name": "e22a24a198bcb82c1606",
   "position": {
-    "x": 0,
-    "y": 0,
+    "x": 857.5,
+    "y": 120,
     "z": 0,
-    "height": 720,
-    "width": 60,
-    "tabOrder": 6000
+    "height": 12.75,
+    "width": 12.25,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "shape",
@@ -35,26 +35,6 @@
                 }
               }
             }
-          }
-        }
-      ],
-      "fill": [
-        {
-          "properties": {
-            "fillColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#0F172A'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "default"
           }
         }
       ],
@@ -86,7 +66,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Sidebar_Background'"
+                  "Value": "'Helper - 12x12 px'"
                 }
               }
             }
@@ -105,10 +85,23 @@
             }
           }
         }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
   },
-  "parentGroupName": "ef53fcff43948cb3bddc",
+  "isHidden": true,
   "howCreated": "InsertVisualButton"
 }

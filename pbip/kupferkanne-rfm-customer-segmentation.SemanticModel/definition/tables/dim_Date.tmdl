@@ -119,16 +119,61 @@ table dim_Date
 
 		annotation SummarizationSetBy = Automatic
 
-	hierarchy 'Date Hierarchy'
-		lineageTag: 37b1ebee-0339-47c4-8a69-62745bc25b2a
+	column 'Start of Month'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: cf4388f5-2f9f-4613-8c07-99c065cf8e49
+		summarizeBy: none
+		sourceColumn: Start of Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Start of Quarter'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5f5e6c85-1850-4722-861e-824b86c05866
+		summarizeBy: none
+		sourceColumn: Start of Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Start of Year'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ac9b55bb-16c7-426b-909d-0e70d6a2eab4
+		summarizeBy: none
+		sourceColumn: Start of Year
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	hierarchy 'Calendar Drill'
+		lineageTag: 279b0283-d781-4635-bc4c-0ae9a0227d4a
+
+		level 'Start of Year'
+			lineageTag: 9ea65dbf-d3bf-4e43-849a-b5cfb713cf75
+			column: 'Start of Year'
+
+		level 'Start of Quarter'
+			lineageTag: cbd162b8-7519-4990-b6d6-b72e7ed47459
+			column: 'Start of Quarter'
+
+		level 'Start of Month'
+			lineageTag: 8c5563cb-e99f-4c1a-adf4-21ee6d835fb4
+			column: 'Start of Month'
+
+		level 'Start of Week'
+			lineageTag: 12358785-bed1-4d98-9505-127595b5fa79
+			column: 'Start of Week'
 
 		level Date
-			lineageTag: d75231bc-f23b-48a9-a062-b71aeaf18db3
+			lineageTag: 56790a44-17a3-44fe-80de-123206ed26c7
 			column: Date
-
-		level Year-Month
-			lineageTag: e508f848-fa10-4b94-8a73-303c47594444
-			column: Year-Month
 
 	partition dim_Date = m
 		mode: import
@@ -151,9 +196,13 @@ table dim_Date
 				    #"Inserted Day" = Table.AddColumn(#"Inserted Start of Week", "Day", each Date.Day([Date]), Int64.Type),
 				    #"Inserted Day Name" = Table.AddColumn(#"Inserted Day", "Day Name", each Date.DayOfWeekName([Date]), type text),
 				    #"Inserted Day Number" = Table.AddColumn(#"Inserted Day Name", "Day Number", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
-				    #"Added Year-Month-Number" = Table.AddColumn(#"Inserted Day Number", "Year-Month-Number", each [Year] * 100 + [Month], Int64.Type)
+				    #"Added Year-Month-Number" = Table.AddColumn(#"Inserted Day Number", "Year-Month-Number", each [Year] * 100 + [Month], Int64.Type),
+				    #"Inserted Start of Month" = Table.AddColumn(#"Added Year-Month-Number", "Start of Month", each Date.StartOfMonth([Date]), type date),
+				    #"Inserted Start of Quarter" = Table.AddColumn(#"Inserted Start of Month", "Start of Quarter", each Date.StartOfQuarter([Date]), type date),
+				    #"Inserted Start of Year" = Table.AddColumn(#"Inserted Start of Quarter", "Start of Year", each Date.StartOfYear([Date]), type date),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Inserted Start of Year",{"Date", "Year", "Month", "Month Name", "Year-Month", "Quarter", "Week of Year", "Day", "Day Name", "Year-Month-Number", "Day Number", "Start of Week", "Start of Month", "Start of Quarter", "Start of Year"})
 				in
-				    #"Added Year-Month-Number"
+				    #"Reordered Columns"
 
 	annotation PBI_NavigationStepName = Navigation
 

@@ -572,6 +572,23 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 651b4502-be94-4783-827b-0c30a3a3fc73
 
+	/// Line-grain unit volume from v_items_for_bi; explicit SUM because F006 disables implicit aggregation on Quantity.
+	measure 'Line Quantity' =
+			
+			SUM ( v_items_for_bi[Quantity] )
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: ff617895-baec-4674-926a-44ee836c100b
+
+	measure 'Combo Chart Title' =
+			
+			"Brand Revenue x Margin % - top brand "
+			    & [Top Brand Name]
+			    & " drives "
+			    & FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 0215e522-d609-4d83-b7ca-851929a13598
+
 	column x
 		isHidden
 		formatString: 0

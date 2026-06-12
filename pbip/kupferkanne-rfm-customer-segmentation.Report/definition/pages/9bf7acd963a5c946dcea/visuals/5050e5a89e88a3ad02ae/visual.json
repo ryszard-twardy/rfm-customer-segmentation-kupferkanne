@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "034ffd14b78773349602",
+  "name": "5050e5a89e88a3ad02ae",
   "position": {
-    "x": 294.61538461538458,
-    "y": 90,
-    "z": 8000,
+    "x": 800,
+    "y": 0,
+    "z": 1000,
     "height": 90,
-    "width": 185.38461538461539,
-    "tabOrder": 8000
+    "width": 180,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "cardVisual",
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Total Products"
+                  "Property": "Total Brands"
                 }
               },
-              "queryRef": "_Measures.Total Products",
-              "nativeQueryRef": "Total Products"
+              "queryRef": "_Measures.Total Brands",
+              "nativeQueryRef": "Total Brands"
             }
           ]
         }
@@ -42,7 +42,7 @@
                     "Entity": "_Measures"
                   }
                 },
-                "Property": "Total Products"
+                "Property": "Total Brands"
               }
             },
             "direction": "Descending"
@@ -140,6 +140,20 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
         }
       ],
       "layout": [
@@ -191,7 +205,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'KPI_01_Revenue'"
+                  "Value": "'KPI_05_Brands'"
                 }
               }
             }
@@ -243,8 +257,56 @@
             }
           }
         }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
-  }
+  },
+  "parentGroupName": "95b57727408d48d34925"
 }
