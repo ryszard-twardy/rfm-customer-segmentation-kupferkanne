@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
   "name": "8024878934cea255b537",
   "position": {
-    "x": 80,
-    "y": 240,
+    "x": 0,
+    "y": 0,
     "z": 9000,
     "height": 220,
     "width": 650,
@@ -146,6 +146,20 @@
           "selector": {
             "metadata": "_Measures.Total Revenue"
           }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "137.31040705164645D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "dim_Segment.Segment"
+          }
         }
       ],
       "values": [
@@ -189,6 +203,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'Left'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
                 }
               }
             }
@@ -254,6 +275,36 @@
             }
           }
         }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "0L"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Total Customers"
+          }
+        },
+        {
+          "properties": {
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "0L"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Total Revenue"
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -263,7 +314,14 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segment Profile Comparison'"
                 }
               }
             }
@@ -305,5 +363,6 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  }
+  },
+  "parentGroupName": "058f22769b0a64701d48"
 }
