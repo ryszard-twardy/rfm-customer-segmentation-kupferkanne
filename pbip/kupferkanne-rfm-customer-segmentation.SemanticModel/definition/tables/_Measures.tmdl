@@ -580,6 +580,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: ff617895-baec-4674-926a-44ee836c100b
 
+	/// Dynamic Page 3 combo chart title naming the top brand and its compact revenue; bound via fx (Field value); text measure, no FormatString by design.
 	measure 'Combo Chart Title' =
 			
 			"Brand Revenue x Margin % - top brand "
