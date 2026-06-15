@@ -50,15 +50,20 @@
           "properties": {
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Subtitle_Page'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Page 4"
                 }
               }
             },
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             }
