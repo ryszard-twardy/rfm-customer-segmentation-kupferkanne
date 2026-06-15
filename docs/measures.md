@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 50 DAX Measures (49 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v14 (2026-06-15) – Page 3 brand combo baseline: added `[Margin Baseline]` (revenue-weighted overall line margin, flat across Brand; drives the combo reference line, replacing the built-in equal-weight Average line; inventory 49 → 50). Full history in the Changelog.
+### v15 (2026-06-15) – B.4 slice 3: `[Subtitle Page 3]` rebound via fx → Field value (was a static literal), completing the `Subtitle Page N` dynamic-subtitle pattern across Pages 1-3. Metadata-only; inventory unchanged at 50. Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -342,7 +342,7 @@ SWITCH(
 | Revenue Trend Chart Title | Dynamic line chart title with live month count | Text | 1 |
 | Subtitle Page 1 | Dynamic Page 1 subtitle with live month count | Text | 1 |
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
-| Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts – **currently unbound** (see note below) | Text | – |
+| Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -430,7 +430,7 @@ Subtitle Page 3 =
 
 **Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
 
-**Status as of v13:** `[Subtitle Page 3]` is **currently unbound** – the rebuilt Page 3 (#24) subtitle text box uses a static literal. The measure is kept; rebind is planned in the B.4 cross-page dynamic-subtitle slice.
+**Status as of v15:** `[Subtitle Page 3]` is **bound** – rebound via fx → Field value on the Page 3 subtitle text box (B.4 slice 3), replacing the prior static literal. All three page subtitles (Pages 1-3) now follow the dynamic `Subtitle Page N` pattern.
 
 ```dax
 Combo Chart Title =
@@ -558,7 +558,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 50 measures – 49 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. One known unbound measure: `[Subtitle Page 3]` (kept; rebind planned in the B.4 cross-page dynamic-subtitle slice). No redundant calculations.
+## Total: 50 measures – 49 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -590,6 +590,10 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v15 (2026-06-15)
+- **`[Subtitle Page 3]` rebound** – the Page 3 subtitle text box Title now binds to `[Subtitle Page 3]` via fx → Field value (B.4 slice 3), replacing the static literal in place since the Page 3 rebuild (#24). Renders identically at current data (60 products, 5 brands) but is now live. Completes the dynamic `Subtitle Page N` pattern across Pages 1-3.
+- **Metadata-only** – no measure logic, FormatString, inventory (stays 50), or model change; no BPA/R041 trigger.
 
 ### v14 (2026-06-15)
 - **`[Margin Baseline]` added** – `CALCULATE ( [Line Margin %], REMOVEFILTERS ( dim_Product[Brand] ) )`, format `0.00%`, folder `01 - Core KPIs`, with `///` description. Revenue-weighted overall line margin, flat across the Brand axis (= 59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line; rendered via a hidden secondary-axis series anchoring an Average analytics line.
