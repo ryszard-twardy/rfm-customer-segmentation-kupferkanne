@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 50 DAX Measures (49 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 53 DAX Measures (52 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v15 (2026-06-15) – B.4 slice 3: `[Subtitle Page 3]` rebound via fx → Field value (was a static literal), completing the `Subtitle Page N` dynamic-subtitle pattern across Pages 1-3. Metadata-only; inventory unchanged at 50. Full history in the Changelog.
+### v16 (2026-06-15) – Page 4 (Churn Risk & What-If) measure suite: added [Customers at Risk] (Folder 01), [% Revenue at Risk] (Folder 03), [Subtitle Page 4] (Folder 06); inventory 50 → 53 (52 in folders + 1 What-If). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 36 of 50 measures carry an explicit `FormatString`. The 14 without: 13 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 38 of 53 measures carry an explicit `FormatString`. The 15 without: 14 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -130,6 +130,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 |---|---|---|---|
 | Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
 | Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2 |
+| Customers at Risk | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), dim_Customer[Segment] IN {"At Risk", "Hibernating"}, NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 4 |
 | Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 1 |
 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | 1 |
@@ -164,6 +165,17 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 **Margin Baseline (new in v14):** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
 
 **Fact-grain principle (dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
+
+### Customers at Risk – full formula
+
+```dax
+Customers at Risk =
+CALCULATE (
+    DISTINCTCOUNT ( dim_Customer[Customer ID] ),
+    dim_Customer[Segment] IN { "At Risk", "Hibernating" },
+    NOT ISBLANK ( dim_Customer[Order Count] )
+)
+```
 
 ### Top Brand Name / Top Category Name – full formula
 
@@ -219,6 +231,7 @@ RETURN
 | Segment % of Total | % 1dp | 1, 2 |
 | Revenue % of Total | % 1dp | 2 |
 | Revenue at Risk | € 0dp | 1, 4 |
+| % Revenue at Risk | % 2dp | 4 |
 
 ```dax
 Segment % of Total =
@@ -255,6 +268,18 @@ CALCULATE(
     SUM(dim_Customer[Total Spend]),
     dim_Customer[Segment] IN {"At Risk", "Hibernating"}
 )
+```
+
+```dax
+% Revenue at Risk =
+VAR RiskRevenue = [Revenue at Risk]
+VAR TotalRevenue =
+    CALCULATE (
+        SUM ( dim_Customer[Total Spend] ),
+        ALL ( dim_Customer )
+    )
+RETURN
+    DIVIDE ( RiskRevenue, TotalRevenue, 0 )
 ```
 
 ---
@@ -343,6 +368,7 @@ SWITCH(
 | Subtitle Page 1 | Dynamic Page 1 subtitle with live month count | Text | 1 |
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
 | Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
+| Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -426,6 +452,13 @@ DISTINCTCOUNT(dim_Segment[Segment]) &
 ```dax
 Subtitle Page 3 = 
 "Profitability across " & [Total Products] & " products and " & [Total Brands] & " brands"
+```
+
+```dax
+Subtitle Page 4 =
+"Revenue at risk across "
+    & FORMAT ( [Customers at Risk], "#,##0" )
+    & " at-risk and hibernating customers"
 ```
 
 **Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
@@ -558,7 +591,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 50 measures – 49 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 53 measures – 52 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -590,6 +623,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v16 (2026-06-15) – Page 4 (Churn Risk & What-If) measure suite: added [Customers at Risk] (Folder 01), [% Revenue at Risk] (Folder 03), [Subtitle Page 4] (Folder 06); inventory 50 → 53 (52 in folders + 1 What-If). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 ### v15 (2026-06-15)
 - **`[Subtitle Page 3]` rebound** – the Page 3 subtitle text box Title now binds to `[Subtitle Page 3]` via fx → Field value (B.4 slice 3), replacing the static literal in place since the Page 3 rebuild (#24). Renders identically at current data (60 products, 5 brands) but is now live. Completes the dynamic `Subtitle Page N` pattern across Pages 1-3.

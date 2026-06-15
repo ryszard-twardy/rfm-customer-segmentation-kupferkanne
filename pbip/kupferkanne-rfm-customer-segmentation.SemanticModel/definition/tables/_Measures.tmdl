@@ -601,6 +601,50 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 01380a35-493c-4727-bab1-5cda24389ad3
 
+	/// Distinct customers in the At Risk and Hibernating segments (Order Count not blank). Page 4 KPI.
+	measure 'Customers at Risk' =
+			
+			CALCULATE (
+			    DISTINCTCOUNT ( dim_Customer[Customer ID] ),
+			    dim_Customer[Segment]
+			        IN {
+			            "At Risk",
+			            "Hibernating"
+			        },
+			    NOT ISBLANK ( dim_Customer[Order Count] )
+			)
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: e4bd24c7-fb3a-4973-819d-a81c4dd2a28b
+
+	/// Share of total customer value (dim_Customer[Total Spend]) in At Risk and Hibernating. Page 4.
+	measure '% Revenue at Risk' =
+			
+			VAR RiskRevenue = [Revenue at Risk]
+			VAR TotalRevenue =
+			    CALCULATE (
+			        SUM ( dim_Customer[Total Spend] ),
+			        ALL ( dim_Customer )
+			    )
+			RETURN
+			    DIVIDE (
+			        RiskRevenue,
+			        TotalRevenue,
+			        0
+			    )
+		formatString: 0.00%
+		displayFolder: 03 - Segment Analysis
+		lineageTag: 16d20981-00b5-4bcb-846f-6c67b100b91e
+
+	/// Dynamic Page 4 subtitle; fx-bound to the subtitle text box.
+	measure 'Subtitle Page 4' =
+			
+			"Revenue at risk across "
+			    & FORMAT ( [Customers at Risk], "#,##0" )
+			    & " at-risk and hibernating customers"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 959ef8ce-a865-4b62-a72b-16887c5a08b3
+
 	column x
 		isHidden
 		formatString: 0
