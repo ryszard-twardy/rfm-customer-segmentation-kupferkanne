@@ -590,6 +590,17 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 0215e522-d609-4d83-b7ca-851929a13598
 
+	/// Revenue-weighted margin across all brands; flat baseline for the Page 3 brand combo.
+	measure 'Margin Baseline' =
+			
+			CALCULATE (
+			    [Line Margin %],
+			    REMOVEFILTERS ( dim_Product[Brand] )
+			)
+		formatString: 0.00%
+		displayFolder: 01 - Core KPIs
+		lineageTag: 01380a35-493c-4727-bab1-5cda24389ad3
+
 	column x
 		isHidden
 		formatString: 0

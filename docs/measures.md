@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 49 DAX Measures (48 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 50 DAX Measures (49 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v13 (2026-06-12) – Page 3 rebuild support (#24): added `[Combo Chart Title]` (text measure bound via fx to the Page 3 combo chart title; inventory 48 → 49); `dim_Date` extended with `Start of Month` / `Start of Quarter` / `Start of Year` (type date) and the **Calendar Drill** hierarchy (replacing `Date Hierarchy`); `[Subtitle Page 3]` currently unbound. Full history in the Changelog.
+### v14 (2026-06-15) – Page 3 brand combo baseline: added `[Margin Baseline]` (revenue-weighted overall line margin, flat across Brand; drives the combo reference line, replacing the built-in equal-weight Average line; inventory 49 → 50). Full history in the Changelog.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 35 of 49 measures carry an explicit `FormatString`. The 14 without: 13 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 36 of 50 measures carry an explicit `FormatString`. The 14 without: 13 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -149,6 +149,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Top Brand Revenue | `MAXX(VALUES(dim_Product[Brand]), [Line Revenue])` | € Currency, display Millions | 3 |
 | Top Brand Name | VAR pattern – see formula block below | Text | 3 |
 | Avg Brand Margin % | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | 3 |
+| Margin Baseline | `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` | % 2dp | 3 |
 | Top Category Revenue | `MAXX(VALUES(dim_Product[Product Category]), [Line Revenue])` | € Currency, display Millions | 3 |
 | Top Category Name | VAR pattern – see formula block below | Text | 3 |
 
@@ -159,6 +160,8 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 **Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
 **Equal-weight benchmark (new in v6):** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
+
+**Margin Baseline (new in v14):** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
 
 **Fact-grain principle (dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
 
@@ -555,7 +558,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 49 measures – 48 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. One known unbound measure: `[Subtitle Page 3]` (kept; rebind planned in the B.4 cross-page dynamic-subtitle slice). No redundant calculations.
+## Total: 50 measures – 49 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. One known unbound measure: `[Subtitle Page 3]` (kept; rebind planned in the B.4 cross-page dynamic-subtitle slice). No redundant calculations.
 
 ---
 
@@ -587,6 +590,10 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v14 (2026-06-15)
+- **`[Margin Baseline]` added** – `CALCULATE ( [Line Margin %], REMOVEFILTERS ( dim_Product[Brand] ) )`, format `0.00%`, folder `01 - Core KPIs`, with `///` description. Revenue-weighted overall line margin, flat across the Brand axis (= 59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line; rendered via a hidden secondary-axis series anchoring an Average analytics line.
+- **Measure inventory 49 → 50** (49 in 6 display folders + 1 What-If parameter measure); header, FormatString coverage (36 of 50; the 14 without = 13 intentional text measures + `[Dynamic KPI Selector]`), and the Total line reconciled.
 
 ### v13 (2026-06-12)
 - **`[Combo Chart Title]` added** – text measure, folder `06 - Formatting & Regional`, no FormatString (text-measure convention); bound via fx (Field value) to the Page 3 brand combo chart title (#24). Composes `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`.
