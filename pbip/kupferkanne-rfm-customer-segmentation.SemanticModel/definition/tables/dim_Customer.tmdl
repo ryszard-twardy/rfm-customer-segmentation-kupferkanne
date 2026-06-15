@@ -14,7 +14,7 @@ table dim_Customer
 
 	column 'Signup Date'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: yyyy-MM-dd
 		lineageTag: 2488a9db-5c64-4913-9d6b-68395fa3d03f
 		summarizeBy: none
 		sourceColumn: Signup Date
@@ -111,7 +111,7 @@ table dim_Customer
 
 	column 'Analysis Date'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: yyyy-MM-dd
 		lineageTag: db973e42-1125-41f3-89e8-660dc600405b
 		summarizeBy: none
 		sourceColumn: analysis_date
@@ -122,7 +122,7 @@ table dim_Customer
 
 	column 'Last Order Date'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: yyyy-MM-dd
 		lineageTag: 41c32900-8145-48e4-bb9f-874f0b52788e
 		summarizeBy: none
 		sourceColumn: last_order_date

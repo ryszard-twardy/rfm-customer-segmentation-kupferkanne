@@ -5,7 +5,7 @@ table dim_Date
 	column Date
 		dataType: dateTime
 		isKey
-		formatString: Long Date
+		formatString: yyyy-MM-dd
 		lineageTag: 98f95b9f-db53-492e-9245-69ac12b7f666
 		summarizeBy: none
 		sourceColumn: Date
@@ -73,7 +73,7 @@ table dim_Date
 
 	column 'Start of Week'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: yyyy-MM-dd
 		lineageTag: e845db2e-d3cf-4722-a471-9027b2f32886
 		summarizeBy: none
 		sourceColumn: Start of Week
@@ -121,7 +121,7 @@ table dim_Date
 
 	column 'Start of Month'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: MMM yyyy
 		lineageTag: cf4388f5-2f9f-4613-8c07-99c065cf8e49
 		summarizeBy: none
 		sourceColumn: Start of Month
@@ -132,7 +132,7 @@ table dim_Date
 
 	column 'Start of Quarter'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: MMM yyyy
 		lineageTag: 5f5e6c85-1850-4722-861e-824b86c05866
 		summarizeBy: none
 		sourceColumn: Start of Quarter
@@ -143,7 +143,7 @@ table dim_Date
 
 	column 'Start of Year'
 		dataType: dateTime
-		formatString: Long Date
+		formatString: yyyy
 		lineageTag: ac9b55bb-16c7-426b-909d-0e70d6a2eab4
 		summarizeBy: none
 		sourceColumn: Start of Year

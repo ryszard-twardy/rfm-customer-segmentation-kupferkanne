@@ -31,7 +31,7 @@ table v_items_for_bi
 	column 'Order Date'
 		dataType: dateTime
 		isHidden
-		formatString: Long Date
+		formatString: yyyy-MM-dd
 		lineageTag: 0dff860c-df66-4127-8c3d-fd5096aad372
 		summarizeBy: none
 		sourceColumn: Order Date
