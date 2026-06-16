@@ -91,7 +91,7 @@ credentials*.json
 # Power BI Project (.pbip) - local cache and user settings (machine-local, not source)
 **/.pbi/
 
-# DAX Query View scratch (auto-named ad-hoc queries; rename a query to track it deliberately)
+# PBIP DAX Query View scratch (named or auto-named); promote durable queries to tools/queries/
 **/DAXQueries/*.dax
 
 # uv / reproducible Python env (additive; .venv/, __pycache__/, .env already declared above)
