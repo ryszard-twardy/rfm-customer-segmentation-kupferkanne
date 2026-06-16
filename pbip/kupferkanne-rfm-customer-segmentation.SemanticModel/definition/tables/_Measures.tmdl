@@ -645,6 +645,24 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 959ef8ce-a865-4b62-a72b-16887c5a08b3
 
+	/// Median of Recency Days in current filter context; P4 V3 vertical quadrant line.
+	measure 'Median Recency Days' =
+			
+			MEDIAN ( dim_Customer[Recency Days] )
+		formatString: #,##0 "days"
+		displayFolder: 01 - Core KPIs
+		lineageTag: c576dbfb-86c6-458b-be79-2946974524c2
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Median of Total Spend in current filter context; P4 V3 horizontal quadrant line.
+	measure 'Median Total Spend' =
+			
+			MEDIAN ( dim_Customer[Total Spend] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: af26c8c2-eafc-4662-b781-3831d490f399
+
 	column x
 		isHidden
 		formatString: 0

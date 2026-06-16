@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 53 DAX Measures (52 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 55 DAX Measures (54 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v16 (2026-06-15) – Page 4 (Churn Risk & What-If) measure suite: added [Customers at Risk] (Folder 01), [% Revenue at Risk] (Folder 03), [Subtitle Page 4] (Folder 06); inventory 50 → 53 (52 in folders + 1 What-If). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
+### v17 (2026-06-16) – Page 4 V3 quadrant reference lines: added [Median Recency Days] and [Median Total Spend] (folder `01 - Core KPIs`), the median oracle for the Value-at-Risk scatter constant lines; inventory 53 → 55 (54 in folders + 1 What-If), FormatString coverage 38 → 40 of 55 (the 15 without unchanged: 14 text + `[Dynamic KPI Selector]`). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 38 of 53 measures carry an explicit `FormatString`. The 15 without: 14 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 40 of 55 measures carry an explicit `FormatString`. The 15 without: 14 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -135,8 +135,10 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | 1 |
 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
+| Median Recency Days | `MEDIAN(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 4 |
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
+| Median Total Spend | `MEDIAN(dim_Customer[Total Spend])` | € Currency, 2dp | 4 |
 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | – |
 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
@@ -591,7 +593,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 53 measures – 52 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 55 measures – 54 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -623,6 +625,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v17 (2026-06-16) – Page 4 V3 quadrant reference lines: added [Median Recency Days] and [Median Total Spend] (folder `01 - Core KPIs`), the median oracle for the Value-at-Risk scatter constant lines; inventory 53 → 55 (54 in folders + 1 What-If), FormatString coverage 38 → 40 of 55 (the 15 without unchanged: 14 text + `[Dynamic KPI Selector]`). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 ### v16 (2026-06-15) – Page 4 (Churn Risk & What-If) measure suite: added [Customers at Risk] (Folder 01), [% Revenue at Risk] (Folder 03), [Subtitle Page 4] (Folder 06); inventory 50 → 53 (52 in folders + 1 What-If). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
