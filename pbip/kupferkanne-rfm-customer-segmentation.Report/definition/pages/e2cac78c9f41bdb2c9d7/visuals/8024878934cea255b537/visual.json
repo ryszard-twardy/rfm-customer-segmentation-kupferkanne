@@ -138,7 +138,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "140D"
+                  "Value": "134.28571428571428D"
                 }
               }
             }
@@ -152,7 +152,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "137.31040705164645D"
+                  "Value": "131.6086939687084D"
                 }
               }
             }
@@ -347,14 +347,28 @@
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "3D"
+                  "Value": "5D"
                 }
               }
             },
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "5D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
