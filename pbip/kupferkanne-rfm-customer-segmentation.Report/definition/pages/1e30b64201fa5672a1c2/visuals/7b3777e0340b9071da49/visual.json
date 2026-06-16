@@ -10,25 +10,80 @@
     "tabOrder": 0
   },
   "visual": {
-    "visualType": "pivotTable",
-    "objects": {
-      "values": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
+    "visualType": "hundredPercentStackedBarChart",
+    "query": {
+      "queryState": {
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Revenue Active"
                 }
-              }
+              },
+              "queryRef": "_Measures.Revenue Active",
+              "nativeQueryRef": "Revenue Active"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Revenue Cooling"
+                }
+              },
+              "queryRef": "_Measures.Revenue Cooling",
+              "nativeQueryRef": "Revenue Cooling"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Revenue Dormant"
+                }
+              },
+              "queryRef": "_Measures.Revenue Dormant",
+              "nativeQueryRef": "Revenue Dormant"
             }
-          }
+          ]
         }
-      ],
-      "columnHeaders": [
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Revenue Active"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "legend": [
         {
           "properties": {
-            "autoSizeColumnWidth": {
+            "showTitle": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -38,18 +93,184 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "8D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 4,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Revenue Active"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 5,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Revenue Cooling"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 6,
+                      "Percent": 0
+                    }
+                  }
                 }
               }
             },
-            "fontFamily": {
+            "borderShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Revenue Dormant"
+          }
+        },
+        {
+          "properties": {
+            "borderShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableValueDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "labelPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'InsideCenter'"
+                }
+              }
+            },
+            "enableTitleDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "detailFontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "detailFontFamily": {
               "expr": {
                 "Literal": {
                   "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
                 }
               }
             },
-            "wordWrap": {
+            "enableBackground": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "labelContentLayout": {
+              "expr": {
+                "Literal": {
+                  "Value": "'SingleLine'"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "showSeries": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Revenue Active"
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "gridlineShow": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -59,73 +280,46 @@
           }
         }
       ],
-      "rowHeaders": [
+      "layout": [
         {
           "properties": {
-            "showExpandCollapseButtons": {
+            "seriesOrderSorted": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
-            "fontSize": {
+            "seriesOrderReversed": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'''Segoe UI'', wf_segoe-ui_normal, helvetica, arial, sans-serif'"
+                  "Value": "false"
                 }
               }
             }
           }
         }
       ],
-      "subTotals": [
+      "ribbonBands": [
         {
           "properties": {
-            "columnSubtotals": {
+            "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "rowSubtotals": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             }
           }
         }
       ],
-      "columnTotal": [
+      "zoom": [
         {
           "properties": {
-            "fontSize": {
+            "show": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "rowTotal": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "11D"
+                  "Value": "false"
                 }
               }
             }
@@ -140,7 +334,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Profitability by Category, Brand and Product'"
+                  "Value": "'Revenue by recency stage'"
                 }
               }
             },
@@ -160,14 +354,28 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "5D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "3D"
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
@@ -188,6 +396,77 @@
         }
       ],
       "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Where customer value sits on the 90 / 180-day cooling curve'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#64748B'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Light'', wf_segoe-ui_light, helvetica, arial, sans-serif'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "spacing": [
+        {
+          "properties": {
+            "verticalSpacing": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "divider": [
         {
           "properties": {
             "show": {

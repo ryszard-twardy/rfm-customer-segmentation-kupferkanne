@@ -133,11 +133,12 @@ table dim_Customer
 
 	column 'Recency Days'
 		dataType: int64
-		isHidden
 		formatString: 0
 		lineageTag: 577b4ac1-d080-40cb-8973-b19626ff3274
 		summarizeBy: none
 		sourceColumn: recency_days
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

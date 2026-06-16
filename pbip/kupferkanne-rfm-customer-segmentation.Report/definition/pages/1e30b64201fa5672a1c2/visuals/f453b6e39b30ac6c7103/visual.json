@@ -1,19 +1,19 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "12c4b0d1d5c9dc85e944",
+  "name": "f453b6e39b30ac6c7103",
   "position": {
-    "x": 0,
-    "y": 0,
-    "z": 5000,
-    "height": 90,
-    "width": 280,
-    "tabOrder": 0
+    "x": 680.07155635062611,
+    "y": 460.25044722719144,
+    "z": 2000,
+    "height": 239.66607036374481,
+    "width": 580.08348240906389,
+    "tabOrder": 4000
   },
   "visual": {
-    "visualType": "cardVisual",
+    "visualType": "clusteredColumnChart",
     "query": {
       "queryState": {
-        "Data": {
+        "Y": {
           "projections": [
             {
               "field": {
@@ -28,6 +28,20 @@
               },
               "queryRef": "_Measures.Revenue at Risk",
               "nativeQueryRef": "Revenue at Risk"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "What-If Revenue Impact"
+                }
+              },
+              "queryRef": "_Measures.What-If Revenue Impact",
+              "nativeQueryRef": "What-If Revenue Impact"
             }
           ]
         }
@@ -52,23 +66,90 @@
       }
     },
     "objects": {
-      "shapeCustomRectangle": [
+      "general": [
+        {
+          "properties": {}
+        }
+      ],
+      "dataPoint": [
         {
           "properties": {
-            "rectangleRoundedCurve": {
+            "borderShow": {
               "expr": {
                 "Literal": {
-                  "Value": "0L"
+                  "Value": "false"
                 }
               }
             }
           },
           "selector": {
-            "id": "default"
+            "metadata": "_Measures.Revenue at Risk"
           }
         }
       ],
-      "outline": [
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "labelPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'InsideEnd'"
+                }
+              }
+            },
+            "enableValueDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1000D"
+                }
+              }
+            },
+            "enableDetailDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableBackground": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "zoom": [
         {
           "properties": {
             "show": {
@@ -78,9 +159,161 @@
                 }
               }
             }
-          },
-          "selector": {
-            "id": "default"
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "showTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1000D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Upside of acting'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Gross recoverable revenue at the selected rate. Gross of win-back discount – see methodology.'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Light'', wf_segoe-ui_light, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 8,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            },
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
           }
         }
       ],
@@ -94,137 +327,16 @@
                 }
               }
             }
-          },
-          "selector": {
-            "id": "default"
           }
         }
       ],
-      "fillCustom": [
+      "spacing": [
         {
           "properties": {
-            "show": {
+            "verticalSpacing": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "padding": [
-        {
-          "properties": {
-            "paddingUniform": {
-              "expr": {
-                "Literal": {
-                  "Value": "0L"
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "default"
-          }
-        }
-      ],
-      "value": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        },
-        {
-          "properties": {
-            "horizontalAlignment": {
-              "expr": {
-                "Literal": {
-                  "Value": "'center'"
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "default"
-          }
-        },
-        {
-          "properties": {
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "ThemeDataColor": {
-                      "ColorId": 6,
-                      "Percent": 0
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "_Measures.Revenue at Risk"
-          }
-        }
-      ],
-      "layout": [
-        {
-          "properties": {
-            "columnCount": {
-              "expr": {
-                "Literal": {
-                  "Value": "5L"
-                }
-              }
-            },
-            "cellPadding": {
-              "expr": {
-                "Literal": {
-                  "Value": "10L"
-                }
-              }
-            }
-          }
-        },
-        {
-          "properties": {
-            "paddingUniform": {
-              "expr": {
-                "Literal": {
-                  "Value": "4L"
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "default"
-          }
-        }
-      ]
-    },
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'KPI_01_Revenue'"
+                  "Value": "2D"
                 }
               }
             }
@@ -243,89 +355,8 @@
             }
           }
         }
-      ],
-      "border": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "radius": {
-              "expr": {
-                "Literal": {
-                  "Value": "5D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "visualHeader": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "padding": [
-        {
-          "properties": {
-            "top": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            },
-            "right": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            },
-            "left": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            },
-            "bottom": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "visualTooltip": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "parentGroupName": "7b7fb24ba26edd9e0c12"
+  }
 }

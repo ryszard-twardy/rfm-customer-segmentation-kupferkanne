@@ -11,6 +11,90 @@
   },
   "visual": {
     "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_Customer"
+                    }
+                  },
+                  "Property": "Segment"
+                }
+              },
+              "queryRef": "dim_Customer.Segment",
+              "nativeQueryRef": "Segment",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Total Spend"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "CountNonNull(dim_Customer.Total Spend)",
+              "nativeQueryRef": "Revenue at Risk",
+              "displayName": "Revenue at Risk"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Customers"
+                }
+              },
+              "queryRef": "_Measures.Total Customers",
+              "nativeQueryRef": "Customers at Risk",
+              "displayName": "Customers at Risk"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Aggregation": {
+                "Expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "dim_Customer"
+                      }
+                    },
+                    "Property": "Total Spend"
+                  }
+                },
+                "Function": 0
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
     "objects": {
       "values": [
         {
@@ -38,7 +122,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "9D"
                 }
               }
             },
@@ -131,6 +215,806 @@
             }
           }
         }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "118D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "dim_Customer.Segment"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.55D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.62D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.68D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.84D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.93D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.97D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "3.98D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.05D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "33D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.11D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "35D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.15D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "35D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.21D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.26D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.27D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.33D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.36D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.38D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.39D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.44D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "37D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Total Spend"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "4.46D"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "138D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CountNonNull(dim_Customer.Total Spend)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "108D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Total Customers"
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1000D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CountNonNull(dim_Customer.Total Spend)"
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -140,7 +1024,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Profitability by Category, Brand and Product'"
+                  "Value": "'Where the risk concentrates'"
                 }
               }
             },
@@ -160,14 +1044,28 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "5D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "3D"
+                  "Value": "5D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
@@ -199,9 +1097,132 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'At-Risk and Hibernating segments - value, heads, recommended win-back'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Light'', wf_segoe-ui_light, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 8,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "spacing": [
+        {
+          "properties": {
+            "verticalSpacing": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
   },
-  "parentGroupName": "530a42050a65089cddb9"
+  "parentGroupName": "530a42050a65089cddb9",
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "322682b4104498c6319d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_Customer"
+              }
+            },
+            "Property": "Segment"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "d",
+              "Entity": "dim_Customer",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "d"
+                          }
+                        },
+                        "Property": "Segment"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'At Risk'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Hibernating'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
 }

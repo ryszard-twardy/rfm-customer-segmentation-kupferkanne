@@ -4,5 +4,97 @@
   "displayName": "Churn Risk & What-If",
   "displayOption": "FitToPage",
   "height": 720,
-  "width": 1280
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "beae0566017b159caebc",
+      "target": "7b3777e0340b9071da49",
+      "type": "NoFilter"
+    },
+    {
+      "source": "beae0566017b159caebc",
+      "target": "7d35446b4010d0890bb0",
+      "type": "NoFilter"
+    },
+    {
+      "source": "beae0566017b159caebc",
+      "target": "9bb1d975c76ea1e4891d",
+      "type": "NoFilter"
+    },
+    {
+      "source": "beae0566017b159caebc",
+      "target": "12c4b0d1d5c9dc85e944",
+      "type": "NoFilter"
+    },
+    {
+      "source": "beae0566017b159caebc",
+      "target": "c3e112027ea77c21e1c3",
+      "type": "NoFilter"
+    },
+    {
+      "source": "beae0566017b159caebc",
+      "target": "0617a9403b05251c50ad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7b3777e0340b9071da49",
+      "target": "f453b6e39b30ac6c7103",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "7d35446b4010d0890bb0",
+      "target": "12c4b0d1d5c9dc85e944",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7d35446b4010d0890bb0",
+      "target": "0617a9403b05251c50ad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7d35446b4010d0890bb0",
+      "target": "efcc794202cea3eae048",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7d35446b4010d0890bb0",
+      "target": "c3e112027ea77c21e1c3",
+      "type": "NoFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "12c4b0d1d5c9dc85e944",
+      "type": "NoFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "c3e112027ea77c21e1c3",
+      "type": "NoFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "0617a9403b05251c50ad",
+      "type": "NoFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "efcc794202cea3eae048",
+      "type": "NoFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "f453b6e39b30ac6c7103",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "7b3777e0340b9071da49",
+      "type": "HighlightFilter"
+    },
+    {
+      "source": "9bb1d975c76ea1e4891d",
+      "target": "7d35446b4010d0890bb0",
+      "type": "NoFilter"
+    }
+  ]
 }

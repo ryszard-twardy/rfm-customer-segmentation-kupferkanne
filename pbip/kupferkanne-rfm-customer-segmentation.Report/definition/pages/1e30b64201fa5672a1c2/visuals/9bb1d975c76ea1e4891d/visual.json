@@ -11,6 +11,83 @@
   },
   "visual": {
     "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_Customer"
+                    }
+                  },
+                  "Property": "Segment"
+                }
+              },
+              "queryRef": "dim_Customer.Segment",
+              "nativeQueryRef": "Segment"
+            }
+          ]
+        },
+        "Size": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Distinct Orders"
+                }
+              },
+              "queryRef": "_Measures.Distinct Orders",
+              "nativeQueryRef": "Distinct Orders"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_Customer"
+                    }
+                  },
+                  "Property": "Recency Days"
+                }
+              },
+              "queryRef": "dim_Customer.Recency Days",
+              "nativeQueryRef": "Recency Days",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_Customer"
+                    }
+                  },
+                  "Property": "Total Spend"
+                }
+              },
+              "queryRef": "dim_Customer.Total Spend",
+              "nativeQueryRef": "Total Spend"
+            }
+          ]
+        }
+      }
+    },
     "objects": {
       "dataPoint": [
         {
@@ -26,6 +103,90 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 5,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Segment"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "'At Risk'"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 6,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "dim_Customer"
+                          }
+                        },
+                        "Property": "Segment"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "'Hibernating'"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
           }
         }
       ],
@@ -75,6 +236,46 @@
             }
           }
         }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "showGradientLegend": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryLabels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -104,7 +305,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "''"
+                  "Value": "'Who to win back'"
                 }
               }
             }
@@ -117,21 +318,28 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "5D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "5D"
                 }
               }
             },
             "left": {
               "expr": {
                 "Literal": {
-                  "Value": "5D"
+                  "Value": "10D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
@@ -157,7 +365,52 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Value vs recency for at-risk customers - prioritise the top-right'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Light'', wf_segoe-ui_light, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#64748B'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "spacing": [
+        {
+          "properties": {
+            "verticalSpacing": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
                 }
               }
             }
@@ -171,76 +424,70 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "1a8d2e5a0c030eb29ca0",
+        "name": "e3e6dcbeb10555e96626",
+        "ordinal": 0,
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Distinct Orders"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "22dda9c7b9a70a7c36e0",
+        "ordinal": 1,
         "field": {
           "Column": {
             "Expression": {
               "SourceRef": {
-                "Entity": "dim_Product"
+                "Entity": "dim_Customer"
               }
             },
-            "Property": "Product Name"
+            "Property": "Recency Days"
           }
         },
-        "type": "TopN",
+        "type": "Advanced"
+      },
+      {
+        "name": "c67b9ed04421cb331e76",
+        "ordinal": 2,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_Customer"
+              }
+            },
+            "Property": "Segment"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d5bde598b5eca149eced",
+        "ordinal": 3,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_Customer"
+              }
+            },
+            "Property": "Segment"
+          }
+        },
+        "type": "Categorical",
         "filter": {
           "Version": 2,
           "From": [
             {
-              "Name": "subquery",
-              "Expression": {
-                "Subquery": {
-                  "Query": {
-                    "Version": 2,
-                    "From": [
-                      {
-                        "Name": "d",
-                        "Entity": "dim_Product",
-                        "Type": 0
-                      },
-                      {
-                        "Name": "_",
-                        "Entity": "_Measures",
-                        "Type": 0
-                      }
-                    ],
-                    "Select": [
-                      {
-                        "Column": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Source": "d"
-                            }
-                          },
-                          "Property": "Product Name"
-                        },
-                        "Name": "field"
-                      }
-                    ],
-                    "OrderBy": [
-                      {
-                        "Direction": 2,
-                        "Expression": {
-                          "Measure": {
-                            "Expression": {
-                              "SourceRef": {
-                                "Source": "_"
-                              }
-                            },
-                            "Property": "Line Revenue"
-                          }
-                        }
-                      }
-                    ],
-                    "Top": 15
-                  }
-                }
-              },
-              "Type": 2
-            },
-            {
               "Name": "d",
-              "Entity": "dim_Product",
+              "Entity": "dim_Customer",
               "Type": 0
             }
           ],
@@ -256,22 +503,49 @@
                             "Source": "d"
                           }
                         },
-                        "Property": "Product Name"
+                        "Property": "Segment"
                       }
                     }
                   ],
-                  "Table": {
-                    "SourceRef": {
-                      "Source": "subquery"
-                    }
-                  }
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'At Risk'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Hibernating'"
+                        }
+                      }
+                    ]
+                  ]
                 }
               }
             }
           ]
         },
         "howCreated": "User"
+      },
+      {
+        "name": "a844559fe1bddc2208c1",
+        "ordinal": 4,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_Customer"
+              }
+            },
+            "Property": "Total Spend"
+          }
+        },
+        "type": "Advanced"
       }
-    ]
+    ],
+    "filterSortOrder": "Custom"
   }
 }
