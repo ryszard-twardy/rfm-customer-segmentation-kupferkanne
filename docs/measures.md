@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 55 DAX Measures (54 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v17 (2026-06-16) – Page 4 V3 quadrant reference lines: added [Median Recency Days] and [Median Total Spend] (folder `01 - Core KPIs`), the median oracle for the Value-at-Risk scatter constant lines; inventory 53 → 55 (54 in folders + 1 What-If), FormatString coverage 38 → 40 of 55 (the 15 without unchanged: 14 text + `[Dynamic KPI Selector]`). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
+### v18 (2026-06-17) – Partial-month trim: added calculated column [Is Closed Month] on `dim_Date` (hidden, SummarizeBy=None, `///` description), `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )`; applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart ONLY, so the category-trend ends on the last closed month (data ends 2026-03-15 → last closed = Feb 2026) and the rule self-corrects as data extends. Hidden inventory recounted from ground truth: 19 → 20 (`Recency Days` was mis-documented as hidden but is visible; `dim_Date[Is Closed Month]` added). Measure count unchanged (55). SummarizeBy=None numeric policy unchanged (32; the boolean column sits outside it). R041: `Is Closed Month` is an accepted "Remove unnecessary columns" BPA exception (false-positive – BPA does not see the reference because the column is consumed solely by a report-layer visual filter); a DAX calculated column rather than a measure or M column because it needs the fact max date. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -105,7 +105,7 @@ Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema U
 
 Visible keys: `dim_Date[Date]` and `dim_Segment[Segment]` – user-facing attributes, not pure plumbing.
 
-**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Recency Days`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
+**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do `Recency Days` and the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
 
 **What does NOT change after hiding the keys:**
 - Relationships remain functional – the engine resolves keys even when hidden
@@ -120,7 +120,7 @@ Four fact-source value columns are hidden so users reach them only through the c
 
 These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]`, `[Line Profit]`, which reference the columns explicitly in DAX.
 
-**Total hidden across the model: 20 columns** – 9 relationship/degenerate keys, 4 fact-source value columns, 6 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`).
+**Total hidden across the model: 20 columns** – 9 relationship/degenerate keys, 4 fact-source value columns, 5 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`).
 
 ---
 
@@ -521,6 +521,8 @@ After load: Mark as Date Table (Date column). Sort by Column: Month Name → Mon
 
 **Hierarchy – Calendar Drill (new in v13):** `Start of Year` > `Start of Quarter` > `Start of Month` > `Start of Week` > `Date`. All `Start of *` levels are date-typed (`type date` in M, `UnderlyingDateTimeDataType = Date`), so drill levels render on a continuous axis. Built for the Page 3 category-trend line chart (#24), which sits at the `Start of Month` level. Replaces the former `Date Hierarchy` (`Date`, `Year-Month`), removed in v13; its single consumer, a temporary Page 4 trend visual, was deleted in the same change.
 
+**Calculated column `Is Closed Month` (new in v18):** `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )` – hidden, SummarizeBy=None, with a `///` description. TRUE for every day in a fully-elapsed month relative to the latest order date, FALSE for the current partial month. Applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart so the category-trend ends on the last closed month, and reusable by Page 5 trend visuals. A DAX calculated column rather than an M column because it depends on the fact max date (row context on `dim_Date` does not propagate to `sales_curated`, so `MAX` returns the global max); consumed only by a report-layer visual filter, so it draws an accepted "Remove unnecessary columns" BPA flag (false-positive – BPA cannot see the report-layer reference).
+
 ### dim_Segment – DAX DATATABLE
 
 ```dax
@@ -625,6 +627,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v18 (2026-06-17) – Partial-month trim: added calculated column [Is Closed Month] on `dim_Date` (hidden, SummarizeBy=None, `///` description), `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )`; applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart ONLY, so the category-trend ends on the last closed month (data ends 2026-03-15 → last closed = Feb 2026) and the rule self-corrects as data extends. Hidden inventory recounted from ground truth: 19 → 20 (`Recency Days` was mis-documented as hidden but is visible; `dim_Date[Is Closed Month]` added). Measure count unchanged (55). SummarizeBy=None numeric policy unchanged (32; the boolean column sits outside it). R041: `Is Closed Month` is an accepted "Remove unnecessary columns" BPA exception (false-positive – BPA does not see the reference because the column is consumed solely by a report-layer visual filter); a DAX calculated column rather than a measure or M column because it needs the fact max date. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 ### v17 (2026-06-16) – Page 4 V3 quadrant reference lines: added [Median Recency Days] and [Median Total Spend] (folder `01 - Core KPIs`), the median oracle for the Value-at-Risk scatter constant lines; inventory 53 → 55 (54 in folders + 1 What-If), FormatString coverage 38 → 40 of 55 (the 15 without unchanged: 14 text + `[Dynamic KPI Selector]`). R041: BPA pass + this docs sync same session. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 

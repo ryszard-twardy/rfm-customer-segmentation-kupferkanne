@@ -152,6 +152,17 @@ table dim_Date
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// TRUE for days in a fully-elapsed month relative to MAX(sales_curated[Order Date]); trims partial final months from trend visuals.
+	column 'Is Closed Month' =
+			VAR _maxOrderDate =
+				MAX ( sales_curated[Order Date] )
+			RETURN
+				EOMONTH ( dim_Date[Date], 0 ) <= _maxOrderDate
+		dataType: boolean
+		isHidden
+		lineageTag: 5a69ca46-e28a-499a-b804-9410dbe6ebf5
+		summarizeBy: none
+
 	hierarchy 'Calendar Drill'
 		lineageTag: 279b0283-d781-4635-bc4c-0ae9a0227d4a
 
