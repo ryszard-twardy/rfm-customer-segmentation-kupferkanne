@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 55 DAX Measures (54 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 56 DAX Measures (55 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v18 (2026-06-17) – Partial-month trim: added calculated column [Is Closed Month] on `dim_Date` (hidden, SummarizeBy=None, `///` description), `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )`; applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart ONLY, so the category-trend ends on the last closed month (data ends 2026-03-15 → last closed = Feb 2026) and the rule self-corrects as data extends. Hidden inventory recounted from ground truth: 19 → 20 (`Recency Days` was mis-documented as hidden but is visible; `dim_Date[Is Closed Month]` added). Measure count unchanged (55). SummarizeBy=None numeric policy unchanged (32; the boolean column sits outside it). R041: `Is Closed Month` is an accepted "Remove unnecessary columns" BPA exception (false-positive – BPA does not see the reference because the column is consumed solely by a report-layer visual filter); a DAX calculated column rather than a measure or M column because it needs the fact max date. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
+### v19 (2026-06-18) – Page 5 subtitle: added `[Subtitle Page 5]` (Folder 06, Text, static literal); inventory 55 → 56 (55 in folders + 1 What-If); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected; FormatString coverage 40/55 → 40/56 (new text measure carries no FormatString by the text convention).
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 40 of 55 measures carry an explicit `FormatString`. The 15 without: 14 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 40 of 56 measures carry an explicit `FormatString`. The 16 without: 15 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -371,6 +371,7 @@ SWITCH(
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
 | Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
+| Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, segment migration) | Text | 5 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -463,9 +464,15 @@ Subtitle Page 4 =
     & " at-risk and hibernating customers"
 ```
 
+```dax
+Subtitle Page 5 = "RFM space distribution, revenue concentration, cohort retention, segment migration"
+```
+
 **Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
 
 **Status as of v15:** `[Subtitle Page 3]` is **bound** – rebound via fx → Field value on the Page 3 subtitle text box (B.4 slice 3), replacing the prior static literal. All three page subtitles (Pages 1-3) now follow the dynamic `Subtitle Page N` pattern.
+
+**Status as of v19:** `[Subtitle Page 5]` is **static** – a plain literal (unlike the live, dynamic Pages 1-4 subtitles), to be rebound to a dynamic expression once the Page 5 cohort-retention and segment-migration visuals land.
 
 ```dax
 Combo Chart Title =
@@ -595,7 +602,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 55 measures – 54 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 56 measures – 55 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -627,6 +634,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v19 (2026-06-18) – Page 5 subtitle: added `[Subtitle Page 5]` (Folder 06, Text, static literal); inventory 55 → 56 (55 in folders + 1 What-If); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected; FormatString coverage 40/55 → 40/56 (new text measure carries no FormatString by the text convention).
 
 ### v18 (2026-06-17) – Partial-month trim: added calculated column [Is Closed Month] on `dim_Date` (hidden, SummarizeBy=None, `///` description), `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )`; applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart ONLY, so the category-trend ends on the last closed month (data ends 2026-03-15 → last closed = Feb 2026) and the rule self-corrects as data extends. Hidden inventory recounted from ground truth: 19 → 20 (`Recency Days` was mis-documented as hidden but is visible; `dim_Date[Is Closed Month]` added). Measure count unchanged (55). SummarizeBy=None numeric policy unchanged (32; the boolean column sits outside it). R041: `Is Closed Month` is an accepted "Remove unnecessary columns" BPA exception (false-positive – BPA does not see the reference because the column is consumed solely by a report-layer visual filter); a DAX calculated column rather than a measure or M column because it needs the fact max date. No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
