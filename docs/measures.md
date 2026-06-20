@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 56 DAX Measures (55 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 58 DAX Measures (57 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v19 (2026-06-18) – Page 5 subtitle: added `[Subtitle Page 5]` (Folder 06, Text, static literal); inventory 55 → 56 (55 in folders + 1 What-If); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected; FormatString coverage 40/55 → 40/56 (new text measure carries no FormatString by the text convention).
+### v20 (2026-06-19) – Pareto / decile suite: added `[Cumulative Revenue %]` (0.00%, Folder 03) and `[Customer Rank]` (#,##0, Folder 01) measures, plus calc column `dim_Customer[Customer Decile]` (visible, SummarizeBy=None, FormatString 0, `///`, DESC Skip; the Pareto X-axis for `[Cumulative Revenue %]`); inventory 56 → 58 measures (57 in folders + 1 What-If; the decile is a column, not counted); FormatString coverage 40/56 → 42/58 (both new measures carry formats; 16 without unchanged); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 40 of 56 measures carry an explicit `FormatString`. The 16 without: 15 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 42 of 58 measures carry an explicit `FormatString`. The 16 without: 15 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -139,6 +139,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
 | Median Total Spend | `MEDIAN(dim_Customer[Total Spend])` | € Currency, 2dp | 4 |
+| Customer Rank | `RANKX(ALL(dim_Customer[Customer ID]), CALCULATE(SUM(dim_Customer[Total Spend])), , DESC, Dense)` | # 0dp | – |
 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | – |
 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
@@ -234,6 +235,7 @@ RETURN
 | Revenue % of Total | % 1dp | 2 |
 | Revenue at Risk | € 0dp | 1, 4 |
 | % Revenue at Risk | % 2dp | 4 |
+| Cumulative Revenue % | % 2dp | 5 |
 
 ```dax
 Segment % of Total =
@@ -282,6 +284,40 @@ VAR TotalRevenue =
     )
 RETURN
     DIVIDE ( RiskRevenue, TotalRevenue, 0 )
+```
+
+```dax
+Cumulative Revenue % =
+VAR CurrentDecile = SELECTEDVALUE ( dim_Customer[Customer Decile] )
+VAR TotalSpend =
+    CALCULATE (
+        SUM ( dim_Customer[Total Spend] ),
+        ALL ( dim_Customer )
+    )
+VAR CumSpend =
+    CALCULATE (
+        SUM ( dim_Customer[Total Spend] ),
+        FILTER ( ALL ( dim_Customer ), dim_Customer[Customer Decile] <= CurrentDecile )
+    )
+RETURN
+    DIVIDE ( CumSpend, TotalSpend )
+```
+
+**Calculated column `dim_Customer[Customer Decile]` (new in v20):** visible, SummarizeBy=None, FormatString `0`, with a `///` description. Buckets customers into 10 equal bands by `Total Spend` (1 = top 10%) – the Pareto X-axis consumed by `[Cumulative Revenue %]`. Uses `RANKX` over `dim_Customer[Total Spend]` with `DESC, Skip` (Skip, not Dense, so each customer gets a distinct rank and the 10-band `INT` bucketing stays even). A **calculated column**, not a measure – excluded from the 58-measure total; like `dim_Date[Is Closed Month]` it is tracked here and sits outside the 32-column SummarizeBy=None batch scope.
+
+```dax
+Customer Decile =
+VAR N = COUNTROWS ( ALL ( dim_Customer ) )
+VAR Rnk =
+    RANKX (
+        ALL ( dim_Customer ),
+        dim_Customer[Total Spend],
+        ,
+        DESC,
+        Skip
+    )
+RETURN
+    INT ( DIVIDE ( ( Rnk - 1 ) * 10, N ) ) + 1
 ```
 
 ---
@@ -602,7 +638,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 56 measures – 55 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 58 measures – 57 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -634,6 +670,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v20 (2026-06-19) – Pareto / decile suite: added `[Cumulative Revenue %]` (0.00%, Folder 03) and `[Customer Rank]` (#,##0, Folder 01) measures, plus calc column `dim_Customer[Customer Decile]` (visible, SummarizeBy=None, FormatString 0, `///`, DESC Skip; the Pareto X-axis for `[Cumulative Revenue %]`); inventory 56 → 58 measures (57 in folders + 1 What-If; the decile is a column, not counted); FormatString coverage 40/56 → 42/58 (both new measures carry formats; 16 without unchanged); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 ### v19 (2026-06-18) – Page 5 subtitle: added `[Subtitle Page 5]` (Folder 06, Text, static literal); inventory 55 → 56 (55 in folders + 1 What-If); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected; FormatString coverage 40/55 → 40/56 (new text measure carries no FormatString by the text convention).
 

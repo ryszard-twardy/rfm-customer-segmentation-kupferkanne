@@ -304,6 +304,26 @@ table dim_Customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Customer spend decile (1 = top 10%); RANKX over dim_Customer[Total Spend], DESC Skip, 10 equal bands; Pareto X-axis.
+	column 'Customer Decile' =
+			
+			VAR N = COUNTROWS ( ALL ( dim_Customer ) )
+			VAR Rnk =
+			    RANKX (
+			        ALL ( dim_Customer ),
+			        dim_Customer[Total Spend],
+			        ,
+			        DESC,
+			        Skip
+			    )
+			RETURN
+			    INT ( DIVIDE ( ( Rnk - 1 ) * 10, N ) ) + 1
+		formatString: 0
+		lineageTag: 963c9fd4-9fd7-4514-8e0d-0bf937ffa6e2
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
 	partition dim_Customer = m
 		mode: import
 		source =

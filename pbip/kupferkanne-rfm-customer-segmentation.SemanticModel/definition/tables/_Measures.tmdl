@@ -670,6 +670,40 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 4b02ede1-e14f-4f91-b4e5-5ae497ae31d4
 
+	/// Cumulative share of total customer spend up to and including the selected decile (Pareto curve).
+	measure 'Cumulative Revenue %' =
+			
+			VAR CurrentDecile = SELECTEDVALUE ( dim_Customer[Customer Decile] )
+			VAR TotalSpend =
+			    CALCULATE (
+			        SUM ( dim_Customer[Total Spend] ),
+			        ALL ( dim_Customer )
+			    )
+			VAR CumSpend =
+			    CALCULATE (
+			        SUM ( dim_Customer[Total Spend] ),
+			        FILTER ( ALL ( dim_Customer ), dim_Customer[Customer Decile] <= CurrentDecile )
+			    )
+			RETURN
+			    DIVIDE ( CumSpend, TotalSpend )
+		formatString: 0.00%
+		displayFolder: 03 - Segment Analysis
+		lineageTag: 6db5d73f-1d6e-4558-9d56-b355041ebf19
+
+	/// Customer rank by Total Spend (1 = highest), DESC Dense; tooltip/utility only.
+	measure 'Customer Rank' =
+			
+			RANKX (
+			    ALL ( dim_Customer[Customer ID] ),
+			    CALCULATE ( SUM ( dim_Customer[Total Spend] ) ),
+			    ,
+			    DESC,
+			    Dense
+			)
+		formatString: #,##0
+		displayFolder: 01 - Core KPIs
+		lineageTag: f33287b3-39d3-4a36-be70-ebf99ab5a25a
+
 	column x
 		isHidden
 		formatString: 0
