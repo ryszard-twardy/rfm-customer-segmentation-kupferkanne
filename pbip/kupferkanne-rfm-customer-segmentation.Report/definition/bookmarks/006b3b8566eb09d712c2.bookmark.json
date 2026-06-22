@@ -555,15 +555,6 @@
                 ]
               }
             }
-          },
-          "a4379f50c56c2514b6e9": {
-            "singleVisual": {
-              "visualType": "shape",
-              "objects": {},
-              "display": {
-                "mode": "hidden"
-              }
-            }
           }
         },
         "visualContainerGroups": {
