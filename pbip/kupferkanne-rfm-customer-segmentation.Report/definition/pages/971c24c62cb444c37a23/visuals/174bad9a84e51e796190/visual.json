@@ -4,13 +4,13 @@
   "position": {
     "x": 80,
     "y": 20,
-    "z": 5000,
+    "z": 6000,
     "height": 60,
     "width": 800,
     "tabOrder": 5000
   },
   "visualGroup": {
-    "displayName": "Page_Header",
+    "displayName": "Row_01_Page_Header",
     "groupMode": "ScaleMode"
   }
 }
