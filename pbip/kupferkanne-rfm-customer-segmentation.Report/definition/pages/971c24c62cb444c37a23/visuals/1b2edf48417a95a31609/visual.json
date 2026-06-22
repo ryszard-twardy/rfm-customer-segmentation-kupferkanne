@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "e873bcb6b9c3ea9bd297",
+  "name": "1b2edf48417a95a31609",
   "position": {
     "x": 0,
     "y": 40,
-    "z": 0,
+    "z": 1500,
     "height": 20,
     "width": 800,
-    "tabOrder": 0
+    "tabOrder": 6001
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,23 @@
               {
                 "textRuns": [
                   {
-                    "value": "xxxxxxxxxxxxxxxxxxxx"
+                    "value": "Kupferkanne ",
+                    "textStyle": {
+                      "color": "#64748b"
+                    }
+                  },
+                  {
+                    "value": "–",
+                    "textStyle": {
+                      "fontFamily": "Aptos, sans-serif",
+                      "fontSize": "11pt"
+                    }
+                  },
+                  {
+                    "value": " D2C E-commerce · 9 European markets · Rolling 38 months",
+                    "textStyle": {
+                      "color": "#64748b"
+                    }
                   }
                 ]
               }
@@ -34,15 +50,20 @@
           "properties": {
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Subtitle_Page'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Page 5"
                 }
               }
             },
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             }
