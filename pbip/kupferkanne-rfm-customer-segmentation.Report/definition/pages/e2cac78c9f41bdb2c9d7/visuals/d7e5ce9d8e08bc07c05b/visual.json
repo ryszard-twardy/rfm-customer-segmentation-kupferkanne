@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "b53c2f24de7e97914b29",
+  "name": "d7e5ce9d8e08bc07c05b",
   "position": {
     "x": 12.307692307692307,
-    "y": 668,
-    "z": 500,
+    "y": 304,
+    "z": 2500,
     "height": 36,
     "width": 36,
-    "tabOrder": 6000
+    "tabOrder": 9003
   },
   "visual": {
     "visualType": "actionButton",
@@ -27,7 +27,7 @@
                 "name": {
                   "expr": {
                     "Literal": {
-                      "Value": "'nav_reset_default.svg'"
+                      "Value": "'nav_05_customer_lifecycle_intelligence_default.svg'"
                     }
                   }
                 },
@@ -36,7 +36,7 @@
                     "ResourcePackageItem": {
                       "PackageName": "RegisteredResources",
                       "PackageType": 1,
-                      "ItemName": "nav_reset_default28250119850476485.svg"
+                      "ItemName": "nav_05_customer_lifecycle_inte6883610228320631.svg"
                     }
                   }
                 },
@@ -96,7 +96,7 @@
                 "name": {
                   "expr": {
                     "Literal": {
-                      "Value": "'nav_reset_hover.svg'"
+                      "Value": "'nav_05_customer_lifecycle_intelligence_hover.svg'"
                     }
                   }
                 },
@@ -105,7 +105,7 @@
                     "ResourcePackageItem": {
                       "PackageName": "RegisteredResources",
                       "PackageType": 1,
-                      "ItemName": "nav_reset_hover3712547887499589.svg"
+                      "ItemName": "nav_05_customer_lifecycle_inte8188736245073268.svg"
                     }
                   }
                 },
@@ -165,7 +165,7 @@
                 "name": {
                   "expr": {
                     "Literal": {
-                      "Value": "'nav_reset_click.svg'"
+                      "Value": "'nav_05_customer_lifecycle_intelligence_click.svg'"
                     }
                   }
                 },
@@ -174,7 +174,7 @@
                     "ResourcePackageItem": {
                       "PackageName": "RegisteredResources",
                       "PackageType": 1,
-                      "ItemName": "nav_reset_click0472190799562443.svg"
+                      "ItemName": "nav_05_customer_lifecycle_inte5473676363940637.svg"
                     }
                   }
                 },
@@ -259,7 +259,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Nav_Reset'"
+                  "Value": "'Nav_05_Lifecycle'"
                 }
               }
             }
@@ -305,28 +305,21 @@
             "type": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bookmark'"
+                  "Value": "'PageNavigation'"
                 }
               }
             },
             "navigationSection": {
               "expr": {
                 "Literal": {
-                  "Value": "'e2cac78c9f41bdb2c9d7'"
+                  "Value": "'971c24c62cb444c37a23'"
                 }
               }
             },
             "tooltip": {
               "expr": {
                 "Literal": {
-                  "Value": "'Reset All Filters'"
-                }
-              }
-            },
-            "bookmark": {
-              "expr": {
-                "Literal": {
-                  "Value": "'006b3b8566eb09d712c2'"
+                  "Value": "'Regional Analysis'"
                 }
               }
             }
@@ -336,6 +329,6 @@
     },
     "drillFilterOtherVisuals": true
   },
-  "parentGroupName": "4917a3491498a1641dc8",
+  "parentGroupName": "400c138ee8e36070897b",
   "howCreated": "InsertVisualButton"
 }

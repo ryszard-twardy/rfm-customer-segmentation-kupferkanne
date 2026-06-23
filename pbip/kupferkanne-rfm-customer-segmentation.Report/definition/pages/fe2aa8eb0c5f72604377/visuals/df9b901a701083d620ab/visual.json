@@ -319,7 +319,7 @@
             "tooltip": {
               "expr": {
                 "Literal": {
-                  "Value": "'nav_reset_default'"
+                  "Value": "'Reset All Filters'"
                 }
               }
             },
