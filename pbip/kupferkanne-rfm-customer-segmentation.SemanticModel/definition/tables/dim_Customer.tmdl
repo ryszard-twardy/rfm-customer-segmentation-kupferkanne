@@ -205,21 +205,23 @@ table dim_Customer
 
 	column 'R Score'
 		dataType: int64
-		isHidden
 		formatString: 0
 		lineageTag: 04496c18-c730-487a-b061-578bed15d5d8
 		summarizeBy: none
 		sourceColumn: r_score
 
+		changedProperty = IsHidden
+
 		annotation SummarizationSetBy = Automatic
 
 	column 'F Score'
 		dataType: int64
-		isHidden
 		formatString: 0
 		lineageTag: 547ea95e-7970-4a68-9516-448eea779168
 		summarizeBy: none
 		sourceColumn: f_score
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

@@ -1,7 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 58 DAX Measures (57 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v20 (2026-06-19) – Pareto / decile suite: added `[Cumulative Revenue %]` (0.00%, Folder 03) and `[Customer Rank]` (#,##0, Folder 01) measures, plus calc column `dim_Customer[Customer Decile]` (visible, SummarizeBy=None, FormatString 0, `///`, DESC Skip; the Pareto X-axis for `[Cumulative Revenue %]`); inventory 56 → 58 measures (57 in folders + 1 What-If; the decile is a column, not counted); FormatString coverage 40/56 → 42/58 (both new measures carry formats; 16 without unchanged); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
+### v21 (2026-06-24) – Pareto reference line + Customer Rank removal: added measure `[Pareto Threshold 80%]` (expression `0.8`, FormatString `0.00%`, Folder 03 – Segment Analysis); a static 80/20 reference line plotted on the secondary axis of the Page 5 "Revenue Concentration (Pareto)" combo chart alongside `[Cumulative Revenue %]` (a constant measure is used because a native fx constant line binds only to the primary/value axis). Removed orphaned measure `[Customer Rank]` (Dense rank, Folder 01) – 0 references in any measure expression or visual.json; superseded by the inline `RANKX ( ..., DESC, Skip )` in the `dim_Customer[Customer Decile]` calc column (D115). Net measure count unchanged at 58 (57 in 6 Display Folders + 1 What-If; –1 Folder 01, +1 Folder 03). Unhid `dim_Customer[R Score]` + `[F Score]` (D120 – the Page 5 V1 RFM heatmap needs draggable score fields on its axes); hidden inventory 20 → 18. FormatString coverage unchanged at 42 of 58 (both the added and removed measures carry formats; the 16-without text set is untouched). No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -105,7 +105,7 @@ Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema U
 
 Visible keys: `dim_Date[Date]` and `dim_Segment[Segment]` – user-facing attributes, not pure plumbing.
 
-**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `R Score`, `F Score`, `M Score`, `Health Score`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve hidden source columns). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do `Recency Days` and the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
+**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `M Score`, `Health Score`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve source columns regardless of visibility); `R Score` and `F Score` are now visible (D120 – draggable score axes for the Page 5 RFM heatmap). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do `Recency Days` and the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
 
 **What does NOT change after hiding the keys:**
 - Relationships remain functional – the engine resolves keys even when hidden
@@ -120,7 +120,7 @@ Four fact-source value columns are hidden so users reach them only through the c
 
 These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]`, `[Line Profit]`, which reference the columns explicitly in DAX.
 
-**Total hidden across the model: 20 columns** – 9 relationship/degenerate keys, 4 fact-source value columns, 5 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`).
+**Total hidden across the model: 18 columns** – 9 relationship/degenerate keys, 4 fact-source value columns, 3 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`).
 
 ---
 
@@ -139,7 +139,6 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
 | Median Total Spend | `MEDIAN(dim_Customer[Total Spend])` | € Currency, 2dp | 4 |
-| Customer Rank | `RANKX(ALL(dim_Customer[Customer ID]), CALCULATE(SUM(dim_Customer[Total Spend])), , DESC, Dense)` | # 0dp | – |
 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | – |
 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
@@ -236,6 +235,7 @@ RETURN
 | Revenue at Risk | € 0dp | 1, 4 |
 | % Revenue at Risk | % 2dp | 4 |
 | Cumulative Revenue % | % 2dp | 5 |
+| Pareto Threshold 80% | % 2dp | 5 |
 
 ```dax
 Segment % of Total =
@@ -301,6 +301,11 @@ VAR CumSpend =
     )
 RETURN
     DIVIDE ( CumSpend, TotalSpend )
+```
+
+```dax
+Pareto Threshold 80% =
+0.8
 ```
 
 **Calculated column `dim_Customer[Customer Decile]` (new in v20):** visible, SummarizeBy=None, FormatString `0`, with a `///` description. Buckets customers into 10 equal bands by `Total Spend` (1 = top 10%) – the Pareto X-axis consumed by `[Cumulative Revenue %]`. Uses `RANKX` over `dim_Customer[Total Spend]` with `DESC, Skip` (Skip, not Dense, so each customer gets a distinct rank and the 10-band `INT` bucketing stays even). A **calculated column**, not a measure – excluded from the 58-measure total; like `dim_Date[Is Closed Month]` it is tracked here and sits outside the 32-column SummarizeBy=None batch scope.
@@ -665,11 +670,13 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 - Cleaner than 3 separate charts + bookmarks
 - Row-context issues make SELECTEDVALUE-based approaches return BLANK on score axis
 
-**Note:** the three score columns this Field Parameter references (`R Score`, `F Score`, `M Score`) live on `dim_Customer` and are hidden – part of the RFM analytic payload merged from the former `v_rfm_for_bi` satellite. Field parameters resolve hidden source columns, so the slicer works while the raw columns stay out of the Fields pane (see Model Hygiene → Foreign Key & Surrogate Key Visibility). The earlier satellite-visibility exception no longer applies.
+**Note:** the three score columns this Field Parameter references (`R Score`, `F Score`, `M Score`) live on `dim_Customer`. `M Score` is hidden – part of the RFM analytic payload merged from the former `v_rfm_for_bi` satellite; `R Score` and `F Score` are now visible (D120 – draggable score axes for the Page 5 RFM heatmap). Field parameters resolve source columns regardless of visibility, so the slicer works while the hidden `M Score` stays out of the Fields pane (see Model Hygiene → Foreign Key & Surrogate Key Visibility).
 
 ---
 
 ## Changelog
+
+### v21 (2026-06-24) – Pareto reference line + Customer Rank removal: added measure `[Pareto Threshold 80%]` (expression `0.8`, FormatString `0.00%`, Folder 03 – Segment Analysis); a static 80/20 reference line plotted on the secondary axis of the Page 5 "Revenue Concentration (Pareto)" combo chart alongside `[Cumulative Revenue %]` (a constant measure is used because a native fx constant line binds only to the primary/value axis). Removed orphaned measure `[Customer Rank]` (Dense rank, Folder 01) – 0 references in any measure expression or visual.json; superseded by the inline `RANKX ( ..., DESC, Skip )` in the `dim_Customer[Customer Decile]` calc column (D115). Net measure count unchanged at 58 (57 in 6 Display Folders + 1 What-If; –1 Folder 01, +1 Folder 03). Unhid `dim_Customer[R Score]` + `[F Score]` (D120 – the Page 5 V1 RFM heatmap needs draggable score fields on its axes); hidden inventory 20 → 18. FormatString coverage unchanged at 42 of 58 (both the added and removed measures carry formats; the 16-without text set is untouched). No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
 ### v20 (2026-06-19) – Pareto / decile suite: added `[Cumulative Revenue %]` (0.00%, Folder 03) and `[Customer Rank]` (#,##0, Folder 01) measures, plus calc column `dim_Customer[Customer Decile]` (visible, SummarizeBy=None, FormatString 0, `///`, DESC Skip; the Pareto X-axis for `[Cumulative Revenue %]`); inventory 56 → 58 measures (57 in folders + 1 What-If; the decile is a column, not counted); FormatString coverage 40/56 → 42/58 (both new measures carry formats; 16 without unchanged); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 

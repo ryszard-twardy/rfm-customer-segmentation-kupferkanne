@@ -690,19 +690,14 @@ table _Measures
 		displayFolder: 03 - Segment Analysis
 		lineageTag: 6db5d73f-1d6e-4558-9d56-b355041ebf19
 
-	/// Customer rank by Total Spend (1 = highest), DESC Dense; tooltip/utility only.
-	measure 'Customer Rank' =
+	/// Constant 80% reference line for the Pareto chart (80/20 threshold marker).
+	/// Plotted on the secondary axis alongside [Cumulative Revenue %].
+	measure 'Pareto Threshold 80%' =
 			
-			RANKX (
-			    ALL ( dim_Customer[Customer ID] ),
-			    CALCULATE ( SUM ( dim_Customer[Total Spend] ) ),
-			    ,
-			    DESC,
-			    Dense
-			)
-		formatString: #,##0
-		displayFolder: 01 - Core KPIs
-		lineageTag: f33287b3-39d3-4a36-be70-ebf99ab5a25a
+			0.8
+		formatString: 0.00%
+		displayFolder: 03 - Segment Analysis
+		lineageTag: d32adbb1-193e-4426-b220-c6f89fce902d
 
 	column x
 		isHidden
