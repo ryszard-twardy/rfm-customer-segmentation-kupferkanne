@@ -380,7 +380,9 @@ table _Measures
 	/// Dynamic Page 1 subtitle with live rolling month count.
 	measure 'Subtitle Page 1' =
 			
-			"Kupferkanne – D2C E-commerce · 9 European markets · Rolling "
+			"Kupferkanne – D2C E-commerce · "
+			    & DISTINCTCOUNT ( dim_Customer[Country] )
+			    & " European markets · Rolling "
 			    & DISTINCTCOUNT ( sales_curated[Source Month] )
 			    & " months"
 		displayFolder: 06 - Formatting & Regional
@@ -698,6 +700,39 @@ table _Measures
 		formatString: 0.00%
 		displayFolder: 03 - Segment Analysis
 		lineageTag: d32adbb1-193e-4426-b220-c6f89fce902d
+
+	/// Dynamic subtitle for the Page 5 V3 Cohort Retention matrix - cohort count, span, tenure window.
+	measure 'Subtitle Cohort Retention' =
+			
+			VAR _cohorts =
+			    DISTINCTCOUNT ( v_cohort_retention[Cohort Month] )
+			VAR _minMonth =
+			    FORMAT ( MIN ( v_cohort_retention[Cohort Month] ), "MMM yyyy" )
+			VAR _maxMonth =
+			    FORMAT ( MAX ( v_cohort_retention[Cohort Month] ), "MMM yyyy" )
+			VAR _window =
+			    MAX ( v_cohort_retention[Months Since Acquisition] )
+			RETURN
+			    _cohorts & " cohorts, "
+			        & _minMonth & " to " & _maxMonth
+			        & ", tenure 0 to " & _window & " months"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: c63235b5-6922-405c-bb86-70b48eff677a
+
+	/// Diverging-gradient font contrast for the V3 cohort matrix - white on the dark blue high end and dark terracotta low end, dark ink in the cream center
+	measure 'Retention Font Color' =
+			
+			VAR _rate =
+			    SUM ( v_cohort_retention[Retention Rate] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        _rate >= 0.70, "#FFFFFF",
+			        _rate <= 0.25, "#FFFFFF",
+			        "#3D4752"
+			    )
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: f03fbd03-ce70-478a-ac39-2ecd65518055
 
 	column x
 		isHidden

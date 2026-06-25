@@ -1,0 +1,68 @@
+table v_cohort_retention
+	lineageTag: c5ad4130-7d33-468b-acfc-8c74c1b509ba
+
+	column 'Cohort Month'
+		dataType: dateTime
+		formatString: MM-yyyy
+		lineageTag: 36b46b6d-7b75-4ec7-80f3-3e6ff02516c4
+		summarizeBy: none
+		sourceColumn: Cohort Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column 'Months Since Acquisition'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8feb37ab-4616-4a4d-9ebc-3c5c1bd19655
+		summarizeBy: none
+		sourceColumn: Months Since Acquisition
+
+		annotation SummarizationSetBy = User
+
+	column 'Active Customers'
+		dataType: int64
+		formatString: 0
+		lineageTag: f4793575-54b3-4d8f-a08b-ae017b694174
+		summarizeBy: none
+		sourceColumn: Active Customers
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cohort Customers'
+		dataType: int64
+		formatString: 0
+		lineageTag: 52f35fc6-0c8b-4ac6-94b3-9acdad33f499
+		summarizeBy: none
+		sourceColumn: Cohort Customers
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Retention Rate'
+		dataType: double
+		formatString: 0%;-0%;0%
+		lineageTag: 6561da65-01c7-41f1-a1c3-39121546215a
+		summarizeBy: none
+		sourceColumn: Retention Rate
+
+		annotation SummarizationSetBy = User
+
+	partition v_cohort_retention = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    v_cohort_retention_View = sales_Schema{[Name="v_cohort_retention",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(v_cohort_retention_View,{{"retention_rate", "Retention Rate"}, {"cohort_month", "Cohort Month"}, {"cohort_customers", "Cohort Customers"}, {"months_since_acquisition", "Months Since Acquisition"}, {"active_customers", "Active Customers"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

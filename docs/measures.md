@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 58 DAX Measures (57 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 60 DAX Measures (59 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v21 (2026-06-24) – Pareto reference line + Customer Rank removal: added measure `[Pareto Threshold 80%]` (expression `0.8`, FormatString `0.00%`, Folder 03 – Segment Analysis); a static 80/20 reference line plotted on the secondary axis of the Page 5 "Revenue Concentration (Pareto)" combo chart alongside `[Cumulative Revenue %]` (a constant measure is used because a native fx constant line binds only to the primary/value axis). Removed orphaned measure `[Customer Rank]` (Dense rank, Folder 01) – 0 references in any measure expression or visual.json; superseded by the inline `RANKX ( ..., DESC, Skip )` in the `dim_Customer[Customer Decile]` calc column (D115). Net measure count unchanged at 58 (57 in 6 Display Folders + 1 What-If; –1 Folder 01, +1 Folder 03). Unhid `dim_Customer[R Score]` + `[F Score]` (D120 – the Page 5 V1 RFM heatmap needs draggable score fields on its axes); hidden inventory 20 → 18. FormatString coverage unchanged at 42 of 58 (both the added and removed measures carry formats; the 16-without text set is untouched). No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
+### v22 (2026-06-25) – Page 5 V3 Cohort Retention measures + dynamic Subtitle Page 1: added [Subtitle Cohort Retention] (Folder 06, Text, dynamic – cohort count, span, tenure window for the V3 matrix; ///) and [Retention Font Color] (Folder 06, Hex text, dynamic – per-cell contrast for the diverging heatmap, white at retention >= 0.70 and <= 0.25, #3D4752 in the cream mid-band; ///); rebound [Subtitle Page 1] from the static "9 European markets" literal to a dynamic DISTINCTCOUNT ( dim_Customer[Country] ) market count (months already dynamic), so both counters self-correct as geography or the calendar extends; inventory 58 → 60 (59 in folders + 1 What-If; both new measures are text, no FormatString); FormatString coverage 42/58 → 42/60 (18-without = 16 prior + 2 new text); no topology change (6 active / 0 bidirectional – v_cohort_retention imported standalone, no relationship); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. SummarizeBy hygiene: set the imported v_cohort_retention auxiliary numeric columns [Active Customers] and [Cohort Customers] to SummarizeBy=None per the model-wide policy, so every numeric column of the view is now None and the table is fully policy-compliant (SummarizeBy=None scope 32 → 36; Retention Rate stays None, no SummarizeBy exception needed). BPA: the "percentages with 1 decimal" rule is recorded as an accepted exception (see note) – house standard for precision-sensitive percentages is 0.00% (2dp).
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,12 +55,14 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 42 of 58 measures carry an explicit `FormatString`. The 16 without: 15 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 42 of 60 measures carry an explicit `FormatString`. The 18 without: 17 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
 
 **Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13; all 13 remaining are intentional (12 text + 1 `SWITCH`-format).
+
+**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception in v18). Affected 2dp measures (all 10 percentage measures in the model use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`. No measure in the model uses 1dp (`0.0%`).
 
 ### Column Behavior: SummarizeBy = None
 
@@ -68,7 +70,7 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 
 **Why:** implicit aggregations have no `FormatString`, no documentation, no name. They drift silently as schemas evolve. Forcing explicit measures keeps the semantic layer honest and visible in the Fields pane.
 
-**Scope – 32 columns; authoritative target list in `tools/format_summarize_by_batch.csx`:**
+**Scope – 36 columns (32 from the v1.0.1 batch in `tools/format_summarize_by_batch.csx`; +4 on the v22 `v_cohort_retention` import):**
 
 | Table | Cols | Columns |
 |---|---|---|
@@ -78,6 +80,7 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 | `sales_curated` | 9 | Order Discount %, Basket Item Count, Order Value, Order Cost, Order Profit, Order Margin %, Total Units, Distinct Products, Source Month |
 | `v_items_for_bi` | 4 | Quantity, Line Net Amount, Line Profit, Line Margin % |
 | `dim_KPI_Selector` | 1 | SortOrder |
+| `v_cohort_retention` | 4 | Months Since Acquisition, Active Customers, Cohort Customers, Retention Rate |
 
 **Batch script:** `tools/format_summarize_by_batch.csx` (explicit `(table, column)` targets list – no pattern matching, per audit precision). Uses `KeyValuePair<string,string>` for TE2 Roslyn pre-C# 7.0 compatibility. BPA delta: 28 → 0 violations.
 
@@ -230,8 +233,8 @@ RETURN
 
 | Measure | Format | Pages |
 |---|---|---|
-| Segment % of Total | % 1dp | 1, 2 |
-| Revenue % of Total | % 1dp | 2 |
+| Segment % of Total | % 2dp | 1, 2 |
+| Revenue % of Total | % 2dp | 2 |
 | Revenue at Risk | € 0dp | 1, 4 |
 | % Revenue at Risk | % 2dp | 4 |
 | Cumulative Revenue % | % 2dp | 5 |
@@ -405,10 +408,10 @@ SWITCH(
 |---|---|---|---|
 | Health Indicator | Status text from health_score | Text | 1, 6 |
 | ARPU by Country | Revenue per customer (context-aware) | € 2dp | 5 |
-| Country Revenue Share | Country share of total revenue | % 1dp | 5 |
+| Country Revenue Share | Country share of total revenue | % 2dp | 5 |
 | Segment Color | Hex color per segment (SWITCH) – USE ONLY IF dim_Segment[SegmentColor] column is not used for conditional formatting | Hex text | All |
 | Revenue Trend Chart Title | Dynamic line chart title with live month count | Text | 1 |
-| Subtitle Page 1 | Dynamic Page 1 subtitle with live month count | Text | 1 |
+| Subtitle Page 1 | Dynamic Page 1 subtitle with live market + month counts | Text | 1 |
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
 | Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
@@ -417,6 +420,8 @@ SWITCH(
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | Combo Chart Title | Dynamic Page 3 combo chart title with top brand name + revenue | Text | 3 |
+| Subtitle Cohort Retention | Dynamic Page 5 V3 subtitle: cohort count, span, tenure window | Text | 5 |
+| Retention Font Color | Per-cell font contrast for the V3 diverging cohort heatmap | Hex text | 5 |
 
 ```dax
 Health Indicator =
@@ -481,10 +486,14 @@ Revenue Trend Chart Title =
 
 ```dax
 Subtitle Page 1 =
-"Kupferkanne – D2C E-commerce · 9 European markets · Rolling " &
-DISTINCTCOUNT ( sales_curated[Source Month] ) &
-" months"
+"Kupferkanne – D2C E-commerce · "
+    & DISTINCTCOUNT ( dim_Customer[Country] )
+    & " European markets · Rolling "
+    & DISTINCTCOUNT ( sales_curated[Source Month] )
+    & " months"
 ```
+
+**Design decision – Subtitle Page 1 market count (new in v22):** the market count is now dynamic via `DISTINCTCOUNT ( dim_Customer[Country] )`, matching the rolling-months pattern; both counters self-correct as geography or the calendar extends (replacing the static `9 European markets` literal).
 
 ```dax
 Subtitle Page 2 = 
@@ -524,6 +533,37 @@ Combo Chart Title =
 ```
 
 **Design decision – dynamic combo title (new in v13):** the Page 3 brand combo chart binds its Title to `[Combo Chart Title]` via fx (Field value), following the `[Revenue Trend Chart Title]` pattern. The headline brand and its compact-formatted revenue come from `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`, so the title auto-updates under slicer context – no manual edits as the leader changes.
+
+```dax
+Subtitle Cohort Retention =
+VAR _cohorts =
+    DISTINCTCOUNT ( v_cohort_retention[Cohort Month] )
+VAR _minMonth =
+    FORMAT ( MIN ( v_cohort_retention[Cohort Month] ), "MMM yyyy" )
+VAR _maxMonth =
+    FORMAT ( MAX ( v_cohort_retention[Cohort Month] ), "MMM yyyy" )
+VAR _window =
+    MAX ( v_cohort_retention[Months Since Acquisition] )
+RETURN
+    _cohorts & " cohorts, "
+        & _minMonth & " to " & _maxMonth
+        & ", tenure 0 to " & _window & " months"
+```
+
+```dax
+Retention Font Color =
+VAR _rate =
+    SUM ( v_cohort_retention[Retention Rate] )
+RETURN
+    SWITCH (
+        TRUE (),
+        _rate >= 0.70, "#FFFFFF",
+        _rate <= 0.25, "#FFFFFF",
+        "#3D4752"
+    )
+```
+
+**Design decision – Page 5 V3 cohort measures (new in v22):** `[Subtitle Cohort Retention]` is bound via fx (Field value) to the V3 matrix subtitle, reporting the live cohort count, calendar span, and tenure window. `[Retention Font Color]` drives per-cell font color on the diverging heatmap – white at both extremes (retention >= 0.70 and <= 0.25) and dark ink (`#3D4752`) in the cream center, because a single threshold rule whitens the light center of a diverging scheme. Both reference the standalone `v_cohort_retention` import.
 
 ---
 
@@ -643,7 +683,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 58 measures – 57 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 60 measures – 59 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -675,6 +715,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v22 (2026-06-25) – Page 5 V3 Cohort Retention measures + dynamic Subtitle Page 1: added [Subtitle Cohort Retention] (Folder 06, Text, dynamic – cohort count, span, tenure window for the V3 matrix; ///) and [Retention Font Color] (Folder 06, Hex text, dynamic – per-cell contrast for the diverging heatmap, white at retention >= 0.70 and <= 0.25, #3D4752 in the cream mid-band; ///); rebound [Subtitle Page 1] from the static "9 European markets" literal to a dynamic DISTINCTCOUNT ( dim_Customer[Country] ) market count (months already dynamic), so both counters self-correct as geography or the calendar extends; inventory 58 → 60 (59 in folders + 1 What-If; both new measures are text, no FormatString); FormatString coverage 42/58 → 42/60 (18-without = 16 prior + 2 new text); no topology change (6 active / 0 bidirectional – v_cohort_retention imported standalone, no relationship); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. SummarizeBy hygiene: set the imported v_cohort_retention auxiliary numeric columns [Active Customers] and [Cohort Customers] to SummarizeBy=None per the model-wide policy, so every numeric column of the view is now None and the table is fully policy-compliant (SummarizeBy=None scope 32 → 36; Retention Rate stays None, no SummarizeBy exception needed). BPA: the "percentages with 1 decimal" rule is recorded as an accepted exception (see note) – house standard for precision-sensitive percentages is 0.00% (2dp).
 
 ### v21 (2026-06-24) – Pareto reference line + Customer Rank removal: added measure `[Pareto Threshold 80%]` (expression `0.8`, FormatString `0.00%`, Folder 03 – Segment Analysis); a static 80/20 reference line plotted on the secondary axis of the Page 5 "Revenue Concentration (Pareto)" combo chart alongside `[Cumulative Revenue %]` (a constant measure is used because a native fx constant line binds only to the primary/value axis). Removed orphaned measure `[Customer Rank]` (Dense rank, Folder 01) – 0 references in any measure expression or visual.json; superseded by the inline `RANKX ( ..., DESC, Skip )` in the `dim_Customer[Customer Decile]` calc column (D115). Net measure count unchanged at 58 (57 in 6 Display Folders + 1 What-If; –1 Folder 01, +1 Folder 03). Unhid `dim_Customer[R Score]` + `[F Score]` (D120 – the Page 5 V1 RFM heatmap needs draggable score fields on its axes); hidden inventory 20 → 18. FormatString coverage unchanged at 42 of 58 (both the added and removed measures carry formats; the 16-without text set is untouched). No topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 
