@@ -5,7 +5,7 @@
 
 ## Context
 
-Kupferkanne is a fictional Erlangen-based D2C e-commerce brand operating across nine European markets with 38 months of order data (~169K orders from ~15,000 customers). The business needs to answer three commercial questions: which customers to invest in (segmentation), which products and brands drive profitability, and how much revenue sits at churn risk.
+Kupferkanne is a fictional Erlangen-based D2C e-commerce brand operating across nine European markets with 39 months of order data (~169K orders from ~15,000 customers). The business needs to answer three commercial questions: which customers to invest in (segmentation), which products and brands drive profitability, and how much revenue sits at churn risk.
 
 A single analyst is responsible for the analytics platform end-to-end: data ingestion, warehouse modelling, BI consumption, documentation. The choice of build philosophy – full engineering pipeline vs. exploratory dashboards layered on quick SQL – affects every downstream decision: data sourcing, schema discipline, pipeline structure, testing depth.
 
