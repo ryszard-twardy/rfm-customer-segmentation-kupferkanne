@@ -4,7 +4,7 @@ dialect = bigquery
 max_line_length = 100
 large_file_skip_byte_limit = 50000
 
-# Excluded rules — documented in RULES.md (R036/R037)
+# Excluded rules – documented in RULES.md (R036/R037)
 # CP02: per-file "consistent" autodetect produces conflicting verdicts across
 #       the pipeline. Convention is to preserve source casing
 #       (CustomerID, OrderDate, LineNetAmount).
