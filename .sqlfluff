@@ -11,7 +11,9 @@ large_file_skip_byte_limit = 50000
 # AL03: audit/validation CTEs (c01-c29) use positional naming by design.
 # RF02: subquery refs like (SELECT n FROM ob) are unambiguous in audit CTEs.
 # AM06: positional GROUP BY/ORDER BY is intentional in pivot queries.
-exclude_rules = CP02, AL03, RF02, AM06
+# ST06: grain/key columns are intentionally placed first in SELECT (grain-first ordering, house style).
+# ST07: USING-style equi-joins are idiomatic GoogleSQL here; ON-only is not enforced.
+exclude_rules = CP02, AL03, RF02, AM06, ST06, ST07
 
 [sqlfluff:indentation]
 indent_unit = space
