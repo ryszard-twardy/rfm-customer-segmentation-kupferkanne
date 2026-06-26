@@ -672,6 +672,17 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 4b02ede1-e14f-4f91-b4e5-5ae497ae31d4
 
+	/// Dynamic Page 6 subtitle with live market and city counts.
+	measure 'Subtitle Page 6' =
+			
+			"Geographic performance across "
+			    & DISTINCTCOUNT ( dim_Customer[Country] )
+			    & " markets and "
+			    & DISTINCTCOUNT ( dim_Customer[City] )
+			    & " cities"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 089c19d6-8fd2-47ff-b816-cd9ac1cae47c
+
 	/// Cumulative share of total customer spend up to and including the selected decile (Pareto curve).
 	measure 'Cumulative Revenue %' =
 			

@@ -1,7 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 60 DAX Measures (59 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 61 DAX Measures (60 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v22 (2026-06-25) – Page 5 V3 Cohort Retention measures + dynamic Subtitle Page 1: added [Subtitle Cohort Retention] (Folder 06, Text, dynamic – cohort count, span, tenure window for the V3 matrix; ///) and [Retention Font Color] (Folder 06, Hex text, dynamic – per-cell contrast for the diverging heatmap, white at retention >= 0.70 and <= 0.25, #3D4752 in the cream mid-band; ///); rebound [Subtitle Page 1] from the static "9 European markets" literal to a dynamic DISTINCTCOUNT ( dim_Customer[Country] ) market count (months already dynamic), so both counters self-correct as geography or the calendar extends; inventory 58 → 60 (59 in folders + 1 What-If; both new measures are text, no FormatString); FormatString coverage 42/58 → 42/60 (18-without = 16 prior + 2 new text); no topology change (6 active / 0 bidirectional – v_cohort_retention imported standalone, no relationship); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. SummarizeBy hygiene: set the imported v_cohort_retention auxiliary numeric columns [Active Customers] and [Cohort Customers] to SummarizeBy=None per the model-wide policy, so every numeric column of the view is now None and the table is fully policy-compliant (SummarizeBy=None scope 32 → 36; Retention Rate stays None, no SummarizeBy exception needed). BPA: the "percentages with 1 decimal" rule is recorded as an accepted exception (see note) – house standard for precision-sensitive percentages is 0.00% (2dp).
+### v23 (2026-06-26) – Page 6 subtitle: added `[Subtitle Page 6]` (Folder 06, Text, dynamic – live market and city counts via `DISTINCTCOUNT ( dim_Customer[Country] )` and `DISTINCTCOUNT ( dim_Customer[City] )`; `///`); inventory 60 → 61 (60 in folders + 1 What-If; new measure is text, no FormatString); FormatString coverage 42/60 → 42/61 (19-without = 18 text + `[Dynamic KPI Selector]`); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Measure only – the Page 6 subtitle visual binding lands in a separate change.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -55,7 +55,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 42 of 60 measures carry an explicit `FormatString`. The 18 without: 17 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 42 of 61 measures carry an explicit `FormatString`. The 19 without: 18 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -416,6 +416,7 @@ SWITCH(
 | Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
 | Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, segment migration) | Text | 5 |
+| Subtitle Page 6 | Dynamic Page 6 subtitle with live market and city counts | Text | 6 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -516,6 +517,15 @@ Subtitle Page 4 =
 
 ```dax
 Subtitle Page 5 = "RFM space distribution, revenue concentration, cohort retention, segment migration"
+```
+
+```dax
+Subtitle Page 6 =
+"Geographic performance across "
+    & DISTINCTCOUNT ( dim_Customer[Country] )
+    & " markets and "
+    & DISTINCTCOUNT ( dim_Customer[City] )
+    & " cities"
 ```
 
 **Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
@@ -683,7 +693,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 60 measures – 59 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 61 measures – 60 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 
@@ -715,6 +725,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v23 (2026-06-26) – Page 6 subtitle: added `[Subtitle Page 6]` (Folder 06, Text, dynamic – live market and city counts via `DISTINCTCOUNT ( dim_Customer[Country] )` and `DISTINCTCOUNT ( dim_Customer[City] )`; `///`); inventory 60 → 61 (60 in folders + 1 What-If; new measure is text, no FormatString); FormatString coverage 42/60 → 42/61 (19-without = 18 text + `[Dynamic KPI Selector]`); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Measure only – the Page 6 subtitle visual binding lands in a separate change.
 
 ### v22 (2026-06-25) – Page 5 V3 Cohort Retention measures + dynamic Subtitle Page 1: added [Subtitle Cohort Retention] (Folder 06, Text, dynamic – cohort count, span, tenure window for the V3 matrix; ///) and [Retention Font Color] (Folder 06, Hex text, dynamic – per-cell contrast for the diverging heatmap, white at retention >= 0.70 and <= 0.25, #3D4752 in the cream mid-band; ///); rebound [Subtitle Page 1] from the static "9 European markets" literal to a dynamic DISTINCTCOUNT ( dim_Customer[Country] ) market count (months already dynamic), so both counters self-correct as geography or the calendar extends; inventory 58 → 60 (59 in folders + 1 What-If; both new measures are text, no FormatString); FormatString coverage 42/58 → 42/60 (18-without = 16 prior + 2 new text); no topology change (6 active / 0 bidirectional – v_cohort_retention imported standalone, no relationship); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. SummarizeBy hygiene: set the imported v_cohort_retention auxiliary numeric columns [Active Customers] and [Cohort Customers] to SummarizeBy=None per the model-wide policy, so every numeric column of the view is now None and the table is fully policy-compliant (SummarizeBy=None scope 32 → 36; Retention Rate stays None, no SummarizeBy exception needed). BPA: the "percentages with 1 decimal" rule is recorded as an accepted exception (see note) – house standard for precision-sensitive percentages is 0.00% (2dp).
 
