@@ -19,23 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Kupferkanne ",
-                    "textStyle": {
-                      "color": "#64748b"
-                    }
-                  },
-                  {
-                    "value": "–",
-                    "textStyle": {
-                      "fontFamily": "Aptos, sans-serif",
-                      "fontSize": "11pt"
-                    }
-                  },
-                  {
-                    "value": " D2C E-commerce · 9 European markets · Rolling 38 months",
-                    "textStyle": {
-                      "color": "#64748b"
-                    }
+                    "value": ""
                   }
                 ]
               }
@@ -64,6 +48,38 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#64748B'"
+                    }
+                  }
+                }
+              }
+            },
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI'', wf_segoe-ui_normal, helvetica, arial, sans-serif'"
                 }
               }
             }
