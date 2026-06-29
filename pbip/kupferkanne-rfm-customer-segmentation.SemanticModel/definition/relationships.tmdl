@@ -22,3 +22,7 @@ relationship 3feead27-c33e-4a2b-abd0-f4928dcefe00
 	fromColumn: v_items_for_bi.'Order Date'
 	toColumn: dim_Date.Date
 
+relationship 48e8eb7d-36a7-8ef3-eca2-e3519c1914c5
+	fromColumn: v_revenue_new_returning.'Revenue Month'
+	toColumn: dim_Date.Date
+

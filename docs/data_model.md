@@ -71,6 +71,17 @@ Two curated fact objects feed Power BI, each at a different grain:
 
 The dual-grain approach prevents aggregation errors that would arise from joining order-level and line-level metrics in a single fact table. Power BI measures follow a naming convention: `[Total *]` for order-grain measures and `[Line *]` for line-grain, enforcing clarity at consumption time. See [measures.md](measures.md) for the full catalogue.
 
+### Standalone analytical views
+
+Two pre-aggregated views feed specific Page 5 visuals. Each is imported standalone: it carries its own grain and stays outside the star schema, apart from the single calendar join noted below.
+
+| Object | Grain | Columns | Used by |
+|---|---|---|---|
+| `v_revenue_new_returning` | One row per month per customer type (~77: 39 New + 38 Returning) | Revenue Month (date), Customer Type (text), Revenue (EUR), Active Customers (int) | Page 5 New vs Returning area chart |
+| `v_cohort_retention` | One row per acquisition cohort per tenure month (cohort month by months since acquisition) | Cohort Month (date), Months Since Acquisition (int), Active Customers (int), Cohort Customers (int), Retention Rate (percent) | Page 5 Cohort Retention heatmap |
+
+`v_revenue_new_returning` joins the date dimension on `Revenue Month` to `dim_Date[Date]` (many-to-one, single-direction), so the calendar slicer and the closed-month trim reach it. `v_cohort_retention` is deliberately left unrelated to the calendar: its grain is cohort-by-tenure rather than a point in time, so it is sliced only by its own axes.
+
 ## Naming conventions
 
 - Raw source tables (`dim_customers`, `dim_products`, `orders20*`, `items20*`): original PascalCase headers preserved (`CustomerID`, `OrderDate`, `LineNetAmount`); raw shapes are never edited in place.

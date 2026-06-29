@@ -1,0 +1,59 @@
+table v_revenue_new_returning
+	lineageTag: bdb4d9f2-923c-4de3-abc5-e2148d36d5d0
+
+	column 'Revenue Month'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 790a2693-3035-4865-b028-bc1909997382
+		summarizeBy: none
+		sourceColumn: Revenue Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Customer Type'
+		dataType: string
+		lineageTag: 9ff1fe2d-ae64-4746-9011-342134dacd12
+		summarizeBy: none
+		sourceColumn: Customer Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: decimal
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		lineageTag: 919eaf46-2296-4f47-a99b-50954880da27
+		summarizeBy: none
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	column 'Active Customers'
+		dataType: int64
+		formatString: 0
+		lineageTag: 03c3c2ff-2d08-46b0-b89b-900ffd531384
+		summarizeBy: none
+		sourceColumn: Active Customers
+
+		annotation SummarizationSetBy = User
+
+	partition v_revenue_new_returning = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"kupferkanne-2026_Database" = Source{[Name="kupferkanne-2026",Kind="Database"]}[Data],
+				    sales_Schema = #"kupferkanne-2026_Database"{[Name="sales",Kind="Schema"]}[Data],
+				    v_revenue_new_returning_View = sales_Schema{[Name="v_revenue_new_returning",Kind="View"]}[Data],
+				    #"Renamed Columns" = Table.RenameColumns(v_revenue_new_returning_View,{{"active_customers", "Active Customers"}, {"customer_type", "Customer Type"}, {"revenue", "Revenue"}, {"revenue_month", "Revenue Month"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Revenue", Currency.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

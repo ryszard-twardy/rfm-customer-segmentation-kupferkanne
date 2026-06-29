@@ -8,7 +8,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["dim_Customer","dim_Product","dim_Date","sales_curated","v_items_for_bi","v_cohort_retention"]
+annotation PBI_QueryOrder = ["dim_Customer","dim_Product","dim_Date","sales_curated","v_items_for_bi","v_cohort_retention","v_revenue_new_returning"]
 
 annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
 
@@ -29,6 +29,7 @@ ref table sales_curated
 ref table v_items_for_bi
 ref table dim_Segment
 ref table v_cohort_retention
+ref table v_revenue_new_returning
 
 ref cultureInfo en-US
 

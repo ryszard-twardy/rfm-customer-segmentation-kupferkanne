@@ -5,7 +5,7 @@
       "ordinal": 0,
       "scrollPosition": {
         "x": 0,
-        "y": 0
+        "y": 628.51037154372034
       },
       "nodes": [
         {
@@ -19,7 +19,7 @@
             "height": 263.69637109796855,
             "width": 234
           },
-          "zIndex": 10
+          "zIndex": 7
         },
         {
           "location": {
@@ -32,12 +32,12 @@
             "height": 558.9901231164788,
             "width": 234
           },
-          "zIndex": 12
+          "zIndex": 8
         },
         {
           "location": {
-            "x": 1558.7119676131622,
-            "y": 9.5045709446924036
+            "x": 1432.9311366131624,
+            "y": 2.4183269446924385
           },
           "nodeIndex": "_Measures",
           "nodeLineageTag": "a3a134bb-f7a7-4964-8501-b8188dcbce0a",
@@ -45,12 +45,12 @@
             "height": 346.57064731284504,
             "width": 234
           },
-          "zIndex": 5
+          "zIndex": 10
         },
         {
           "location": {
-            "x": 1571.7145187291217,
-            "y": 582.05458980966353
+            "x": 1426.4465167291219,
+            "y": 566.11054080966358
           },
           "nodeIndex": "dim_KPI_Selector",
           "nodeLineageTag": "19a40776-a39a-4303-a736-b84eed75a3ce",
@@ -58,12 +58,12 @@
             "height": 200,
             "width": 234
           },
-          "zIndex": 6
+          "zIndex": 5
         },
         {
           "location": {
-            "x": 1575.3714842339252,
-            "y": 808.89126858571717
+            "x": 1430.1034822339254,
+            "y": 792.94721958571722
           },
           "nodeIndex": "Reactivation Rate",
           "nodeLineageTag": "d0018cdb-994a-4b2d-9eb5-2c1306376579",
@@ -71,7 +71,7 @@
             "height": 224,
             "width": 239.19653183341961
           },
-          "zIndex": 1
+          "zIndex": 2
         },
         {
           "location": {
@@ -84,12 +84,12 @@
             "height": 200,
             "width": 234
           },
-          "zIndex": 2
+          "zIndex": 3
         },
         {
           "location": {
-            "x": 1574.3180782751147,
-            "y": 395.19091201760176
+            "x": 1429.0500762751149,
+            "y": 379.24686301760181
           },
           "nodeIndex": "RFM Score Selector",
           "nodeLineageTag": "e0ded359-bc09-4a03-9836-352fb646617a",
@@ -97,12 +97,12 @@
             "height": 152,
             "width": 234
           },
-          "zIndex": 3
+          "zIndex": 4
         },
         {
           "location": {
-            "x": 0,
-            "y": 703.56799305314507
+            "x": 319.9000785727755,
+            "y": 736.36064037962058
           },
           "nodeIndex": "sales_curated",
           "nodeLineageTag": "e0136b96-5a72-4e68-aedd-e60e9d130abe",
@@ -110,20 +110,20 @@
             "height": 461.42442909212082,
             "width": 234
           },
-          "zIndex": 11
+          "zIndex": 9
         },
         {
           "location": {
-            "x": 782.96663466316659,
-            "y": 697.84116950412931
+            "x": 699.79565334424876,
+            "y": 695.63826646426446
           },
           "nodeIndex": "v_items_for_bi",
           "nodeLineageTag": "7d5271c9-b37f-40b8-97c4-4763500a711a",
           "size": {
-            "height": 486.14334855085474,
+            "height": 294.81476055085534,
             "width": 234
           },
-          "zIndex": 9
+          "zIndex": 6
         },
         {
           "location": {
@@ -136,11 +136,37 @@
             "height": 564.69437504102859,
             "width": 234
           },
-          "zIndex": 0
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1139.4488469503706,
+            "y": 756.284886400563
+          },
+          "nodeIndex": "v_cohort_retention",
+          "nodeLineageTag": "c5ad4130-7d33-468b-acfc-8c74c1b509ba",
+          "size": {
+            "height": 220.54131493117734,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 750.38673453482647
+          },
+          "nodeIndex": "v_revenue_new_returning",
+          "nodeLineageTag": "bdb4d9f2-923c-4de3-abc5-e2148d36d5d0",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 12
         }
       ],
       "name": "All tables",
-      "zoomValue": 89.19259052056961,
+      "zoomValue": 79.553182037699926,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

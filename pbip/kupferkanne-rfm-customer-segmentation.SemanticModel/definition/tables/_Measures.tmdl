@@ -672,17 +672,6 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 4b02ede1-e14f-4f91-b4e5-5ae497ae31d4
 
-	/// Dynamic Page 6 subtitle with live market and city counts.
-	measure 'Subtitle Page 6' =
-			
-			"Geographic performance across "
-			    & DISTINCTCOUNT ( dim_Customer[Country] )
-			    & " markets and "
-			    & DISTINCTCOUNT ( dim_Customer[City] )
-			    & " cities"
-		displayFolder: 06 - Formatting & Regional
-		lineageTag: 089c19d6-8fd2-47ff-b816-cd9ac1cae47c
-
 	/// Cumulative share of total customer spend up to and including the selected decile (Pareto curve).
 	measure 'Cumulative Revenue %' =
 			
@@ -744,6 +733,37 @@ table _Measures
 			    )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: f03fbd03-ce70-478a-ac39-2ecd65518055
+
+	/// Dynamic Page 6 subtitle with live market and city counts.
+	measure 'Subtitle Page 6' =
+			
+			"Geographic performance across "
+			    & DISTINCTCOUNT ( dim_Customer[Country] )
+			    & " markets and "
+			    & DISTINCTCOUNT ( dim_Customer[City] )
+			    & " cities"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 089c19d6-8fd2-47ff-b816-cd9ac1cae47c
+
+	/// Monthly revenue by new vs returning customers from v_revenue_new_returning; reconciles to [Total Revenue] grand total (EUR).
+	measure 'Lifecycle Revenue' =
+			
+			SUM ( v_revenue_new_returning[Revenue] )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 01 - Core KPIs
+		lineageTag: 2e4d6df4-b9d2-4899-b6db-0d4e99e87acf
+
+	/// Dynamic title for the New vs Returning area chart; returns "Repeat customers drive ~N% of revenue" where N is the Returning share of [Lifecycle Revenue] rounded to nearest 5 (text, no format string).
+	measure 'Lifecycle Headline' =
+			
+			VAR _returning =
+			    CALCULATE ( [Lifecycle Revenue], v_revenue_new_returning[Customer Type] = "Returning" )
+			VAR _share =
+			    DIVIDE ( _returning, [Lifecycle Revenue] )
+			RETURN
+			    "Repeat customers drive ~" & FORMAT ( MROUND ( _share * 100, 5 ), "0" ) & "% of revenue"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: d5f4d4e0-90d2-4c72-8eb7-446eb803b3e2
 
 	column x
 		isHidden

@@ -1,6 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 61 DAX Measures (60 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 63 DAX Measures (62 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
+### v24 (2026-06-29) – Page 5 V4 New vs Returning: added `[Lifecycle Revenue]` (Folder 01 – Core KPIs; `SUM ( v_revenue_new_returning[Revenue] )`; FormatString `"€"#,##0.00;-"€"#,##0.00`) and `[Lifecycle Headline]` (Folder 06, Text, dynamic visual title – returns "Repeat customers drive ~N% of revenue" where N is the Returning share of `[Lifecycle Revenue]` rounded to the nearest 5; no FormatString); inventory 61 → 63 (62 in folders + 1 What-If); FormatString coverage 42/61 → 43/63 (20-without = 19 text + `[Dynamic KPI Selector]`); two standalone analytical view imports – `v_revenue_new_returning` (V4 source; one relationship to `dim_Date`) and `v_cohort_retention` (Unit A cohort backfill, standalone, no relationship); topology 6 → 7 active / 0 bidirectional; total model tables corrected 10 → 12. KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 ### v23 (2026-06-26) – Page 6 subtitle: added `[Subtitle Page 6]` (Folder 06, Text, dynamic – live market and city counts via `DISTINCTCOUNT ( dim_Customer[Country] )` and `DISTINCTCOUNT ( dim_Customer[City] )`; `///`); inventory 60 → 61 (60 in folders + 1 What-If; new measure is text, no FormatString); FormatString coverage 42/60 → 42/61 (19-without = 18 text + `[Dynamic KPI Selector]`); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Measure only – the Page 6 subtitle visual binding lands in a separate change.
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
@@ -19,17 +20,20 @@
 | dim_Segment | DAX DATATABLE | 6 rows | Segment, Email Cadence, Loyalty Tier, Discount Approach, Budget Allocation, SortOrder, SegmentColor |
 | dim_KPI_Selector | DAX DATATABLE | 5 rows | KPI (disconnected) |
 | Reactivation Rate | What-If Parameter | auto-generated | Reactivation Rate Value (0–50, step 5) |
-*Model also contains `_Measures` (measure container) and `RFM Score Selector` (Field Parameter) - neither has a SQL source. Total model tables: 10.*
+| v_cohort_retention | `v_cohort_retention` (VIEW) | 1 row per cohort month × months-since-acquisition | Cohort Month, Months Since Acquisition, Active Customers, Cohort Customers, Retention Rate |
+| v_revenue_new_returning | `v_revenue_new_returning` (VIEW) | 1 row per month per customer type (~77: 39 New + 38 Returning) | Revenue Month, Customer Type, Revenue, Active Customers |
+*Model also contains `_Measures` (measure container) and `RFM Score Selector` (Field Parameter) - neither has a SQL source. Total model tables: 12.*
 
 **v6 architecture rule:** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
-**Active relationships (6) - verified against `relationships.tmdl`, after the single-direction refactor:**
+**Active relationships (7) - verified against `relationships.tmdl`, after the single-direction refactor:**
 - sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
 - v_items_for_bi[Order Date] → dim_Date[Date] | M:1 | Single - **added in v11: date-slicing for the line-grain measures (Page 3 build)**
 - dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **re-pointed onto the merged dim_Segment**
+- v_revenue_new_returning[Revenue Month] → dim_Date[Date] | M:1 | Single - **added in v24: monthly date-slicing for the New vs Returning area chart (Page 5 V4)**
 
 **Retiring `v_rfm_for_bi`:** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (a former bidirectional join, since superseded), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via `dim_Customer[Segment] → dim_Segment[Segment]`. Bidirectional count: 2 → **1**.
 
