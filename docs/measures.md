@@ -1,6 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 63 DAX Measures (62 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 67 DAX Measures (66 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
+### v25 (2026-07-01) – Page 6 Regional Analysis V2 (native combo): added 4 Folder 06 title/subtitle measures – `[Map Title]` (DACH revenue-share headline), `[Map Subtitle]` (revenue encoding + EUR total), `[Market Ranking Title]` (static reach-not-basket claim), `[Market Ranking Subtitle]` (revenue-descending sort + blended value per customer); all text, no FormatString. Backfilled 2 v24 measures into the body catalog – `[Lifecycle Revenue]` (Folder 01) and `[Lifecycle Headline]` (Folder 06), previously listed only in the v24 header note. Inventory 63 → 67 (66 in folders + 1 What-If); FormatString coverage 43/67 (24-without = 23 text + `[Dynamic KPI Selector]`); header, catalog total, and coverage counts reconciled to the live 67. Topology unchanged (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Page 6 V2 = native combo (Total Revenue columns + ARPU by Country line, secondary axis 0-based); Deneb map (V1) deferred to a later commit.
 ### v24 (2026-06-29) – Page 5 V4 New vs Returning: added `[Lifecycle Revenue]` (Folder 01 – Core KPIs; `SUM ( v_revenue_new_returning[Revenue] )`; FormatString `"€"#,##0.00;-"€"#,##0.00`) and `[Lifecycle Headline]` (Folder 06, Text, dynamic visual title – returns "Repeat customers drive ~N% of revenue" where N is the Returning share of `[Lifecycle Revenue]` rounded to the nearest 5; no FormatString); inventory 61 → 63 (62 in folders + 1 What-If); FormatString coverage 42/61 → 43/63 (20-without = 19 text + `[Dynamic KPI Selector]`); two standalone analytical view imports – `v_revenue_new_returning` (V4 source; one relationship to `dim_Date`) and `v_cohort_retention` (Unit A cohort backfill, standalone, no relationship); topology 6 → 7 active / 0 bidirectional; total model tables corrected 10 → 12. KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
 ### v23 (2026-06-26) – Page 6 subtitle: added `[Subtitle Page 6]` (Folder 06, Text, dynamic – live market and city counts via `DISTINCTCOUNT ( dim_Customer[Country] )` and `DISTINCTCOUNT ( dim_Customer[City] )`; `///`); inventory 60 → 61 (60 in folders + 1 What-If; new measure is text, no FormatString); FormatString coverage 42/60 → 42/61 (19-without = 18 text + `[Dynamic KPI Selector]`); no topology change (6 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Measure only – the Page 6 subtitle visual binding lands in a separate change.
 
@@ -59,7 +60,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 42 of 61 measures carry an explicit `FormatString`. The 19 without: 18 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 43 of 67 measures carry an explicit `FormatString`. The 24 without: 23 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -162,6 +163,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Margin Baseline | `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` | % 2dp | 3 |
 | Top Category Revenue | `MAXX(VALUES(dim_Product[Product Category]), [Line Revenue])` | € Currency, display Millions | 3 |
 | Top Category Name | VAR pattern – see formula block below | Text | 3 |
+| Lifecycle Revenue | `SUM(v_revenue_new_returning[Revenue])` | € Currency, 2dp | 5 |
 
 **Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand/category measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
 
@@ -219,6 +221,13 @@ RETURN
 ```
 
 **Edge case:** ties in revenue resolve alphabetically first (TOPN ASC tiebreak on the name column). Acceptable for KPI cards – display only.
+
+### Lifecycle Revenue – full formula
+
+```dax
+Lifecycle Revenue =
+SUM ( v_revenue_new_returning[Revenue] )
+```
 
 ---
 
@@ -427,6 +436,11 @@ SWITCH(
 | Combo Chart Title | Dynamic Page 3 combo chart title with top brand name + revenue | Text | 3 |
 | Subtitle Cohort Retention | Dynamic Page 5 V3 subtitle: cohort count, span, tenure window | Text | 5 |
 | Retention Font Color | Per-cell font contrast for the V3 diverging cohort heatmap | Hex text | 5 |
+| Lifecycle Headline | Dynamic Page 5 V4 title: repeat-customer share of revenue | Text | 5 |
+| Map Title | Dynamic Page 6 map title: DACH share of revenue (core dependency) | Text | 6 |
+| Map Subtitle | Dynamic Page 6 map subtitle: revenue encoding and EUR total | Text | 6 |
+| Market Ranking Title | Page 6 combo title: static reach-not-basket claim | Text | 6 |
+| Market Ranking Subtitle | Dynamic Page 6 combo subtitle: revenue sort and blended value per customer | Text | 6 |
 
 ```dax
 Health Indicator =
@@ -579,6 +593,42 @@ RETURN
 
 **Design decision – Page 5 V3 cohort measures (new in v22):** `[Subtitle Cohort Retention]` is bound via fx (Field value) to the V3 matrix subtitle, reporting the live cohort count, calendar span, and tenure window. `[Retention Font Color]` drives per-cell font color on the diverging heatmap – white at both extremes (retention >= 0.70 and <= 0.25) and dark ink (`#3D4752`) in the cream center, because a single threshold rule whitens the light center of a diverging scheme. Both reference the standalone `v_cohort_retention` import.
 
+```dax
+Lifecycle Headline =
+VAR _returning =
+    CALCULATE ( [Lifecycle Revenue], v_revenue_new_returning[Customer Type] = "Returning" )
+VAR _share =
+    DIVIDE ( _returning, [Lifecycle Revenue] )
+RETURN
+    "Repeat customers drive ~" & FORMAT ( MROUND ( _share * 100, 5 ), "0" ) & "% of revenue"
+```
+
+```dax
+Map Title =
+VAR _DACH =
+    CALCULATE ( [Total Revenue], dim_Customer[Country] IN { "DE", "AT", "CH" } )
+VAR _Share = DIVIDE ( _DACH, [Total Revenue] )
+RETURN
+    "Three markets drive " & FORMAT ( _Share, "0%" ) & " of revenue – DACH is the core dependency"
+```
+
+```dax
+Map Subtitle =
+"Revenue by country (EUR " & FORMAT ( DIVIDE ( [Total Revenue], 1000000 ), "0.0" ) & "M total)"
+```
+
+```dax
+Market Ranking Title =
+"Growth comes from reach, not basket"
+```
+
+```dax
+Market Ranking Subtitle =
+"Ranked by revenue; value per customer clusters near "
+    & FORMAT ( DIVIDE ( [Total Revenue], [Total Customers] ), "€0" )
+    & " across markets"
+```
+
 ---
 
 ## Product, brand and category measures (Page 3)
@@ -697,7 +747,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 61 measures – 60 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 67 measures – 66 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 

@@ -765,6 +765,40 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: d5f4d4e0-90d2-4c72-8eb7-446eb803b3e2
 
+	/// Regional map headline: share of revenue concentrated in the DACH core.
+	measure 'Map Title' =
+			
+			VAR _DACH =
+			    CALCULATE ( [Total Revenue], dim_Customer[Country] IN { "DE", "AT", "CH" } )
+			VAR _Share = DIVIDE ( _DACH, [Total Revenue] )
+			RETURN
+			    "Three markets drive " & FORMAT ( _Share, "0%" ) & " of revenue – DACH is the core dependency"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: b0e13960-4fd8-4fcf-9ca3-94ee2c995b8f
+
+	/// Regional map subtitle: revenue encoding and total.
+	measure 'Map Subtitle' =
+			
+			"Revenue by country (EUR " & FORMAT ( DIVIDE ( [Total Revenue], 1000000 ), "0.0" ) & "M total)"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: d281149e-1ec1-4eb3-ab0d-54cd82de7ecb
+
+	/// Fx-bound title for the Page 6 regional market-ranking combo chart. Returns the strategic conclusion that revenue growth comes from widening customer reach across under-penetrated markets rather than increasing per-customer basket size.
+	measure 'Market Ranking Title' =
+			
+			"Growth comes from reach, not basket"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: a413406d-0c30-4a44-ab27-f435dc239865
+
+	/// Fx-bound subtitle for the Page 6 regional market-ranking combo chart. Orients the reader to the revenue-descending bar sort and reports blended revenue per customer, which clusters near a single value across markets – the evidence behind the title's reach-not-basket claim.
+	measure 'Market Ranking Subtitle' =
+			
+			"Ranked by revenue; value per customer clusters near "
+			    & FORMAT ( DIVIDE ( [Total Revenue], [Total Customers] ), "€0" )
+			    & " across markets"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 84fc3ed4-e479-486d-b649-7b33711e4d97
+
 	column x
 		isHidden
 		formatString: 0
