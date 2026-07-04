@@ -799,6 +799,22 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 84fc3ed4-e479-486d-b649-7b33711e4d97
 
+	/// Drill signal for the P6 Deneb map: 1 when a State/Region filter is active.
+	measure 'Region Filter Active' =
+			
+			IF ( ISFILTERED ( dim_Customer[State] ), 1, 0 )
+		formatString: 0
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 6ac726c7-d2c7-4868-b27a-145fc90f79a4
+
+	/// Country-grain revenue immune to the Region slicer; fill driver for the whole-country choropleth.
+	measure 'Country Total Revenue' =
+			
+			CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer[State] ) )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 457ff8a3-ab73-45d3-86a5-c608f0f99743
+
 	column x
 		isHidden
 		formatString: 0
