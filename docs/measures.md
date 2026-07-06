@@ -1,6 +1,7 @@
 # DAX Measures Reference
 ## Kupferkanne – 69 DAX Measures (68 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
+### v27 (2026-07-06) – Region drill flag fix: rewrote `[Region Filter Active]`'s body to `IF ( CALCULATE ( ISFILTERED ( dim_Customer[State] ), ALLSELECTED ( ) ), 1, 0 )` – the P6 map visual's own `State` groupby (query context) was raising `ISFILTERED` unconditionally regardless of an actual user filter (F068); wrapping in `CALCULATE ( ..., ALLSELECTED ( ) )` strips the visual's own groupby context so the flag reads 1 only for a genuine State/Region slicer selection. FormatString unchanged (`0`). Measure count unchanged at 69 (68 in folders + 1 What-If); FormatString coverage unchanged at 45/69 (no measures added/removed, only a body edit). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence stays PARTIAL (R041), rides the same queued Desktop/TE2 Hidden-conformance pass as v26.
 ### v26 (2026-07-04) – P6 drill measures for region-aware map: added 2 Folder 06 measures – `[Region Filter Active]` (ISFILTERED drill signal – 1 when a State/Region filter is active, FormatString `0`) and `[Country Total Revenue]` (REMOVEFILTERS country-grain revenue, immune to the Region slicer, fill driver for the whole-country choropleth; FormatString copied verbatim from `[Total Revenue]`, `"€"#,##0.00;-"€"#,##0.00`). Inventory 67 → 69 (68 in folders + 1 What-If); FormatString coverage 43/67 → 45/69 (24-without unchanged: 23 text + `[Dynamic KPI Selector]` – both new measures carry formats). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence stays PARTIAL (R041) – rides the queued Desktop/TE2 Hidden-conformance pass carried from v38/v39.
 ### v25 (2026-07-01) – Page 6 Regional Analysis V2 (native combo): added 4 Folder 06 title/subtitle measures – `[Map Title]` (DACH revenue-share headline), `[Map Subtitle]` (revenue encoding + EUR total), `[Market Ranking Title]` (static reach-not-basket claim), `[Market Ranking Subtitle]` (revenue-descending sort + blended value per customer); all text, no FormatString. Backfilled 2 v24 measures into the body catalog – `[Lifecycle Revenue]` (Folder 01) and `[Lifecycle Headline]` (Folder 06), previously listed only in the v24 header note. Inventory 63 → 67 (66 in folders + 1 What-If); FormatString coverage 43/67 (24-without = 23 text + `[Dynamic KPI Selector]`); header, catalog total, and coverage counts reconciled to the live 67. Topology unchanged (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Page 6 V2 = native combo (Total Revenue columns + ARPU by Country line, secondary axis 0-based); Deneb map (V1) deferred to a later commit.
 ### v24 (2026-06-29) – Page 5 V4 New vs Returning: added `[Lifecycle Revenue]` (Folder 01 – Core KPIs; `SUM ( v_revenue_new_returning[Revenue] )`; FormatString `"€"#,##0.00;-"€"#,##0.00`) and `[Lifecycle Headline]` (Folder 06, Text, dynamic visual title – returns "Repeat customers drive ~N% of revenue" where N is the Returning share of `[Lifecycle Revenue]` rounded to the nearest 5; no FormatString); inventory 61 → 63 (62 in folders + 1 What-If); FormatString coverage 42/61 → 43/63 (20-without = 19 text + `[Dynamic KPI Selector]`); two standalone analytical view imports – `v_revenue_new_returning` (V4 source; one relationship to `dim_Date`) and `v_cohort_retention` (Unit A cohort backfill, standalone, no relationship); topology 6 → 7 active / 0 bidirectional; total model tables corrected 10 → 12. KPI baseline 7/7 + Grain Reconciliation 0 unaffected.
@@ -442,7 +443,7 @@ SWITCH(
 | Map Subtitle | Dynamic Page 6 map subtitle: revenue encoding and EUR total | Text | 6 |
 | Market Ranking Title | Page 6 combo title: static reach-not-basket claim | Text | 6 |
 | Market Ranking Subtitle | Dynamic Page 6 combo subtitle: revenue sort and blended value per customer | Text | 6 |
-| Region Filter Active | Drill signal: 1 when a State/Region filter is active | Whole # | 6 |
+| Region Filter Active | Drill signal (ALLSELECTED-guarded): 1 only when a direct State/Region filter is active | Whole # | 6 |
 | Country Total Revenue | Country-grain revenue immune to the Region slicer (choropleth fill driver) | € 2dp | 6 |
 
 ```dax
@@ -634,7 +635,11 @@ Market Ranking Subtitle =
 
 ```dax
 Region Filter Active =
-IF ( ISFILTERED ( dim_Customer[State] ), 1, 0 )
+IF (
+    CALCULATE ( ISFILTERED ( dim_Customer[State] ), ALLSELECTED ( ) ),
+    1,
+    0
+)
 ```
 
 ```dax
@@ -792,6 +797,8 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 ---
 
 ## Changelog
+
+### v27 (2026-07-06) – Region drill flag fix: rewrote `[Region Filter Active]`'s body to `IF ( CALCULATE ( ISFILTERED ( dim_Customer[State] ), ALLSELECTED ( ) ), 1, 0 )` – the P6 map visual's own `State` groupby (query context) was raising `ISFILTERED` unconditionally regardless of an actual user filter (F068); wrapping in `CALCULATE ( ..., ALLSELECTED ( ) )` strips the visual's own groupby context so the flag reads 1 only for a genuine State/Region slicer selection. FormatString unchanged (`0`). Measure count unchanged at 69 (68 in folders + 1 What-If); FormatString coverage unchanged at 45/69 (no measures added/removed, only a body edit). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence stays PARTIAL (R041), rides the same queued Desktop/TE2 Hidden-conformance pass as v26.
 
 ### v26 (2026-07-04) – P6 drill measures for region-aware map: added 2 Folder 06 measures – `[Region Filter Active]` (ISFILTERED drill signal – 1 when a State/Region filter is active, FormatString `0`) and `[Country Total Revenue]` (REMOVEFILTERS country-grain revenue, immune to the Region slicer, fill driver for the whole-country choropleth; FormatString copied verbatim from `[Total Revenue]`, `"€"#,##0.00;-"€"#,##0.00`). Inventory 67 → 69 (68 in folders + 1 What-If); FormatString coverage 43/67 → 45/69 (24-without unchanged: 23 text + `[Dynamic KPI Selector]` – both new measures carry formats). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence stays PARTIAL (R041) – rides the queued Desktop/TE2 Hidden-conformance pass carried from v38/v39.
 

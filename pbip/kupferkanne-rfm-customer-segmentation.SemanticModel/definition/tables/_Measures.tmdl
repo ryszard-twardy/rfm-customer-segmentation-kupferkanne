@@ -799,10 +799,14 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 84fc3ed4-e479-486d-b649-7b33711e4d97
 
-	/// Drill signal for the P6 Deneb map: 1 when a State/Region filter is active.
+	/// Drill signal for the P6 Deneb map: 1 only when a direct State/Region filter is active; ALLSELECTED strips the visual's own groupby context (F068).
 	measure 'Region Filter Active' =
 			
-			IF ( ISFILTERED ( dim_Customer[State] ), 1, 0 )
+			IF (
+			    CALCULATE ( ISFILTERED ( dim_Customer[State] ), ALLSELECTED ( ) ),
+			    1,
+			    0
+			)
 		formatString: 0
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 6ac726c7-d2c7-4868-b27a-145fc90f79a4
