@@ -1,6 +1,7 @@
 # DAX Measures Reference
-## Kupferkanne – 69 DAX Measures (68 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 70 DAX Measures (69 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
+### v28 (2026-07-06) – P6 filter-aware titles: reworked 5 Page 6 title/subtitle measures (`[Map Title]`, `[Map Subtitle]`, `[Market Ranking Title]`, `[Market Ranking Subtitle]`, `[Subtitle Page 6]`) to three-state logic – default, country selection, region drill – with singular/plural handling; fixes a share headline that exceeded 100% under a country filter and the "1 markets" grammar defect. Added `[Country Filter Active]` (Folder 06, FormatString `0`) – subset-aware, ALLSELECTED-guarded country-selection signal; select-all reads 0 by design (text driver only, unlike the grain-switching region flag). Inventory 69 → 70 (69 in folders + 1 What-If); FormatString coverage 45/69 → 46/70 (24-without unchanged: 23 text + `[Dynamic KPI Selector]`). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence pending – rides the queued Desktop/TE2 Hidden-conformance pass.
 ### v27 (2026-07-06) – Region drill flag fix: rewrote `[Region Filter Active]`'s body to `IF ( CALCULATE ( ISFILTERED ( dim_Customer[State] ), ALLSELECTED ( ) ), 1, 0 )` – the P6 map visual's own `State` groupby (query context) was raising `ISFILTERED` unconditionally regardless of an actual user filter (F068); wrapping in `CALCULATE ( ..., ALLSELECTED ( ) )` strips the visual's own groupby context so the flag reads 1 only for a genuine State/Region slicer selection. FormatString unchanged (`0`). Measure count unchanged at 69 (68 in folders + 1 What-If); FormatString coverage unchanged at 45/69 (no measures added/removed, only a body edit). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence stays PARTIAL (R041), rides the same queued Desktop/TE2 Hidden-conformance pass as v26.
 ### v26 (2026-07-04) – P6 drill measures for region-aware map: added 2 Folder 06 measures – `[Region Filter Active]` (ISFILTERED drill signal – 1 when a State/Region filter is active, FormatString `0`) and `[Country Total Revenue]` (REMOVEFILTERS country-grain revenue, immune to the Region slicer, fill driver for the whole-country choropleth; FormatString copied verbatim from `[Total Revenue]`, `"€"#,##0.00;-"€"#,##0.00`). Inventory 67 → 69 (68 in folders + 1 What-If); FormatString coverage 43/67 → 45/69 (24-without unchanged: 23 text + `[Dynamic KPI Selector]` – both new measures carry formats). No topology change (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. BPA evidence stays PARTIAL (R041) – rides the queued Desktop/TE2 Hidden-conformance pass carried from v38/v39.
 ### v25 (2026-07-01) – Page 6 Regional Analysis V2 (native combo): added 4 Folder 06 title/subtitle measures – `[Map Title]` (DACH revenue-share headline), `[Map Subtitle]` (revenue encoding + EUR total), `[Market Ranking Title]` (static reach-not-basket claim), `[Market Ranking Subtitle]` (revenue-descending sort + blended value per customer); all text, no FormatString. Backfilled 2 v24 measures into the body catalog – `[Lifecycle Revenue]` (Folder 01) and `[Lifecycle Headline]` (Folder 06), previously listed only in the v24 header note. Inventory 63 → 67 (66 in folders + 1 What-If); FormatString coverage 43/67 (24-without = 23 text + `[Dynamic KPI Selector]`); header, catalog total, and coverage counts reconciled to the live 67. Topology unchanged (7 active / 0 bidirectional); KPI baseline 7/7 + Grain Reconciliation 0 unaffected. Page 6 V2 = native combo (Total Revenue columns + ARPU by Country line, secondary axis 0-based); Deneb map (V1) deferred to a later commit.
@@ -62,7 +63,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 45 of 69 measures carry an explicit `FormatString`. The 24 without: 23 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 46 of 70 measures carry an explicit `FormatString`. The 24 without: 23 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -431,7 +432,7 @@ SWITCH(
 | Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
 | Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, segment migration) | Text | 5 |
-| Subtitle Page 6 | Dynamic Page 6 subtitle with live market and city counts | Text | 6 |
+| Subtitle Page 6 | Dynamic Page 6 subtitle with live market and city counts, singular/plural-aware | Text | 6 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -439,11 +440,12 @@ SWITCH(
 | Subtitle Cohort Retention | Dynamic Page 5 V3 subtitle: cohort count, span, tenure window | Text | 5 |
 | Retention Font Color | Per-cell font contrast for the V3 diverging cohort heatmap | Hex text | 5 |
 | Lifecycle Headline | Dynamic Page 5 V4 title: repeat-customer share of revenue | Text | 5 |
-| Map Title | Dynamic Page 6 map title: DACH share of revenue (core dependency) | Text | 6 |
-| Map Subtitle | Dynamic Page 6 map subtitle: revenue encoding and EUR total | Text | 6 |
-| Market Ranking Title | Page 6 combo title: static reach-not-basket claim | Text | 6 |
-| Market Ranking Subtitle | Dynamic Page 6 combo subtitle: revenue sort and blended value per customer | Text | 6 |
+| Map Title | Dynamic Page 6 map title, three-state: region drill, country selection, default DACH headline | Text | 6 |
+| Map Subtitle | Dynamic Page 6 map subtitle: grain word plus EUR total, selection-aware | Text | 6 |
+| Market Ranking Title | Page 6 combo title: reach-not-basket claim by default, neutral under filters | Text | 6 |
+| Market Ranking Subtitle | Dynamic Page 6 combo subtitle: clustering claim gated on 2+ visible markets | Text | 6 |
 | Region Filter Active | Drill signal (ALLSELECTED-guarded): 1 only when a direct State/Region filter is active | Whole # | 6 |
+| Country Filter Active | Country selection signal (subset-aware, ALLSELECTED-guarded): 1 only on a proper-subset Country selection | Whole # | 6 |
 | Country Total Revenue | Country-grain revenue immune to the Region slicer (choropleth fill driver) | € 2dp | 6 |
 
 ```dax
@@ -543,11 +545,15 @@ Subtitle Page 5 = "RFM space distribution, revenue concentration, cohort retenti
 
 ```dax
 Subtitle Page 6 =
-"Geographic performance across "
-    & DISTINCTCOUNT ( dim_Customer[Country] )
-    & " markets and "
-    & DISTINCTCOUNT ( dim_Customer[City] )
-    & " cities"
+VAR _Markets =
+    DISTINCTCOUNT ( dim_Customer[Country] )
+VAR _Cities =
+    DISTINCTCOUNT ( dim_Customer[City] )
+RETURN
+    "Geographic performance across "
+        & _Markets & IF ( _Markets = 1, " market", " markets" )
+        & " and "
+        & _Cities & IF ( _Cities = 1, " city", " cities" )
 ```
 
 **Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
@@ -609,28 +615,88 @@ RETURN
 
 ```dax
 Map Title =
+VAR _Markets =
+    DISTINCTCOUNT ( dim_Customer[Country] )
+VAR _Regions =
+    DISTINCTCOUNT ( dim_Customer[State] )
+VAR _GrandTotal =
+    CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer ) )
+VAR _ParentRevenue =
+    CALCULATE (
+        [Total Revenue],
+        REMOVEFILTERS ( dim_Customer[State] ),
+        VALUES ( dim_Customer[Country] )
+    )
 VAR _DACH =
     CALCULATE ( [Total Revenue], dim_Customer[Country] IN { "DE", "AT", "CH" } )
-VAR _Share = DIVIDE ( _DACH, [Total Revenue] )
+VAR _RegionLabel =
+    IF ( _Regions = 1, SELECTEDVALUE ( dim_Customer[State] ), _Regions & " regions" )
+VAR _RegionVerb =
+    IF ( _Regions = 1, " drives ", " drive " )
+VAR _RegionScope =
+    IF (
+        _Markets = 1,
+        SELECTEDVALUE ( dim_Customer[Country] ) & " revenue",
+        "combined market revenue"
+    )
+VAR _CountryLabel =
+    IF ( _Markets = 1, SELECTEDVALUE ( dim_Customer[Country] ), _Markets & " selected markets" )
+VAR _CountryVerb =
+    IF ( _Markets = 1, " drives ", " drive " )
 RETURN
-    "Three markets drive " & FORMAT ( _Share, "0%" ) & " of revenue – DACH is the core dependency"
+    SWITCH (
+        TRUE (),
+        [Region Filter Active] = 1,
+            _RegionLabel & _RegionVerb
+                & FORMAT ( DIVIDE ( [Total Revenue], _ParentRevenue ), "0%" )
+                & " of " & _RegionScope,
+        [Country Filter Active] = 1,
+            _CountryLabel & _CountryVerb
+                & FORMAT ( DIVIDE ( [Total Revenue], _GrandTotal ), "0%" )
+                & " of total revenue",
+        "Three markets drive "
+            & FORMAT ( DIVIDE ( _DACH, [Total Revenue] ), "0%" )
+            & " of revenue – DACH is the core dependency"
+    )
 ```
 
 ```dax
 Map Subtitle =
-"Revenue by country (EUR " & FORMAT ( DIVIDE ( [Total Revenue], 1000000 ), "0.0" ) & "M total)"
+VAR _RevM =
+    FORMAT ( DIVIDE ( [Total Revenue], 1000000 ), "0.0" )
+RETURN
+    SWITCH (
+        TRUE (),
+        [Region Filter Active] = 1, "Revenue by region (EUR " & _RevM & "M selected)",
+        [Country Filter Active] = 1, "Revenue by country (EUR " & _RevM & "M selected)",
+        "Revenue by country (EUR " & _RevM & "M total)"
+    )
 ```
 
 ```dax
 Market Ranking Title =
-"Growth comes from reach, not basket"
+IF (
+    [Region Filter Active] = 1 || [Country Filter Active] = 1,
+    "Revenue and value per customer – current selection",
+    "Growth comes from reach, not basket"
+)
 ```
 
 ```dax
 Market Ranking Subtitle =
-"Ranked by revenue; value per customer clusters near "
-    & FORMAT ( DIVIDE ( [Total Revenue], [Total Customers] ), "€0" )
-    & " across markets"
+VAR _Markets =
+    DISTINCTCOUNT ( dim_Customer[Country] )
+VAR _VPC =
+    FORMAT ( DIVIDE ( [Total Revenue], [Total Customers] ), "€0" )
+RETURN
+    SWITCH (
+        TRUE (),
+        [Region Filter Active] = 1 || _Markets = 1, "Value per customer: " & _VPC,
+        [Country Filter Active] = 1,
+            "Ranked by revenue; value per customer clusters near " & _VPC
+                & " across " & _Markets & " selected markets",
+        "Ranked by revenue; value per customer clusters near " & _VPC & " across markets"
+    )
 ```
 
 ```dax
@@ -640,6 +706,18 @@ IF (
     1,
     0
 )
+```
+
+```dax
+Country Filter Active =
+VAR _IsFiltered =
+    CALCULATE ( ISFILTERED ( dim_Customer[Country] ), ALLSELECTED ( ) )
+VAR _Visible =
+    DISTINCTCOUNT ( dim_Customer[Country] )
+VAR _All =
+    CALCULATE ( DISTINCTCOUNT ( dim_Customer[Country] ), REMOVEFILTERS ( dim_Customer ) )
+RETURN
+    IF ( _IsFiltered && _Visible < _All, 1, 0 )
 ```
 
 ```dax
@@ -765,7 +843,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 69 measures – 68 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 70 measures – 69 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 

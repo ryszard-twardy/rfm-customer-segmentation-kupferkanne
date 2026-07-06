@@ -734,14 +734,18 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: f03fbd03-ce70-478a-ac39-2ecd65518055
 
-	/// Dynamic Page 6 subtitle with live market and city counts.
+	/// Dynamic Page 6 subtitle: live market and city counts with singular/plural handling.
 	measure 'Subtitle Page 6' =
 			
-			"Geographic performance across "
-			    & DISTINCTCOUNT ( dim_Customer[Country] )
-			    & " markets and "
-			    & DISTINCTCOUNT ( dim_Customer[City] )
-			    & " cities"
+			VAR _Markets =
+			    DISTINCTCOUNT ( dim_Customer[Country] )
+			VAR _Cities =
+			    DISTINCTCOUNT ( dim_Customer[City] )
+			RETURN
+			    "Geographic performance across "
+			        & _Markets & IF ( _Markets = 1, " market", " markets" )
+			        & " and "
+			        & _Cities & IF ( _Cities = 1, " city", " cities" )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 089c19d6-8fd2-47ff-b816-cd9ac1cae47c
 
@@ -765,37 +769,97 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: d5f4d4e0-90d2-4c72-8eb7-446eb803b3e2
 
-	/// Regional map headline: share of revenue concentrated in the DACH core.
+	/// Dynamic Page 6 map title, three-state: region drill (share of parent-market revenue), country selection (share of grand total), default DACH headline.
 	measure 'Map Title' =
 			
+			VAR _Markets =
+			    DISTINCTCOUNT ( dim_Customer[Country] )
+			VAR _Regions =
+			    DISTINCTCOUNT ( dim_Customer[State] )
+			VAR _GrandTotal =
+			    CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer ) )
+			VAR _ParentRevenue =
+			    CALCULATE (
+			        [Total Revenue],
+			        REMOVEFILTERS ( dim_Customer[State] ),
+			        VALUES ( dim_Customer[Country] )
+			    )
 			VAR _DACH =
 			    CALCULATE ( [Total Revenue], dim_Customer[Country] IN { "DE", "AT", "CH" } )
-			VAR _Share = DIVIDE ( _DACH, [Total Revenue] )
+			VAR _RegionLabel =
+			    IF ( _Regions = 1, SELECTEDVALUE ( dim_Customer[State] ), _Regions & " regions" )
+			VAR _RegionVerb =
+			    IF ( _Regions = 1, " drives ", " drive " )
+			VAR _RegionScope =
+			    IF (
+			        _Markets = 1,
+			        SELECTEDVALUE ( dim_Customer[Country] ) & " revenue",
+			        "combined market revenue"
+			    )
+			VAR _CountryLabel =
+			    IF ( _Markets = 1, SELECTEDVALUE ( dim_Customer[Country] ), _Markets & " selected markets" )
+			VAR _CountryVerb =
+			    IF ( _Markets = 1, " drives ", " drive " )
 			RETURN
-			    "Three markets drive " & FORMAT ( _Share, "0%" ) & " of revenue – DACH is the core dependency"
+			    SWITCH (
+			        TRUE (),
+			        [Region Filter Active] = 1,
+			            _RegionLabel & _RegionVerb
+			                & FORMAT ( DIVIDE ( [Total Revenue], _ParentRevenue ), "0%" )
+			                & " of " & _RegionScope,
+			        [Country Filter Active] = 1,
+			            _CountryLabel & _CountryVerb
+			                & FORMAT ( DIVIDE ( [Total Revenue], _GrandTotal ), "0%" )
+			                & " of total revenue",
+			        "Three markets drive "
+			            & FORMAT ( DIVIDE ( _DACH, [Total Revenue] ), "0%" )
+			            & " of revenue – DACH is the core dependency"
+			    )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: b0e13960-4fd8-4fcf-9ca3-94ee2c995b8f
 
-	/// Regional map subtitle: revenue encoding and total.
+	/// Dynamic Page 6 map subtitle: grain word (country/region) plus EUR total, "selected" under any filter.
 	measure 'Map Subtitle' =
 			
-			"Revenue by country (EUR " & FORMAT ( DIVIDE ( [Total Revenue], 1000000 ), "0.0" ) & "M total)"
+			VAR _RevM =
+			    FORMAT ( DIVIDE ( [Total Revenue], 1000000 ), "0.0" )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        [Region Filter Active] = 1, "Revenue by region (EUR " & _RevM & "M selected)",
+			        [Country Filter Active] = 1, "Revenue by country (EUR " & _RevM & "M selected)",
+			        "Revenue by country (EUR " & _RevM & "M total)"
+			    )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: d281149e-1ec1-4eb3-ab0d-54cd82de7ecb
 
-	/// Fx-bound title for the Page 6 regional market-ranking combo chart. Returns the strategic conclusion that revenue growth comes from widening customer reach across under-penetrated markets rather than increasing per-customer basket size.
+	/// Page 6 combo title: static reach-not-basket claim by default; neutral descriptive text under any filter.
 	measure 'Market Ranking Title' =
 			
-			"Growth comes from reach, not basket"
+			IF (
+			    [Region Filter Active] = 1 || [Country Filter Active] = 1,
+			    "Revenue and value per customer – current selection",
+			    "Growth comes from reach, not basket"
+			)
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: a413406d-0c30-4a44-ab27-f435dc239865
 
-	/// Fx-bound subtitle for the Page 6 regional market-ranking combo chart. Orients the reader to the revenue-descending bar sort and reports blended revenue per customer, which clusters near a single value across markets – the evidence behind the title's reach-not-basket claim.
+	/// Dynamic Page 6 combo subtitle: clustering claim only when two or more markets are visible; plain value-per-customer otherwise.
 	measure 'Market Ranking Subtitle' =
 			
-			"Ranked by revenue; value per customer clusters near "
-			    & FORMAT ( DIVIDE ( [Total Revenue], [Total Customers] ), "€0" )
-			    & " across markets"
+			VAR _Markets =
+			    DISTINCTCOUNT ( dim_Customer[Country] )
+			VAR _VPC =
+			    FORMAT ( DIVIDE ( [Total Revenue], [Total Customers] ), "€0" )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        [Region Filter Active] = 1 || _Markets = 1, "Value per customer: " & _VPC,
+			        [Country Filter Active] = 1,
+			            "Ranked by revenue; value per customer clusters near " & _VPC
+			                & " across " & _Markets & " selected markets",
+			        "Ranked by revenue; value per customer clusters near " & _VPC & " across markets"
+			    )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 84fc3ed4-e479-486d-b649-7b33711e4d97
 
@@ -810,6 +874,21 @@ table _Measures
 		formatString: 0
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 6ac726c7-d2c7-4868-b27a-145fc90f79a4
+
+	/// Country selection signal for P6 title measures: 1 only when a genuine proper-subset Country filter is active (select-all reads 0). ALLSELECTED-guarded (visual-groupby-immune). Unlike [Region Filter Active] (grain switch, select-all = 1 by design), this drives text only.
+	measure 'Country Filter Active' =
+
+			VAR _IsFiltered =
+			    CALCULATE ( ISFILTERED ( dim_Customer[Country] ), ALLSELECTED ( ) )
+			VAR _Visible =
+			    DISTINCTCOUNT ( dim_Customer[Country] )
+			VAR _All =
+			    CALCULATE ( DISTINCTCOUNT ( dim_Customer[Country] ), REMOVEFILTERS ( dim_Customer ) )
+			RETURN
+			    IF ( _IsFiltered && _Visible < _All, 1, 0 )
+		formatString: 0
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 8ed1acd4-b04f-4386-86aa-13a59f53c692
 
 	/// Country-grain revenue immune to the Region slicer; fill driver for the whole-country choropleth.
 	measure 'Country Total Revenue' =
