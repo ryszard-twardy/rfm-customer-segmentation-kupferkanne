@@ -70,6 +70,10 @@ desktop.ini
 .specify/cache/
 .specify/state/
 
+# Cut P1: dead DDD-grilling husks kept local, not public
+/CONTEXT.md
+/docs/agents/domain.md
+
 # Data / Python (workflow v3 data stack)
 .ipynb_checkpoints/
 .pytest_cache/

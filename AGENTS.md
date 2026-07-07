@@ -18,7 +18,6 @@ This repo follows the **workflow v3** convention. Key files and directories:
 |---|---|---|
 | `AGENTS.md` | This file. Master config. | ✅ |
 | `CLAUDE.md` | 3-line stub → redirects here. | ✅ |
-| `CONTEXT.md` | DDD ubiquitous language glossary. | ✅ |
 | `docs/adr/` | Architectural Decision Records. | ✅ |
 | `docs/agents/` | Per-repo mattpocock configuration. | ✅ |
 | `.checkpoints/` | Session checkpoints (L0+L1+L2 living docs). | ❌ gitignored |
@@ -38,12 +37,11 @@ Canonical 5-role vocabulary + 4 type labels (Opcja D, workflow v3). See `docs/ag
 
 ### Domain docs
 
-Single-context – `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
+Architectural decisions live in `docs/adr/`.
 
 ### Configured skills
 
 - `/mp-triage`, `/mp-to-issues`, `/mp-to-prd` – consume `docs/agents/issue-tracker.md` + `docs/agents/triage-labels.md`
-- `/mp-grill-with-docs`, `/mp-improve-arch` – consume `CONTEXT.md` + `docs/adr/`
 - `/mp-handoff` – conversation compaction
 - `/rt-checkpoint-emit`, `/rt-repo-bootstrap` – Ryszard custom skills (see `.checkpoints/` and this file)
 
