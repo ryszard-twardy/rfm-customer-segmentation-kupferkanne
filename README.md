@@ -17,7 +17,7 @@ End-to-end retail analytics platform for **Kupferkanne**, a fictional Erlangen-b
 │                  │    │  + 9-step SQL    │    │   (Import mode)  │
 └──────────────────┘    └──────────────────┘    └──────────────────┘
    80 CSV files            33 BQ objects          7-page dashboard
-   ~440K records          (11 tables + 22 views)  70 DAX measures
+   ~460K records          (11 tables + 22 views)  70 DAX measures
 ```
 
 - **39 months** of order data (2023-01 to 2026-03), ~169K orders from ~15,000 customers.
