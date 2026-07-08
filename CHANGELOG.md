@@ -6,6 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [Unreleased]
+
+Power BI dashboard build-out and semantic-model consolidation. The report reaches its full seven-page structure and migrates to PBIP / TMDL for text-based version control; the segment and customer dimensions are unified onto `dim_Segment` and `dim_Customer`. All KPI invariants preserved (Total Revenue, Total Profit, and the dual-grain Grain Reconciliation = 0), now guarded by a parity regression harness.
+
+### Added
+
+- Three Power BI pages built out to their full structure: Churn Risk & What-If (Page 4), Customer Lifecycle Intelligence (Page 5), and Regional Analysis (Page 6), alongside a Customer Drillthrough target page.
+- Page 5 lifecycle visuals – RFM heatmap, Pareto concentration, cohort-retention heatmap, and a new-vs-returning revenue area chart – plus a Customer Decile column and supporting measures.
+- Page 6 regional visuals – adaptive dual-grain choropleth map (Deneb), market-ranking combo chart, and Country / Region slicers – with filter-aware titles driven by a `[Country Filter Active]` measure.
+- Two SQL views feeding the lifecycle page, `v_cohort_retention` and `v_revenue_new_returning`, plus `v_dim_customers_for_bi`, a BI-facing customer dimension.
+- KPI parity regression harness (baseline capture plus verify) guarding Total Revenue, Total Profit, and the dual-grain Grain Reconciliation invariant across model refactors.
+- Churn-risk and median-benchmark measures for Page 4, plus page-subtitle measures across Pages 1, 3, 5, and 6.
+- `uv` dependency management for the Python ingest utility (`pyproject.toml` plus `uv.lock`), pinned to Python 3.12.
+
+### Changed
+
+- Power BI project migrated from `.pbix` to PBIP / TMDL format for text-based, reviewable version control; `.gitattributes` and `.git-blame-ignore-revs` added to normalise line endings and stop TMDL CRLF churn.
+- Semantic model consolidated: `dim_SegmentOrder` and `dim_SegmentActions` merged into a single `dim_Segment`; RFM segment attributes re-homed onto `dim_Customer`; the customer dimension repointed to `v_dim_customers_for_bi` and renamed `dim_Customer`; `v_dim_products_std` renamed `dim_Product`.
+- Product & Brand page (Page 3) rebuilt on the line-grain `v_items_for_bi` model with a weighted Margin Baseline reference.
+- Pipeline columns renamed to snake_case end-to-end; a `v_items_for_bi` to `dim_Date` relationship added for date-sliced line-grain analysis; field-visibility and format-string hygiene across the model.
+- Deck-wide report hygiene: unified visual padding, standardised Selection-pane group names and z-ordering, pinned subtitle colours and title fonts, and registered AppSource custom visuals.
+
+### Removed
+
+- Legacy `.pbix` report (superseded by the PBIP project) and development-only diagnostic / metadata-export DAX queries.
+- `v_rfm_for_bi` retired and its bidirectional customer-satellite relationship dropped in favour of the single-direction topology.
+- Duplicate geography columns dropped from the `sales_curated` import.
+
+### Fixed
+
+- Page 6 header corrected to "Regional Analysis"; region drill flags made immune to visual group-by.
+- Segment Color measure realigned to the Muted Earth palette with a neutral fallback.
+- Partial final month trimmed from the Page 3 category trend via a closed-month flag.
+
+### Documentation
+
+- `measures.md` reconciled to the live post-refactor model: inventory tables rebuilt, stale column and source references corrected, and the internal build changelog and decision identifiers removed to leave a clean reviewer-facing catalogue.
+- `architecture.md`, `README.md`, and ADR page-count references reconciled to the live seven-page structure; order-data span corrected to 39 months; synthetic-data cohort-retention limitation documented in `methodology.md`.
+- Two new Architecture Decision Records – single-direction customer topology (0012) and unified segment dimension (0013) – supersede 0010 and 0011.
+
+### Internal
+
+- Read-only SessionStart git-state hook (dirty / ahead / behind banner) added.
+- SQL lint policy updated (ST06 / ST07 documented as house-style deviations); diagnostic DAX and PBIP scratch-query hygiene; checkpoint and agent-config cleanup.
+
+---
+
 ## [1.0.2] – 2026-05-27
 
 Internal agent-configuration and documentation-hygiene release. No functional, model, SQL, or measure changes; all KPI invariants preserved (Total Revenue, Total Profit, and the dual-grain Grain Reconciliation = 0).
@@ -157,6 +204,7 @@ Earlier iteration history is preserved in `_checkpoints/CHECKPOINT_*.md` (local 
 
 ---
 
+[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.0.2...HEAD
 [1.0.2]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.2
 [1.0.1]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.1
 [1.0.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.0
