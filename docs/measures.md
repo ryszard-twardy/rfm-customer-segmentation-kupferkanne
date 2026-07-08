@@ -3,7 +3,7 @@
 ### Author: Ryszard Twardy
 ### v28 (2026-07-06)
 
-> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. **As of v7 (v1.0.1 BPA batch, 2026-05-24)**, model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
+> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
 ---
 
@@ -23,16 +23,16 @@
 | v_revenue_new_returning | `v_revenue_new_returning` (VIEW) | 1 row per month per customer type (~77: 39 New + 38 Returning) | Revenue Month, Customer Type, Revenue, Active Customers |
 *Model also contains `_Measures` (measure container) and `RFM Score Selector` (Field Parameter) - neither has a SQL source. Total model tables: 12.*
 
-**v6 architecture rule:** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
+**Architecture rule:** `[Total Revenue]` and `[Total Profit]` measures pull from fact-grain `sales_curated` ONLY. Dimensional views serve as drill-down axes/legends only – pre-aggregated views break filter context across products/brands/categories.
 
 **Active relationships (7) - verified against `relationships.tmdl`, after the single-direction refactor:**
 - sales_curated[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
-- v_items_for_bi[Order Date] → dim_Date[Date] | M:1 | Single - **added in v11: date-slicing for the line-grain measures (Page 3 build)**
+- v_items_for_bi[Order Date] → dim_Date[Date] | M:1 | Single - **date-slicing for the line-grain measures (Page 3 build)**
 - dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **re-pointed onto the merged dim_Segment**
-- v_revenue_new_returning[Revenue Month] → dim_Date[Date] | M:1 | Single - **added in v24: monthly date-slicing for the New vs Returning area chart (Page 5 V4)**
+- v_revenue_new_returning[Revenue Month] → dim_Date[Date] | M:1 | Single - **monthly date-slicing for the New vs Returning area chart (Page 5 V4)**
 
 **Retiring `v_rfm_for_bi`:** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (a former bidirectional join, since superseded), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via `dim_Customer[Segment] → dim_Segment[Segment]`. Bidirectional count: 2 → **1**.
 
@@ -40,7 +40,7 @@
 
 ---
 
-## Model Hygiene (v1.0.1 BPA batch, v7)
+## Model Hygiene (v1.0.1 BPA batch)
 
 The conventions below are model-wide metadata policies established during the v1.0.1 BPA batch (sessions 2026-05-22 and 2026-05-24) and carried forward through the single-direction refactor. They change no measure expressions and no display-folder structure. Every measure and column in this document conforms to them.
 
@@ -65,7 +65,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 
 **Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13; all 13 remaining are intentional (12 text + 1 `SWITCH`-format).
 
-**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception in v18). Affected 2dp measures (all 10 percentage measures in the model use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`. No measure in the model uses 1dp (`0.0%`).
+**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (all 10 percentage measures in the model use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`. No measure in the model uses 1dp (`0.0%`).
 
 ### Column Behavior: SummarizeBy = None
 
@@ -169,9 +169,9 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 **Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
-**Equal-weight benchmark (new in v6):** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
+**Equal-weight benchmark:** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
 
-**Margin Baseline (new in v14):** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
+**Margin Baseline:** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
 
 **Fact-grain principle (dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
 
@@ -322,7 +322,7 @@ Pareto Threshold 80% =
 0.8
 ```
 
-**Calculated column `dim_Customer[Customer Decile]` (new in v20):** visible, SummarizeBy=None, FormatString `0`, with a `///` description. Buckets customers into 10 equal bands by `Total Spend` (1 = top 10%) – the Pareto X-axis consumed by `[Cumulative Revenue %]`. Uses `RANKX` over `dim_Customer[Total Spend]` with `DESC, Skip` (Skip, not Dense, so each customer gets a distinct rank and the 10-band `INT` bucketing stays even). A **calculated column**, not a measure – excluded from the 58-measure total; like `dim_Date[Is Closed Month]` it is tracked here and sits outside the 32-column SummarizeBy=None batch scope.
+**Calculated column `dim_Customer[Customer Decile]`:** visible, SummarizeBy=None, FormatString `0`, with a `///` description. Buckets customers into 10 equal bands by `Total Spend` (1 = top 10%) – the Pareto X-axis consumed by `[Cumulative Revenue %]`. Uses `RANKX` over `dim_Customer[Total Spend]` with `DESC, Skip` (Skip, not Dense, so each customer gets a distinct rank and the 10-band `INT` bucketing stays even). A **calculated column**, not a measure – excluded from the measure total; like `dim_Date[Is Closed Month]` it is tracked here and sits outside the 32-column SummarizeBy=None batch scope.
 
 ```dax
 Customer Decile =
@@ -513,7 +513,7 @@ Subtitle Page 1 =
     & " months"
 ```
 
-**Design decision – Subtitle Page 1 market count (new in v22):** the market count is now dynamic via `DISTINCTCOUNT ( dim_Customer[Country] )`, matching the rolling-months pattern; both counters self-correct as geography or the calendar extends (replacing the static `9 European markets` literal).
+**Design decision – Subtitle Page 1 market count:** the market count is now dynamic via `DISTINCTCOUNT ( dim_Customer[Country] )`, matching the rolling-months pattern; both counters self-correct as geography or the calendar extends (replacing the static `9 European markets` literal).
 
 ```dax
 Subtitle Page 2 = 
@@ -551,11 +551,11 @@ RETURN
         & _Cities & IF ( _Cities = 1, " city", " cities" )
 ```
 
-**Design decision – Subtitle Page N convention (new in v6):** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was static text in v5; refactored to dynamic measure in v6. Subtitle Page 3 added new for Page 3 build.
+**Design decision – Subtitle Page N convention:** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was refactored from static text to a dynamic measure. Subtitle Page 3 was added for the Page 3 build.
 
-**Status as of v15:** `[Subtitle Page 3]` is **bound** – rebound via fx → Field value on the Page 3 subtitle text box (B.4 slice 3), replacing the prior static literal. All three page subtitles (Pages 1-3) now follow the dynamic `Subtitle Page N` pattern.
+`[Subtitle Page 3]` is **bound** – rebound via fx → Field value on the Page 3 subtitle text box (B.4 slice 3), replacing the prior static literal. All three page subtitles (Pages 1-3) now follow the dynamic `Subtitle Page N` pattern.
 
-**Status as of v19:** `[Subtitle Page 5]` is **static** – a plain literal (unlike the live, dynamic Pages 1-4 subtitles), to be rebound to a dynamic expression once the Page 5 cohort-retention and segment-migration visuals land.
+`[Subtitle Page 5]` is **static** – a plain literal (unlike the live, dynamic Pages 1-4 subtitles).
 
 ```dax
 Combo Chart Title =
@@ -565,7 +565,7 @@ Combo Chart Title =
     & FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )
 ```
 
-**Design decision – dynamic combo title (new in v13):** the Page 3 brand combo chart binds its Title to `[Combo Chart Title]` via fx (Field value), following the `[Revenue Trend Chart Title]` pattern. The headline brand and its compact-formatted revenue come from `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`, so the title auto-updates under slicer context – no manual edits as the leader changes.
+**Design decision – dynamic combo title:** the Page 3 brand combo chart binds its Title to `[Combo Chart Title]` via fx (Field value), following the `[Revenue Trend Chart Title]` pattern. The headline brand and its compact-formatted revenue come from `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`, so the title auto-updates under slicer context – no manual edits as the leader changes.
 
 ```dax
 Subtitle Cohort Retention =
@@ -596,7 +596,7 @@ RETURN
     )
 ```
 
-**Design decision – Page 5 V3 cohort measures (new in v22):** `[Subtitle Cohort Retention]` is bound via fx (Field value) to the V3 matrix subtitle, reporting the live cohort count, calendar span, and tenure window. `[Retention Font Color]` drives per-cell font color on the diverging heatmap – white at both extremes (retention >= 0.70 and <= 0.25) and dark ink (`#3D4752`) in the cream center, because a single threshold rule whitens the light center of a diverging scheme. Both reference the standalone `v_cohort_retention` import.
+**Design decision – Page 5 V3 cohort measures:** `[Subtitle Cohort Retention]` is bound via fx (Field value) to the V3 matrix subtitle, reporting the live cohort count, calendar span, and tenure window. `[Retention Font Color]` drives per-cell font color on the diverging heatmap – white at both extremes (retention >= 0.70 and <= 0.25) and dark ink (`#3D4752`) in the cream center, because a single threshold rule whitens the light center of a diverging scheme. Both reference the standalone `v_cohort_retention` import.
 
 ```dax
 Lifecycle Headline =
@@ -762,9 +762,9 @@ in
 
 After load: Mark as Date Table (Date column). Sort by Column: Month Name → Month. Sort by Column: Day Name → Day Number.
 
-**Hierarchy – Calendar Drill (new in v13):** `Start of Year` > `Start of Quarter` > `Start of Month` > `Start of Week` > `Date`. All `Start of *` levels are date-typed (`type date` in M, `UnderlyingDateTimeDataType = Date`), so drill levels render on a continuous axis. Built for the Page 3 category-trend line chart (#24), which sits at the `Start of Month` level. Replaces the former `Date Hierarchy` (`Date`, `Year-Month`), removed in v13; its single consumer, a temporary Page 4 trend visual, was deleted in the same change.
+**Hierarchy – Calendar Drill:** `Start of Year` > `Start of Quarter` > `Start of Month` > `Start of Week` > `Date`. All `Start of *` levels are date-typed (`type date` in M, `UnderlyingDateTimeDataType = Date`), so drill levels render on a continuous axis. Built for the Page 3 category-trend line chart (#24), which sits at the `Start of Month` level. Replaces the former `Date Hierarchy` (`Date`, `Year-Month`), removed; its single consumer, a temporary Page 4 trend visual, was deleted in the same change.
 
-**Calculated column `Is Closed Month` (new in v18):** `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )` – hidden, SummarizeBy=None, with a `///` description. TRUE for every day in a fully-elapsed month relative to the latest order date, FALSE for the current partial month. Applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart so the category-trend ends on the last closed month, and reusable by Page 5 trend visuals. A DAX calculated column rather than an M column because it depends on the fact max date (row context on `dim_Date` does not propagate to `sales_curated`, so `MAX` returns the global max); consumed only by a report-layer visual filter, so it draws an accepted "Remove unnecessary columns" BPA flag (false-positive – BPA cannot see the report-layer reference).
+**Calculated column `Is Closed Month`:** `EOMONTH ( dim_Date[Date], 0 ) <= MAX ( sales_curated[Order Date] )` – hidden, SummarizeBy=None, with a `///` description. TRUE for every day in a fully-elapsed month relative to the latest order date, FALSE for the current partial month. Applied as a visual-level filter (is True) on the Page 3 "Revenue Trend by Category" line chart so the category-trend ends on the last closed month, and reusable by Page 5 trend visuals. A DAX calculated column rather than an M column because it depends on the fact max date (row context on `dim_Date` does not propagate to `sales_curated`, so `MAX` returns the global max); consumed only by a report-layer visual filter, so it draws an accepted "Remove unnecessary columns" BPA flag (false-positive – BPA cannot see the report-layer reference).
 
 ### dim_Segment – DAX DATATABLE
 
@@ -822,11 +822,11 @@ Modeling → New Parameter → Name: Reactivation Rate, Min: 0, Max: 50, Increme
 
 ## Relationships
 
-The authoritative relationship list is the **Active relationships (6)** table in the Data Model section above (after the single-direction refactor and the v11 date-join addition: 6 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
+The authoritative relationship list is the **Active relationships (7)** table in the Data Model section above (after the single-direction refactor and the date-join addition: 7 active, all M:1 single-direction, 0 bidirectional). It is not duplicated here, to avoid drift.
 
 **Disconnected / standalone:** `dim_KPI_Selector` is a disconnected slicer (no relationship).
 
-### Fact-to-fact joins: explicitly NOT used (v7)
+### Fact-to-fact joins: explicitly NOT used
 
 The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_curated[Order ID]` was removed. The model now has **zero inactive relationships**. The deliberate design choice – consistent with Kimball star-schema discipline and the dual-grain architecture – is that fact tables never join directly to other fact tables. Instead:
 
