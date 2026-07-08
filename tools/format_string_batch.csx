@@ -26,7 +26,7 @@
 //   - Explicit manual-override list for measures with custom semantics
 //   - Explicit currency-override list for false-positives from IsCountLike
 //
-// Reusable for F006 (Summarize By = None) — see Step 2 of post-F003 work.
+// Reusable for F006 (Summarize By = None) – see Step 2 of post-F003 work.
 
 bool dryRun = true;  // FLIP TO false AFTER REVIEWING DRY-RUN OUTPUT
 
@@ -79,8 +79,8 @@ System.Func<string, bool> IsCountLike = (n) =>
     n.Contains("Score") ||
     n.Contains("Distinct");
 
-// Explicit currency overrides — measures that pattern-matching would miscategorize
-// Examples: "ARPU by Country" — currency (Spend / users), but "Count" substring in "Country" trips IsCountLike
+// Explicit currency overrides – measures that pattern-matching would miscategorize
+// Examples: "ARPU by Country" – currency (Spend / users), but "Count" substring in "Country" trips IsCountLike
 System.Func<string, bool> IsCurrencyExplicit = (n) =>
     n.StartsWith("ARPU") ||
     n.StartsWith("MRPU");  // future-proof: Marginal Revenue Per User if added later
@@ -88,9 +88,9 @@ System.Func<string, bool> IsCurrencyExplicit = (n) =>
 // --- Explicit overrides ---
 // Measures with custom semantics that pattern-matching mis-categorizes.
 // Manual format preservation (do NOT touch FormatString):
-//   - "Avg Health Score" — custom "0.0 ""/ 15""" display with /15 max suffix
-//   - "Dynamic KPI Selector" — multi-KPI SWITCH measure, format depends on selected KPI (cannot be statically set)
-//   - "Reactivation Rate Value" — Integer percentage POINTS (10/20/30), not ratio; "Rate" name pattern miscategorizes as percent
+//   - "Avg Health Score" – custom "0.0 ""/ 15""" display with /15 max suffix
+//   - "Dynamic KPI Selector" – multi-KPI SWITCH measure, format depends on selected KPI (cannot be statically set)
+//   - "Reactivation Rate Value" – Integer percentage POINTS (10/20/30), not ratio; "Rate" name pattern miscategorizes as percent
 System.Func<string, bool> IsManualOverride = (n) =>
     n == "Avg Health Score" ||
     n == "Dynamic KPI Selector" ||
@@ -107,15 +107,15 @@ foreach (var m in Model.AllMeasures) {
     string reason   = "";
 
     // Priority order:
-    //   1. Manual override       — explicit name list -> skip
-    //   2. Text (skip)           — by DataType.String OR name pattern
-    //   3. Date                  — DataType.DateTime -> dd-mmm-yyyy
-    //   4. Percent               — name has %/Rate/Share -> 0.00%
-    //   5. Currency explicit     — ARPU/MRPU prefix -> "€"#,##0.00
-    //   6. Avg Score             — "Avg * Score" Double-returning -> 0.00
-    //   7. Count                 — DataType.Int64 OR count-like name -> #,##0
-    //   8. Currency (default)    — any remaining Decimal/Double -> "€"#,##0.00
-    //   9. Unknown (skip)        — any other DataType
+    //   1. Manual override       – explicit name list -> skip
+    //   2. Text (skip)           – by DataType.String OR name pattern
+    //   3. Date                  – DataType.DateTime -> dd-mmm-yyyy
+    //   4. Percent               – name has %/Rate/Share -> 0.00%
+    //   5. Currency explicit     – ARPU/MRPU prefix -> "€"#,##0.00
+    //   6. Avg Score             – "Avg * Score" Double-returning -> 0.00
+    //   7. Count                 – DataType.Int64 OR count-like name -> #,##0
+    //   8. Currency (default)    – any remaining Decimal/Double -> "€"#,##0.00
+    //   9. Unknown (skip)        – any other DataType
 
     if (IsManualOverride(m.Name)) {
         skipped.Add(string.Format("{0} [manual override -> skip]", m.Name));
@@ -173,10 +173,10 @@ foreach (var m in Model.AllMeasures) {
 
 // --- Output summary (grouped by reason) ---
 
-string mode = dryRun ? "DRY RUN (no changes applied — flip dryRun=false to apply)" : "APPLIED";
+string mode = dryRun ? "DRY RUN (no changes applied – flip dryRun=false to apply)" : "APPLIED";
 
 var sb = new System.Text.StringBuilder();
-sb.AppendLine("=== F003 Format String Batch — " + mode + " ===");
+sb.AppendLine("=== F003 Format String Batch – " + mode + " ===");
 sb.AppendLine(string.Format("Changed: {0}", changes.Count));
 sb.AppendLine(string.Format("Skipped: {0}", skipped.Count));
 sb.AppendLine();

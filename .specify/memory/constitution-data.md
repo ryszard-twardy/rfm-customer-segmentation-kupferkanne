@@ -14,13 +14,13 @@ Invariant rules for this project. These do not change session-to-session. If a r
 
 ### Data integrity
 
-- **Grain Reconciliation must equal zero.** Always-on validation measure. If it's not zero, the model is broken — stop and fix before any other work.
+- **Grain Reconciliation must equal zero.** Always-on validation measure. If it's not zero, the model is broken – stop and fix before any other work.
 - **No silent type coercions.** All BigQuery `CAST` operations are explicit. No implicit conversion via comparisons.
 - **Foreign keys are documented in `.checkpoints/L2_SCHEMA.md`.** Skills must consult this file before suggesting JOIN modifications.
 
 ### Modeling rules
 
-- **One fact table per grain.** Order-grain, line-grain, customer-grain — separate fact tables, not denormalized.
+- **One fact table per grain.** Order-grain, line-grain, customer-grain – separate fact tables, not denormalized.
 - **Dimensions follow `dim_<name>_std` convention.** `_std` suffix indicates standardized dimension (deduplicated, surrogate-keyed).
 - **Pre-aggregation views are forbidden.** Use measures in Power BI, not pre-aggregated SQL views (this caused the v0.x → v1.0 model refactor).
 

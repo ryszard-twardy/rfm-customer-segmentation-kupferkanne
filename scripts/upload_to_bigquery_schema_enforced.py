@@ -1,5 +1,5 @@
 """
-Kupferkanne — Bulk Upload to BigQuery (Schema-Enforced Raw Load)
+Kupferkanne – Bulk Upload to BigQuery (Schema-Enforced Raw Load)
 ================================================================
 Uploads all CSV files (dimensions + monthly orders/items) to BigQuery.
 
