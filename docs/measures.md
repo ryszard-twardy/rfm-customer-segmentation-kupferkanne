@@ -1,7 +1,6 @@
 # DAX Measures Reference
 ## Kupferkanne – 70 DAX Measures (69 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
-### v28 (2026-07-06)
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
@@ -73,7 +72,7 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 
 **Why:** implicit aggregations have no `FormatString`, no documentation, no name. They drift silently as schemas evolve. Forcing explicit measures keeps the semantic layer honest and visible in the Fields pane.
 
-**Scope – 36 columns (32 from the v1.0.1 batch in `tools/format_summarize_by_batch.csx`; +4 on the v22 `v_cohort_retention` import):**
+**Scope – 38 columns (32 from the v1.0.1 batch in `tools/format_summarize_by_batch.csx`; +4 on the `v_cohort_retention` import; +2 on the `v_revenue_new_returning` import):**
 
 | Table | Cols | Columns |
 |---|---|---|
@@ -84,6 +83,7 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 | `v_items_for_bi` | 4 | Quantity, Line Net Amount, Line Profit, Line Margin % |
 | `dim_KPI_Selector` | 1 | SortOrder |
 | `v_cohort_retention` | 4 | Months Since Acquisition, Active Customers, Cohort Customers, Retention Rate |
+| `v_revenue_new_returning` | 2 | Revenue, Active Customers |
 
 **Batch script:** `tools/format_summarize_by_batch.csx` (explicit `(table, column)` targets list – no pattern matching, per audit precision). Uses `KeyValuePair<string,string>` for TE2 Roslyn pre-C# 7.0 compatibility. BPA delta: 28 → 0 violations.
 
@@ -126,7 +126,7 @@ Four fact-source value columns are hidden so users reach them only through the c
 
 These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]`, `[Line Profit]`, which reference the columns explicitly in DAX.
 
-**Total hidden across the model: 18 columns** – 9 relationship/degenerate keys, 4 fact-source value columns, 3 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`).
+**Total hidden: 21 columns model-wide** – 18 deliberately managed (9 relationship/degenerate keys, 4 fact-source value columns, 3 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`)), plus 3 Power BI auto-generated system columns (the `_Measures` container column and the two `RFM Score Selector` field-parameter columns).
 
 ---
 
