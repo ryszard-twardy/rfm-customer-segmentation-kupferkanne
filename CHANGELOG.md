@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+---
+
+## [1.1.0] – 2026-07-09
+
 Power BI dashboard build-out and semantic-model consolidation. The report reaches its full seven-page structure and migrates to PBIP / TMDL for text-based version control; the segment and customer dimensions are unified onto `dim_Segment` and `dim_Customer`. All KPI invariants preserved (Total Revenue, Total Profit, and the dual-grain Grain Reconciliation = 0), now guarded by a parity regression harness.
 
 ### Added
@@ -186,15 +190,11 @@ Earlier iteration history is preserved in `_checkpoints/CHECKPOINT_*.md` (local 
 
 ## Roadmap
 
-### [1.1.0] – planned post-Power BI dashboard ship
+### [1.2.0] – planned
 
 - **Quarto analytical notebook** (`eda_kupferkanne.qmd`) as companion to the SQL EDA views, rendered to HTML and published via GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`.
 - New ADR documenting the analytical notebook decision.
-
-### [1.2.0] – planned
-
-- **TMDL / `.pbip` export** of the Power BI model for text-based version control and review.
-- Power BI Page 5 (Lifecycle Intelligence) and Page 6 (Drillthrough) build completion.
+- Customer Drillthrough detail page (customer-level drill target).
 
 ### Considered, not committed
 
@@ -204,7 +204,8 @@ Earlier iteration history is preserved in `_checkpoints/CHECKPOINT_*.md` (local 
 
 ---
 
-[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.1.0
 [1.0.2]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.2
 [1.0.1]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.1
 [1.0.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.0

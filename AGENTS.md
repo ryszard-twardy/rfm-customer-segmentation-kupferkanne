@@ -7,7 +7,7 @@ Master agent configuration for `rfm-customer-segmentation-kupferkanne`. Read thi
 - **Name**: rfm-customer-segmentation-kupferkanne
 - **Stack**: data
 - **Owner**: Ryszard Twardy (`r.twardy@proton.me`)
-- **Status**: v1.0.2 tagged; Power BI dashboard build-out and model consolidation in progress (see `CHANGELOG.md`).
+- **Status**: v1.1.0 tagged; Customer Drillthrough page and Quarto analytical notebook ahead (see `CHANGELOG.md`).
 - **Primary objective**: RFM (Recency, Frequency, Monetary) customer segmentation for Kupferkanne e-commerce – BigQuery modeling + Power BI BI layer + Python pipelines.
 
 ## How this repo works

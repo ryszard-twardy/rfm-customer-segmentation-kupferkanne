@@ -1,6 +1,6 @@
 # Kupferkanne – Retail Analytics Platform
 
-[![Status](https://img.shields.io/badge/status-v1.0.2-blue)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-v1.1.0-blue)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![BigQuery](https://img.shields.io/badge/warehouse-BigQuery-4285F4)](docs/architecture.md)
 [![Power BI](https://img.shields.io/badge/BI-Power%20BI-F2C811)](pbip/)
@@ -141,7 +141,7 @@ A web-published version will be hosted on [NovyPro](https://novypro.com/profile_
 
 ## Roadmap
 
-- **v1.1.0** – Quarto analytical notebook (`eda_kupferkanne.qmd`) companion to the SQL EDA views, rendered to HTML and published via GitHub Pages.
+- **v1.2.0** – Quarto analytical notebook (`eda_kupferkanne.qmd`) companion to the SQL EDA views, rendered to HTML and published via GitHub Pages.
 - **Planned** – Customer Drillthrough detail page (customer-level drill target).
 - **Considered** – pipeline orchestration via Dataform or scheduled queries; `dbt` migration; Sankey migration-flow visual on Page 5.
 
