@@ -31,7 +31,7 @@ These are additive: an issue can have zero or one type label. Use them to catego
 |---|---|
 | Priority (P0, P1, P2) | GitHub Projects v2 custom field `Priority` (single-select: P0, P1, P2, P3) |
 | Size estimate (S, M, L, XL) | GitHub Projects v2 custom field `Size` (single-select) |
-| Version (v1.0.0, v1.0.1, v1.1) | GitHub Milestones |
+| Version (v1.0.0, v1.0.1, v1.1.0) | GitHub Milestones |
 | Current workflow position (Backlog, In Progress, Review, Done) | GitHub Projects v2 custom field `Status` |
 
 ## How `/mp-triage` uses this file

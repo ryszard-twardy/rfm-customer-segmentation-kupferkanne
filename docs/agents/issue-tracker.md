@@ -4,7 +4,7 @@ This repository uses **GitHub Issues** as the primary issue tracker.
 
 - **Repository**: `ryszard-twardy/rfm-customer-segmentation-kupferkanne`
 - **URL**: `https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/issues`
-- **Default visibility**: PRIVATE (until v1.2 PUBLIC flip)
+- **Default visibility**: PRIVATE (until v1.2.0 PUBLIC flip)
 - **Projects v2 ID**: `PVT_kwHODYeDCc4BYXw3` (board #1, linked to repo; consumed by `/mp-to-issues` for field assignment)
 
 ## Skills that consume this file
@@ -33,11 +33,11 @@ Every published issue must have:
 
 This repo uses GitHub Milestones for version tracking. Skills should suggest the right milestone based on context, but never assign automatically without user confirmation.
 
-- `v1.0.0` – initial stable release (closed)
-- `v1.0.1` – BPA/model-hygiene batch (F003 + F004 + F006 + F007 + F008 + F028) + docs/measures.md v7 rewrite
-- `v1.0.2` – agent-configuration + documentation-hygiene release
-- `v1.1` – F005 Float→Fixed Decimal + LOW/MEDIUM BPA polish
-- `v1.2` – `.pbix` → `.pbip` conversion + ADR 0010/0011 + PUBLIC flip
+- `v1.0.0` – initial stable release (shipped)
+- `v1.0.1` – model-hygiene batch: Best Practice Analyzer findings, format-string and SummarizeBy normalisation, plus the measures catalogue rewrite (shipped)
+- `v1.0.2` – agent-configuration and documentation-hygiene release (shipped)
+- `v1.1.0` – Power BI dashboard build-out and semantic-model consolidation: full seven-page report, PBIP / TMDL migration, and dimension consolidation onto `dim_Segment` and `dim_Customer` (shipped)
+- `v1.2.0` – planned: Quarto analytical notebook and companion ADR, Customer Drillthrough detail page, and the issue-tracker PUBLIC flip
 
 ## Operating via the `gh` CLI
 
