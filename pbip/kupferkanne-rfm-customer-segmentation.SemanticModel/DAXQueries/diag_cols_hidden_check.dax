@@ -1,0 +1,18 @@
+// Purpose: hidden-column inventory (all columns where IsHidden = TRUE).
+// Expected: matches the Best Practice Analyzer hidden-column policy.
+// Run: after visibility changes and at docs-sync.
+
+EVALUATE
+SELECTCOLUMNS (
+    FILTER (
+        INFO.VIEW.COLUMNS (),
+        [IsHidden] = TRUE ()
+    ),
+    "Table", [Table],
+    "Name", [Name],
+    "Data Type", [DataType],
+    "Is Hidden", [IsHidden]
+)
+ORDER BY
+    [Table],
+    [Name]

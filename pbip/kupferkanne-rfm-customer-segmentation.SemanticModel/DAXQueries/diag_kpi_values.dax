@@ -1,0 +1,15 @@
+// Purpose: KPI baseline snapshot (revenue, profit, customers, orders, AOV, margin) for regression checks.
+// Expected: values match the release tag KPI footer digit-for-digit.
+// Run: at release cut and around any model or pipeline change.
+
+EVALUATE
+ROW (
+    "Total Revenue", [Total Revenue],
+    "Total Profit", [Total Profit],
+    "Total Customers", [Total Customers],
+    "Total Orders", [Total Orders],
+    "AOV", [Avg Order Value],
+    "Profit Margin %", [Profit Margin %],
+    "Margin ratio 4dp", FORMAT ( [Profit Margin %], "0.0000" ),
+    "Margin percent", FORMAT ( [Profit Margin %], "0.00%" )
+)

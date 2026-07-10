@@ -1,0 +1,18 @@
+// Purpose: column-level inventory (data type, format string, description, hidden, display folder).
+// Expected: supports docs/data_model.md verification; format strings match the SQLBI standard.
+// Run: at docs-sync and after column or format changes.
+
+EVALUATE
+SELECTCOLUMNS (
+    INFO.VIEW.COLUMNS (),
+    "Table", [Table],
+    "Column", [Name],
+    "DataType", [DataType],
+    "FormatString", [FormatString],
+    "Description", [Description],
+    "IsHidden", [IsHidden],
+    "DisplayFolder", [DisplayFolder]
+)
+ORDER BY
+    [Table],
+    [Column]

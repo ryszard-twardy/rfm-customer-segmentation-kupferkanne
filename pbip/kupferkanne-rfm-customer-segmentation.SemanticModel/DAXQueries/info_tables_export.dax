@@ -1,0 +1,15 @@
+// Purpose: table-level inventory (name, description, hidden, category, storage mode, expression).
+// Expected: model table surface matches the documented set.
+// Run: at docs-sync and after table additions or removals.
+
+EVALUATE
+SELECTCOLUMNS (
+    INFO.VIEW.TABLES (),
+    "Table", [Name],
+    "Description", [Description],
+    "IsHidden", [IsHidden],
+    "DataCategory", [DataCategory],
+    "StorageMode", [StorageMode],
+    "Expression", [Expression]
+)
+ORDER BY [Table]

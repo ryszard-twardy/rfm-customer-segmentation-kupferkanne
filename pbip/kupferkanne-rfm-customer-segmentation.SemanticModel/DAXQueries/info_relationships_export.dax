@@ -1,0 +1,16 @@
+// Purpose: relationship topology guard (active state and cross-filter direction).
+// Expected: all relationships active and single-direction, zero bidirectional, per ADR 0012.
+// Run: after any relationship change.
+
+EVALUATE
+SELECTCOLUMNS (
+    INFO.VIEW.RELATIONSHIPS (),
+    "Relationship", [Relationship],
+    "From Table", [FromTable],
+    "From Column", [FromColumn],
+    "To Table", [ToTable],
+    "To Column", [ToColumn],
+    "Is Active", [IsActive],
+    "Cross Filtering", [CrossFilteringBehavior]
+)
+ORDER BY [Relationship]

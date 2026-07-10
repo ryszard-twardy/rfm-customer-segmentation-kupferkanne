@@ -1,0 +1,18 @@
+// Purpose: full measure inventory (table, display folder, name, DAX, hidden, state).
+// Expected: source material for docs/measures.md; every model measure has a catalogue entry.
+// Run: at docs-sync and after any measure change.
+
+EVALUATE
+SELECTCOLUMNS (
+    INFO.VIEW.MEASURES (),
+    "Table", [Table],
+    "DisplayFolder", [DisplayFolder],
+    "Measure", [Name],
+    "DAX", [Expression],
+    "IsHidden", [IsHidden],
+    "State", [State]
+)
+ORDER BY
+    [Table],
+    [DisplayFolder],
+    [Measure]

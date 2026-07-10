@@ -1,0 +1,10 @@
+// Purpose: dual-grain integrity; order-grain vs line-grain revenue via [Grain Reconciliation].
+// Expected: [Grain Reconciliation] returns 0.
+// Run: before and after any model change touching the order or line grains.
+
+EVALUATE
+ROW (
+    "Order Grain Revenue", [Total Revenue],
+    "Line Grain Revenue", [Line Revenue],
+    "Grain Reconciliation", [Grain Reconciliation]
+)
