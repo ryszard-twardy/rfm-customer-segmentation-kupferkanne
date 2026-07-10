@@ -25,3 +25,5 @@ Use **Google BigQuery** with the GoogleSQL dialect. The project lives under one 
 - **PostgreSQL local** – rejected: doesn't match Kupferkanne's operational profile (cloud-native, serverless, zero infrastructure overhead) and lacks free-tier sharded-table semantics.
 - **Databricks Free Edition** – considered but rejected: Lakehouse architecture is overkill for dimensional reporting at this scale and adds learning curve without proportional gain.
 - **DuckDB** – used in parallel internal tooling but rejected here: not aligned with the hosted-warehouse operational model Kupferkanne required.
+
+Note (2026-07-10): the object counts in this decision (22: 10 tables + 12 views) reflect the dataset at decision time. The warehouse has since grown and been restructured; current object counts are maintained in README.md and architecture.md.

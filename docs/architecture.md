@@ -12,9 +12,11 @@ Kupferkanne is a portfolio-grade retail analytics demonstration showing how a si
 │  (Python CLI)    │    │  data warehouse  │    │   Desktop        │
 │                  │    │  + 9-step SQL    │    │   (Import mode)  │
 └──────────────────┘    └──────────────────┘    └──────────────────┘
-   80 CSV files            33 BQ objects           7-page dashboard
-   ~460K records           (11 tables + 22 views)  7 pages, 70 DAX
+   80 CSV files            25 BQ objects           7-page dashboard
+   ~460K records           (11 tables + 14 views)  7 pages, 70 DAX
 ```
+
+_Object counts reflect the live warehouse. The eight EDA views defined in `sql/02_eda` are pending a rewrite against the restructured staging schema._
 
 ## Tech stack
 

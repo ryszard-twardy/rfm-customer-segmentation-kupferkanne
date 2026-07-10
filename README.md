@@ -16,9 +16,11 @@ End-to-end retail analytics platform for **Kupferkanne**, a fictional Erlangen-b
 │  (Python CLI)    │    │  data warehouse  │    │   Desktop        │
 │                  │    │  + 9-step SQL    │    │   (Import mode)  │
 └──────────────────┘    └──────────────────┘    └──────────────────┘
-   80 CSV files            33 BQ objects          7-page dashboard
-   ~460K records          (11 tables + 22 views)  70 DAX measures
+   80 CSV files            25 BQ objects          7-page dashboard
+   ~460K records          (11 tables + 14 views)  70 DAX measures
 ```
+
+_Object counts reflect the live warehouse. The eight EDA views defined in `sql/02_eda` are pending a rewrite against the restructured staging schema and are temporarily absent from the warehouse._
 
 - **39 months** of order data (2023-01 to 2026-03), ~169K orders from ~15,000 customers.
 - **Nine-step SQL pipeline** on Google BigQuery, idempotent, lint-clean, with explicit exception policy.
@@ -69,7 +71,7 @@ rfm-customer-segmentation-kupferkanne/
 
 ## SQL pipeline
 
-The pipeline runs in nine numbered steps. Each step is idempotent (`CREATE OR REPLACE` for views, `DROP+CREATE` for partitioned tables) so the full chain is re-runnable from any point.
+The pipeline runs in nine numbered steps. Each step is idempotent (`CREATE OR REPLACE` for views, `DROP+CREATE` for partitioned tables) so the full chain is re-runnable from any point (except step 5, pending the EDA rewrite).
 
 | # | Script | Purpose | Output |
 |---|---|---|---|
