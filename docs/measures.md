@@ -1,5 +1,5 @@
 # DAX Measures Reference
-## Kupferkanne – 81 DAX Measures (80 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 98 DAX Measures (97 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
@@ -57,7 +57,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 46 of 81 measures carry an explicit `FormatString`. The 35 without: 34 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 46 of 98 measures carry an explicit `FormatString`. The 52 without: 51 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -453,6 +453,23 @@ SWITCH(
 | Subtitle RFM Heatmap | Static subtitle for the RFM Distribution Map | Text | 5 |
 | Subtitle Revenue Trend | Dynamic Page 1 subtitle with subset-aware segment and market counts | Text | 1 |
 | Subtitle Whatif Upside | Dynamic Page 4 subtitle injecting the live What-If reactivation rate | Text | 4 |
+| Title Recency Stages | Static Page 4 title for the Revenue by recency stage chart | Text | 4 |
+| Title Risk Concentration | Static Page 4 title for the Where the risk concentrates table | Text | 4 |
+| Title Winback Scatter | Static Page 4 title for the Who to win back scatter chart | Text | 4 |
+| Title Whatif Upside | Static Page 4 title for the Upside of acting chart | Text | 4 |
+| Title Pareto | Static Page 5 title for the Revenue Concentration (Pareto) chart | Text | 5 |
+| Title RFM Heatmap | Static Page 5 title for the RFM Distribution Map | Text | 5 |
+| Title Segment Strategy | Static Page 2 title for the Recommended Strategy by Segment table | Text | 2 |
+| Title Segment Scatter | Static Page 2 title for the Frequency x Monetary by Segment scatter chart | Text | 2 |
+| Title Cohort Retention | Static Page 5 title for the Cohort Retention Heatmap | Text | 5 |
+| Title Revenue by Segment | Static Page 1 title for the Revenue by Segment bar chart | Text | 1 |
+| Title Recency Histogram | Static Page 1 title for the Customer Count by Recency histogram | Text | 1 |
+| Title Segment Distribution | Static Page 1 title for the Customer Distribution by Segment donut chart | Text | 1 |
+| Title Top Products | Static Page 3 title for the Top 15 Products by Revenue chart | Text | 3 |
+| Title Profitability Matrix | Static Page 3 title for the Profitability by Category, Brand and Product matrix | Text | 3 |
+| Title Category Trend | Static Page 3 title for the Revenue Trend by Category chart | Text | 3 |
+| Title Segment Profile | Static Page 2 title for the Segment Profile Comparison table | Text | 2 |
+| Title Revenue by RFM | Static Page 2 title for the Revenue by RFM Score chart | Text | 2 |
 
 ```dax
 Health Indicator =
@@ -875,7 +892,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 81 measures – 80 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 98 measures – 97 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 

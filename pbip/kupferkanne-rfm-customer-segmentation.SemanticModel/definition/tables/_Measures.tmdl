@@ -984,6 +984,125 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 54e20eff-815c-4418-9d9f-da081784dc2a
 
+	/// Static Page 4 title for the Revenue by recency stage chart.
+	measure 'Title Recency Stages' =
+			
+			"Revenue by recency stage"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 6dea72a7-5bd4-44d7-adb4-d16ae0ffaaaa
+
+	/// Static Page 4 title for the Where the risk concentrates table.
+	measure 'Title Risk Concentration' =
+			
+			"Where the risk concentrates"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 9cc0d9bb-7a5c-47f8-bea4-0bf6c5554820
+
+	/// Static Page 4 title for the Who to win back scatter chart.
+	measure 'Title Winback Scatter' =
+			
+			"Who to win back"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 034bc11c-02f2-4d6b-b71b-4b18fcc69301
+
+	/// Static Page 4 title for the Upside of acting chart.
+	measure 'Title Whatif Upside' =
+			
+			"Upside of acting"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: ab53a705-8a4d-43a7-a298-3ac3f1b57f21
+
+	/// Static Page 5 title for the Revenue Concentration (Pareto) chart.
+	measure 'Title Pareto' =
+			
+			"Revenue Concentration (Pareto)"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: af3b91e7-9f67-4c46-8d4a-93615348967d
+
+	/// Static Page 5 title for the RFM Distribution Map.
+	measure 'Title RFM Heatmap' =
+			
+			"RFM Distribution Map"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 30e499bc-3a2b-4b58-8a9a-c774add726d6
+
+	/// Static Page 2 title for the Recommended Strategy by Segment table.
+	measure 'Title Segment Strategy' =
+			
+			"Recommended Strategy by Segment"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 0829b033-8613-4738-9f95-7ec695c8ea7c
+
+	/// Static Page 2 title for the frequency vs monetary scatter chart by segment.
+	measure 'Title Segment Scatter' =
+			
+			"Frequency × Monetary by Segment"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: af2d1d43-a10f-4dda-b59d-98910cf207f7
+
+	/// Static Page 5 title for the Cohort Retention Heatmap.
+	measure 'Title Cohort Retention' =
+			
+			"Cohort Retention Heatmap"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 912de8d9-5c61-485a-a621-9d3c8efe6ab7
+
+	/// Static Page 1 title for the Revenue by Segment bar chart.
+	measure 'Title Revenue by Segment' =
+			
+			"Revenue by Segment"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 1063810a-a5a5-4308-91f1-2a0888392b7f
+
+	/// Static Page 1 title for the Customer Count by Recency histogram.
+	measure 'Title Recency Histogram' =
+			
+			"Customer Count by Recency (days since last order)"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: a14d3ad6-98ef-4c47-9657-1abe9997bcc7
+
+	/// Static Page 1 title for the Customer Distribution by Segment donut chart.
+	measure 'Title Segment Distribution' =
+			
+			"Customer Distribution by Segment"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: c0101998-c04b-4dc9-be87-0c27944744ec
+
+	/// Static Page 3 title for the Top 15 Products by Revenue chart.
+	measure 'Title Top Products' =
+			
+			"Top 15 Products by Revenue"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 05162935-121c-4559-ae1c-4da30e483ddb
+
+	/// Static Page 3 title for the Profitability by Category, Brand and Product matrix.
+	measure 'Title Profitability Matrix' =
+			
+			"Profitability by Category, Brand and Product"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 699ff7e0-f846-4885-8111-31c64ae6ec2c
+
+	/// Static Page 3 title for the Revenue Trend by Category chart.
+	measure 'Title Category Trend' =
+			
+			"Revenue Trend by Category"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 554f3028-8a66-4e0f-b972-ca8e4819232d
+
+	/// Static Page 2 title for the Segment Profile Comparison table.
+	measure 'Title Segment Profile' =
+			
+			"Segment Profile Comparison"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 05262add-72c9-40cb-99ea-6355b0ad201c
+
+	/// Static Page 2 title for the Revenue by RFM Score chart.
+	measure 'Title Revenue by RFM' =
+			
+			"Revenue by RFM Score"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 7f9dc5d8-208b-460f-9de4-20cdeb1e314b
+
 	column x
 		isHidden
 		formatString: 0
