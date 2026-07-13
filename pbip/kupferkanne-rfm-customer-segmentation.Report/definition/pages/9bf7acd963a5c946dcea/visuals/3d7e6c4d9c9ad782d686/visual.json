@@ -808,8 +808,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Eigenmarke leads on margin'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Brand Margin"
                 }
               }
             }

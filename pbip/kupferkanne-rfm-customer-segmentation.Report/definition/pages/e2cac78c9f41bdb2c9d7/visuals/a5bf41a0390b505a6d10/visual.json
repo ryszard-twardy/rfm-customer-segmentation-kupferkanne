@@ -572,8 +572,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Marketing actions calibrated to each segment''s value tier'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Segment Strategy"
                 }
               }
             },

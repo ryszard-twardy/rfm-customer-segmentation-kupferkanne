@@ -420,8 +420,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Where customer value sits on the 90 / 180-day cooling curve'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Recency Stages"
                 }
               }
             },

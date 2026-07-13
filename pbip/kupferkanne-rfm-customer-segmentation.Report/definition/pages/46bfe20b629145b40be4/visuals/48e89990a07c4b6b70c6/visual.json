@@ -299,8 +299,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'All segments, all markets'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Revenue Trend"
                 }
               }
             },

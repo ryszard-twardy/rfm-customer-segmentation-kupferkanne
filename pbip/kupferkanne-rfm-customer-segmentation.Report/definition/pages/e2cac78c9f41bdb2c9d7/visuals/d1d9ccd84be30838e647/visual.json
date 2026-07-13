@@ -540,8 +540,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Logarithmic scale highlights proportional differences'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Segment Scatter"
                 }
               }
             },

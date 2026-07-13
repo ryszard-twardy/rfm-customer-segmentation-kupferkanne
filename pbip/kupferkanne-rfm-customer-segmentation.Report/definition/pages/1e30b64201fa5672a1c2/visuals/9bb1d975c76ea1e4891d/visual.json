@@ -644,8 +644,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Value vs recency for at-risk customers - prioritise the top-right'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Winback Scatter"
                 }
               }
             },

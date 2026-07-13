@@ -1110,8 +1110,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'At-Risk and Hibernating segments - value, heads, recommended win-back'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Risk Concentration"
                 }
               }
             },

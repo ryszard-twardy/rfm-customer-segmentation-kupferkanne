@@ -565,8 +565,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Customer count across all 25 R x F combinations'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle RFM Heatmap"
                 }
               }
             },

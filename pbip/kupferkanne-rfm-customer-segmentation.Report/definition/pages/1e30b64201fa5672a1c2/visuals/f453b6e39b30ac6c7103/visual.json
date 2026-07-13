@@ -229,8 +229,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Gross recoverable revenue at the selected rate. Gross of win-back discount – see methodology.'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Whatif Upside"
                 }
               }
             },

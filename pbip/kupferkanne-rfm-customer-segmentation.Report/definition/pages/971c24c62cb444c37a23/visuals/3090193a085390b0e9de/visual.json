@@ -403,8 +403,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Cumulative revenue share by customer decile'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Subtitle Pareto"
                 }
               }
             },
