@@ -1,5 +1,5 @@
 # DAX Measures Reference
-## Kupferkanne – 70 DAX Measures (69 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 81 DAX Measures (80 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
@@ -57,7 +57,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 46 of 70 measures carry an explicit `FormatString`. The 24 without: 23 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 46 of 81 measures carry an explicit `FormatString`. The 35 without: 34 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
@@ -442,6 +442,17 @@ SWITCH(
 | Region Filter Active | Drill signal (ALLSELECTED-guarded): 1 only when a direct State/Region filter is active | Whole # | 6 |
 | Country Filter Active | Country selection signal (subset-aware, ALLSELECTED-guarded): 1 only on a proper-subset Country selection | Whole # | 6 |
 | Country Total Revenue | Country-grain revenue immune to the Region slicer (choropleth fill driver) | € 2dp | 6 |
+| Subtitle Segment Strategy | Static subtitle for the Recommended Strategy by Segment table | Text | 2 |
+| Subtitle Segment Scatter | Static subtitle for the Frequency x Monetary by Segment scatter chart | Text | 2 |
+| Subtitle Brand Margin | Static data-claim subtitle for the Page 3 brand combo chart - revalidate if margin ranking changes | Text | 3 |
+| Subtitle Recency Stages | Static subtitle for the Revenue by recency stage chart (90/180-day cooling curve) | Text | 4 |
+| Subtitle Risk Concentration | Static subtitle for the Where the risk concentrates table | Text | 4 |
+| Subtitle Winback Scatter | Static subtitle for the Who to win back scatter chart | Text | 4 |
+| Subtitle Pareto | Static subtitle for the Revenue Concentration (Pareto) chart | Text | 5 |
+| Subtitle New Returning | Static subtitle for the New vs Returning revenue chart | Text | 5 |
+| Subtitle RFM Heatmap | Static subtitle for the RFM Distribution Map | Text | 5 |
+| Subtitle Revenue Trend | Dynamic Page 1 subtitle with subset-aware segment and market counts | Text | 1 |
+| Subtitle Whatif Upside | Dynamic Page 4 subtitle injecting the live What-If reactivation rate | Text | 4 |
 
 ```dax
 Health Indicator =
@@ -720,6 +731,32 @@ Country Total Revenue =
 CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer[State] ) )
 ```
 
+```dax
+Subtitle Revenue Trend =
+VAR _SegVisible =
+    DISTINCTCOUNT ( dim_Segment[Segment] )
+VAR _SegAll =
+    CALCULATE ( DISTINCTCOUNT ( dim_Segment[Segment] ), REMOVEFILTERS ( dim_Segment ) )
+VAR _MktVisible =
+    DISTINCTCOUNT ( dim_Customer[Country] )
+VAR _MktAll =
+    CALCULATE ( DISTINCTCOUNT ( dim_Customer[Country] ), REMOVEFILTERS ( dim_Customer ) )
+VAR _SegText =
+    IF ( _SegVisible < _SegAll, _SegVisible & " of " & _SegAll & " segments", "All segments" )
+VAR _MktText =
+    IF ( _MktVisible < _MktAll, _MktVisible & " of " & _MktAll & " markets", "all markets" )
+RETURN
+    _SegText & ", " & _MktText
+```
+
+```dax
+Subtitle Whatif Upside =
+VAR _Rate =
+    FORMAT ( [Reactivation Rate Value] / 100, "0%" )
+RETURN
+    "Gross recoverable revenue at " & _Rate & " reactivation. Gross of win-back discount – see methodology."
+```
+
 ---
 
 ## Product, brand and category measures (Page 3)
@@ -838,7 +875,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 70 measures – 69 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 81 measures – 80 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 

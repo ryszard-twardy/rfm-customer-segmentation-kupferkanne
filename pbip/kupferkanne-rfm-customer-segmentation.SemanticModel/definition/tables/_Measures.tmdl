@@ -898,6 +898,92 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 457ff8a3-ab73-45d3-86a5-c608f0f99743
 
+	/// Static Page 2 subtitle for the Recommended Strategy by Segment table.
+	measure 'Subtitle Segment Strategy' =
+			
+			"Marketing actions calibrated to each segment's value tier"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 42bd64ba-a43c-4ee7-b5fe-7036d52fdfb9
+
+	/// Static Page 2 subtitle for the Frequency x Monetary by Segment scatter chart.
+	measure 'Subtitle Segment Scatter' =
+			
+			"Logarithmic scale highlights proportional differences"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 7a658494-621d-45a9-8406-46b63910fe0a
+
+	/// Static Page 3 subtitle for the brand combo chart; data-claim literal, revalidate if margin ranking changes.
+	measure 'Subtitle Brand Margin' =
+			
+			"Eigenmarke leads on margin"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 566e7193-22bd-47ff-94e7-65e35d33f653
+
+	/// Static Page 4 subtitle for the Revenue by recency stage chart (90/180-day cooling curve).
+	measure 'Subtitle Recency Stages' =
+			
+			"Where customer value sits on the 90 / 180-day cooling curve"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: c7bfcd57-9eb5-45db-a0a8-51f9b5ea21f5
+
+	/// Static Page 4 subtitle for the Where the risk concentrates table.
+	measure 'Subtitle Risk Concentration' =
+			
+			"At-Risk and Hibernating segments - value, heads, recommended win-back"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: f84668a5-0de3-4b35-90fa-4a5e0f1cdd42
+
+	/// Static Page 4 subtitle for the Who to win back scatter chart.
+	measure 'Subtitle Winback Scatter' =
+			
+			"Value vs recency for at-risk customers - prioritise the top-right"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: a6e47313-03db-4816-b8bf-081af6b84172
+
+	/// Static Page 5 subtitle for the Revenue Concentration (Pareto) chart.
+	measure 'Subtitle Pareto' =
+			
+			"Cumulative revenue share by customer decile"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 12648fed-5484-487d-95e1-3d9681527700
+
+	/// Static Page 5 subtitle for the New vs Returning revenue area chart.
+	measure 'Subtitle New Returning' =
+			
+			"Monthly revenue split: new (first purchase) vs returning customers"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: a21ae399-59b1-4580-b5f8-7825209179c9
+
+	/// Static Page 5 subtitle for the RFM Distribution Map.
+	measure 'Subtitle RFM Heatmap' =
+			
+			"Customer count across all 25 R x F combinations"
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 46478b3b-a4b7-4b9c-9d39-8a0840e1f0d7
+
+	/// Dynamic Page 1 subtitle: subset-aware segment and market counts; unfiltered renders "All segments, all markets".
+	measure 'Subtitle Revenue Trend' =
+			
+			VAR _SegVisible = DISTINCTCOUNT ( dim_Segment[Segment] )
+			VAR _SegAll = CALCULATE ( DISTINCTCOUNT ( dim_Segment[Segment] ), REMOVEFILTERS ( dim_Segment ) )
+			VAR _MktVisible = DISTINCTCOUNT ( dim_Customer[Country] )
+			VAR _MktAll = CALCULATE ( DISTINCTCOUNT ( dim_Customer[Country] ), REMOVEFILTERS ( dim_Customer ) )
+			VAR _SegText = IF ( _SegVisible < _SegAll, _SegVisible & " of " & _SegAll & " segments", "All segments" )
+			VAR _MktText = IF ( _MktVisible < _MktAll, _MktVisible & " of " & _MktAll & " markets", "all markets" )
+			RETURN
+			    _SegText & ", " & _MktText
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 6b428315-bd5b-429f-aea3-f66b7d128cf2
+
+	/// Dynamic Page 4 subtitle for the Upside of acting chart; injects the live What-If reactivation rate.
+	measure 'Subtitle Whatif Upside' =
+			
+			VAR _Rate = FORMAT ( [Reactivation Rate Value] / 100, "0%" )
+			RETURN
+			    "Gross recoverable revenue at " & _Rate & " reactivation. Gross of win-back discount – see methodology."
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 54e20eff-815c-4418-9d9f-da081784dc2a
+
 	column x
 		isHidden
 		formatString: 0
