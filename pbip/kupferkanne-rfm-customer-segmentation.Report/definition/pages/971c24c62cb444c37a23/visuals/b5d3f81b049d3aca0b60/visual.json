@@ -471,8 +471,13 @@
           "properties": {
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'RFM Distribution Map'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Title RFM Heatmap"
                 }
               }
             },

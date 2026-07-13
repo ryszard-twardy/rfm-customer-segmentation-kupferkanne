@@ -320,8 +320,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Segment Profile Comparison'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Title Segment Profile"
                 }
               }
             }

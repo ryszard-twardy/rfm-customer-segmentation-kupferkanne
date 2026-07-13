@@ -470,8 +470,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Recommended Strategy by Segment'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Title Segment Strategy"
                 }
               }
             }

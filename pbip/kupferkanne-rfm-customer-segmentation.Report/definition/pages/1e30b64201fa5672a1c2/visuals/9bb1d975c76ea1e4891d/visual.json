@@ -577,8 +577,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Who to win back'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Title Winback Scatter"
                 }
               }
             }

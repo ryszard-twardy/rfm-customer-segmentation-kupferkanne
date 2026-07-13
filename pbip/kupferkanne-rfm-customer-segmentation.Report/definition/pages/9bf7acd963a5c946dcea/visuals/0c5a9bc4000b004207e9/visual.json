@@ -252,8 +252,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Top 15 Products by Revenue'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Title Top Products"
                 }
               }
             }
