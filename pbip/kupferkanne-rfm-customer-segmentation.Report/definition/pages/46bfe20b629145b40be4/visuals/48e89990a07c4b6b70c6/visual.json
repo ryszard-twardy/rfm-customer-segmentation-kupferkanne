@@ -132,7 +132,7 @@
             "titleText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Orders (month)'"
+                  "Value": "'Weekly Revenue'"
                 }
               }
             },

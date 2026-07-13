@@ -269,7 +269,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'KPI_04_Products'"
+                  "Value": "'Recoverable Revenue'"
                 }
               }
             }

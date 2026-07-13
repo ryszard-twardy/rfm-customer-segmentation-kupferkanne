@@ -319,7 +319,7 @@
             "tooltip": {
               "expr": {
                 "Literal": {
-                  "Value": "'Regional Analysis'"
+                  "Value": "'Customer Lifecycle Intelligence'"
                 }
               }
             }
