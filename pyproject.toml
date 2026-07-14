@@ -1,11 +1,20 @@
 [project]
 name = "rfm-customer-segmentation-kupferkanne"
 version = "0.0.0"
-description = "Reproducible Python environment for the BigQuery ingest utility in scripts/."
+description = "Reproducible Python environment for the BigQuery ingest utility in scripts/, the KPI parity harness, and the Quarto EDA notebook."
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "db-dtypes>=1.7.1",
     "google-api-core>=2.30.3",
     "google-cloud-bigquery>=3.41.0",
+    "google-cloud-bigquery-storage>=2.39.0",
+    "ipykernel>=7.3.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.0",
+    "pandas>=3.0.3",
+    "pandas-gbq>=0.35.0",
+    "plotly>=6.9.0",
+    "pyarrow>=25.0.0",
 ]
 
 [tool.uv]
