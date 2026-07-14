@@ -102,3 +102,7 @@ credentials*.json
 # Named GCP credential patterns (never blanket *.json - BQ schema JSONs stay tracked)
 *-service-account*.json
 gcp-credentials*.json
+# Quarto local render outputs (notebook published via Pages in a later step)
+notebooks/eda_kupferkanne.html
+notebooks/eda_kupferkanne_files/
+.quarto/
