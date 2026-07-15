@@ -1,0 +1,9 @@
+project:
+  type: default
+  output-dir: _site
+  render:
+    - eda_kupferkanne.qmd
+
+# Project-level metadata merges into the single render target: the notebook
+# publishes as the site landing page so the Pages root URL needs no filename.
+output-file: index.html

@@ -106,3 +106,7 @@ gcp-credentials*.json
 notebooks/eda_kupferkanne.html
 notebooks/eda_kupferkanne_files/
 .quarto/
+notebooks/_site/
+notebooks/_freeze/
+# Quarto auto-generates this nested .gitignore on every project render
+notebooks/.gitignore
