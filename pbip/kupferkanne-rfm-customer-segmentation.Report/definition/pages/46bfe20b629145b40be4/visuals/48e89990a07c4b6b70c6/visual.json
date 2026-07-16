@@ -49,6 +49,24 @@
               "nativeQueryRef": "Total Revenue"
             }
           ]
+        },
+        "Y2": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Revenue Rolling 12M"
+                }
+              },
+              "queryRef": "_Measures.Revenue Rolling 12M",
+              "nativeQueryRef": "Revenue Rolling 12M"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -180,26 +198,6 @@
           }
         }
       ],
-      "dataPoint": [
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#475569'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Sum(v_monthly_revenue.Total Revenue)"
-          }
-        }
-      ],
       "lineStyles": [
         {
           "properties": {
@@ -210,6 +208,27 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "lineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'dashed'"
+                }
+              }
+            },
+            "strokeWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Revenue Rolling 12M"
           }
         }
       ],
@@ -236,6 +255,26 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#A5A29A'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Revenue Rolling 12M"
           }
         }
       ]

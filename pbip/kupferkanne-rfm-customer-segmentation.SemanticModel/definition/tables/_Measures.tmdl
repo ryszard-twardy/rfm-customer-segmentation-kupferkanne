@@ -961,7 +961,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 46478b3b-a4b7-4b9c-9d39-8a0840e1f0d7
 
-	/// Dynamic Page 1 subtitle: subset-aware segment and market counts; unfiltered renders "All segments, all markets".
+	/// Dynamic Page 1 subtitle: subset-aware segment and market counts plus the trailing-12M overlay note; unfiltered renders "All segments, all markets · Trailing 12M on right axis".
 	measure 'Subtitle Revenue Trend' =
 			
 			VAR _SegVisible = DISTINCTCOUNT ( dim_Segment[Segment] )
@@ -971,7 +971,7 @@ table _Measures
 			VAR _SegText = IF ( _SegVisible < _SegAll, _SegVisible & " of " & _SegAll & " segments", "All segments" )
 			VAR _MktText = IF ( _MktVisible < _MktAll, _MktVisible & " of " & _MktAll & " markets", "all markets" )
 			RETURN
-			    _SegText & ", " & _MktText
+			    _SegText & ", " & _MktText & " · Trailing 12M on right axis"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 6b428315-bd5b-429f-aea3-f66b7d128cf2
 
@@ -1155,13 +1155,18 @@ table _Measures
 		displayFolder: 02 - RFM Scores
 		lineageTag: 3c94c0b7-1607-4901-9d6f-405d6b0bace5
 
-	/// Total Revenue over the trailing 12 months ending at the current date context (EUR).
+	/// Total Revenue over the trailing 12 months ending at the current date context (EUR); blank past the last sales date.
 	measure 'Revenue Rolling 12M' =
 			
-			CALCULATE (
-			    [Total Revenue],
-			    DATESINPERIOD ( dim_Date[Date], MAX ( dim_Date[Date] ), -12, MONTH )
-			)
+			VAR LastSalesDate =
+			    CALCULATE ( MAX ( sales_curated[Order Date] ), REMOVEFILTERS () )
+			VAR Result =
+			    CALCULATE (
+			        [Total Revenue],
+			        DATESINPERIOD ( dim_Date[Date], MAX ( dim_Date[Date] ), -12, MONTH )
+			    )
+			RETURN
+			    IF ( MIN ( dim_Date[Date] ) <= LastSalesDate, Result )
 		formatString: "€"#,##0;-"€"#,##0
 		displayFolder: 04 - Time Intelligence
 		lineageTag: 8a1aae11-13e9-49a1-a612-40231ae60e1f

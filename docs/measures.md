@@ -763,7 +763,7 @@ VAR _SegText =
 VAR _MktText =
     IF ( _MktVisible < _MktAll, _MktVisible & " of " & _MktAll & " markets", "all markets" )
 RETURN
-    _SegText & ", " & _MktText
+    _SegText & ", " & _MktText & " · Trailing 12M on right axis"
 ```
 
 ```dax
