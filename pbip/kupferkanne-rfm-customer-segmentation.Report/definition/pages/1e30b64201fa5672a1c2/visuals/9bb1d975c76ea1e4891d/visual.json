@@ -13,6 +13,25 @@
     "visualType": "scatterChart",
     "query": {
       "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_Customer"
+                    }
+                  },
+                  "Property": "Customer ID"
+                }
+              },
+              "queryRef": "dim_Customer.Customer ID",
+              "nativeQueryRef": "Customer ID",
+              "active": true
+            }
+          ]
+        },
         "Series": {
           "projections": [
             {
@@ -53,18 +72,24 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_Customer"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Recency Days"
                     }
                   },
-                  "Property": "Recency Days"
+                  "Function": 0
                 }
               },
               "queryRef": "dim_Customer.Recency Days",
               "nativeQueryRef": "Recency Days",
-              "active": true
+              "active": true,
+              "displayName": "Recency Days"
             }
           ]
         },
@@ -72,17 +97,23 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_Customer"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Total Spend"
                     }
                   },
-                  "Property": "Total Spend"
+                  "Function": 0
                 }
               },
               "queryRef": "dim_Customer.Total Spend",
-              "nativeQueryRef": "Total Spend"
+              "nativeQueryRef": "Total Spend",
+              "displayName": "Total Spend"
             }
           ]
         }
@@ -747,7 +778,8 @@
             "Property": "Recency Days"
           }
         },
-        "type": "Advanced"
+        "type": "Advanced",
+        "howCreated": "User"
       },
       {
         "name": "c67b9ed04421cb331e76",
@@ -839,7 +871,8 @@
             "Property": "Total Spend"
           }
         },
-        "type": "Advanced"
+        "type": "Advanced",
+        "howCreated": "User"
       }
     ],
     "filterSortOrder": "Custom"
