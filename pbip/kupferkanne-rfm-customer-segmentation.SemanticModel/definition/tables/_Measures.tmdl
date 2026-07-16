@@ -195,7 +195,7 @@ table _Measures
 			    dim_Customer[Recency Days] <= 90
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
-		displayFolder: 04 - Time Intelligence (Recency Buckets)
+		displayFolder: 04 - Time Intelligence
 		lineageTag: 80277715-e07f-42a3-b819-71cde6e5bf8f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -209,7 +209,7 @@ table _Measures
 			        && dim_Customer[Recency Days] <= 180
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
-		displayFolder: 04 - Time Intelligence (Recency Buckets)
+		displayFolder: 04 - Time Intelligence
 		lineageTag: 3e18133c-07c7-431b-91e3-827dad96c767
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -222,7 +222,7 @@ table _Measures
 			    dim_Customer[Recency Days] > 180
 			)
 		formatString: "€"#,##0.00;-"€"#,##0.00
-		displayFolder: 04 - Time Intelligence (Recency Buckets)
+		displayFolder: 04 - Time Intelligence
 		lineageTag: e3aae03a-8f0a-439d-925f-bcea7814b109
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -875,9 +875,17 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 6ac726c7-d2c7-4868-b27a-145fc90f79a4
 
+	/// Country-grain revenue immune to the Region slicer; fill driver for the whole-country choropleth.
+	measure 'Country Total Revenue' =
+			
+			CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer[State] ) )
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: 457ff8a3-ab73-45d3-86a5-c608f0f99743
+
 	/// Country selection signal for P6 title measures: 1 only when a genuine proper-subset Country filter is active (select-all reads 0). ALLSELECTED-guarded (visual-groupby-immune). Unlike [Region Filter Active] (grain switch, select-all = 1 by design), this drives text only.
 	measure 'Country Filter Active' =
-
+			
 			VAR _IsFiltered =
 			    CALCULATE ( ISFILTERED ( dim_Customer[Country] ), ALLSELECTED ( ) )
 			VAR _Visible =
@@ -889,14 +897,6 @@ table _Measures
 		formatString: 0
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 8ed1acd4-b04f-4386-86aa-13a59f53c692
-
-	/// Country-grain revenue immune to the Region slicer; fill driver for the whole-country choropleth.
-	measure 'Country Total Revenue' =
-			
-			CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer[State] ) )
-		formatString: "€"#,##0.00;-"€"#,##0.00
-		displayFolder: 06 - Formatting & Regional
-		lineageTag: 457ff8a3-ab73-45d3-86a5-c608f0f99743
 
 	/// Static Page 2 subtitle for the Recommended Strategy by Segment table.
 	measure 'Subtitle Segment Strategy' =
@@ -1102,6 +1102,84 @@ table _Measures
 			"Revenue by RFM Score"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 7f9dc5d8-208b-460f-9de4-20cdeb1e314b
+
+	/// Drillthrough header "C-10482 · Champions · Erlangen, Germany"; prompts the drill-through gesture when no single customer is in context.
+	measure 'Subtitle Page 7' =
+			
+			VAR HasCustomer =
+			    HASONEVALUE ( dim_Customer[Customer ID] )
+			RETURN
+			    IF (
+			        HasCustomer,
+			        SELECTEDVALUE ( dim_Customer[Customer ID] )
+			            & " · " & SELECTEDVALUE ( dim_Customer[Segment] )
+			            & " · " & SELECTEDVALUE ( dim_Customer[City] )
+			            & ", " & SELECTEDVALUE ( dim_Customer[Country] ),
+			        "Right-click a customer on any page and choose Drill through"
+			    )
+		displayFolder: 06 - Formatting & Regional
+		lineageTag: a01ca6ef-0fca-42be-87d4-67a755cb7266
+
+	/// Single-customer display of dim_Customer[Recency Days]; BLANK unless exactly one customer is in context.
+	measure 'Customer Recency Days' =
+			
+			SELECTEDVALUE ( dim_Customer[Recency Days] )
+		formatString: #,##0 "days"
+		displayFolder: 02 - RFM Scores
+		lineageTag: 9729869c-af5d-418d-bae3-f065797b8329
+
+	/// Single-customer display of dim_Customer[Health Score] (RFM score sum, scale 3-15); BLANK unless exactly one customer is in context.
+	measure 'Customer Health Score' =
+			
+			SELECTEDVALUE ( dim_Customer[Health Score] )
+		formatString: 0 "/ 15"
+		displayFolder: 02 - RFM Scores
+		lineageTag: fdccb68d-2d9e-4f44-95ba-6c665fa46a68
+
+	/// "R5 · F4 · M5" score triplet of the drilled customer; BLANK unless exactly one customer is in context.
+	measure 'Customer RFM Label' =
+			
+			VAR RScore =
+			    SELECTEDVALUE ( dim_Customer[R Score] )
+			VAR FScore =
+			    SELECTEDVALUE ( dim_Customer[F Score] )
+			VAR MScore =
+			    SELECTEDVALUE ( dim_Customer[M Score] )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( RScore ),
+			        "R" & RScore
+			            & " · F" & FScore
+			            & " · M" & MScore
+			    )
+		displayFolder: 02 - RFM Scores
+		lineageTag: 3c94c0b7-1607-4901-9d6f-405d6b0bace5
+
+	/// Total Revenue over the trailing 12 months ending at the current date context (EUR).
+	measure 'Revenue Rolling 12M' =
+			
+			CALCULATE (
+			    [Total Revenue],
+			    DATESINPERIOD ( dim_Date[Date], MAX ( dim_Date[Date] ), -12, MONTH )
+			)
+		formatString: "€"#,##0;-"€"#,##0
+		displayFolder: 04 - Time Intelligence
+		lineageTag: 8a1aae11-13e9-49a1-a612-40231ae60e1f
+
+	/// YoY change of Total Revenue vs the same period last year; the current open month reads low against a full prior-year month - surface on the Page 1 trend tooltip.
+	measure 'Revenue YoY %' =
+			
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PriorRevenue =
+			    CALCULATE (
+			        [Total Revenue],
+			        SAMEPERIODLASTYEAR ( dim_Date[Date] )
+			    )
+			RETURN
+			    DIVIDE ( CurrentRevenue - PriorRevenue, PriorRevenue )
+		formatString: 0.0%
+		displayFolder: 04 - Time Intelligence
+		lineageTag: af2a1c88-dad3-4e14-82d6-f0c5873a92dd
 
 	column x
 		isHidden
