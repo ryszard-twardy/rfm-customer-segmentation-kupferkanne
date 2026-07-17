@@ -1,5 +1,6 @@
 ---
 title: "Kupferkanne RFM - Exploratory Data Analysis"
+author: "Ryszard Twardy"
 date: 2026-07-14
 format:
   html:
@@ -60,7 +61,9 @@ views is stated and quantified, not assumed.
 #| label: setup
 import matplotlib.pyplot as plt
 import pandas as pd
+from decimal import Decimal
 from google.cloud import bigquery
+from IPython.display import HTML
 
 PROJECT = "kupferkanne-2026"
 DATASET = f"{PROJECT}.sales"
@@ -74,6 +77,41 @@ def view(name: str) -> pd.DataFrame:
     """Read one EDA view into a DataFrame (read-only SELECT)."""
     sql = f"SELECT * FROM `{DATASET}.{name}`"
     return client.query(sql, location="EU").to_dataframe()
+
+
+LABELS = {
+    "recency_bucket": "Recency Bucket", "customer_count": "Customers",
+    "min_days": "Min Days", "max_days": "Max Days", "order_id": "Order ID",
+    "country": "Country", "order_value": "Order Value",
+    "p99_threshold": "P99 Threshold", "multiple_of_p99": "Multiple of P99",
+    "order_count": "Orders", "avg_order_value": "Avg Order Value",
+    "total_revenue": "Total Revenue", "revenue_share_pct": "Revenue Share",
+    "line_count": "Line Items", "avg_items_per_order": "Avg Items per Order",
+    "avg_declared_items_per_order": "Avg Declared Items per Order",
+    "declared_actual_mismatch_count": "Declared vs Actual Mismatch Count",
+    "declared_actual_mismatch_pct": "Declared vs Actual Mismatch",
+}
+
+
+def show(df, labels=LABELS, percent=(), currency_int=(), ratio=()):
+    """HTML table, no index. Formats float/Decimal cols (percent -> N.NN%,
+    currency_int -> whole with thousands, ratio -> plain 2dp, else 2dp with
+    thousands), then renames headers via `labels`."""
+    out = df.copy()
+    for col in out.columns:
+        s = out[col]
+        is_num = pd.api.types.is_float_dtype(s) or (
+            s.dtype == object and s.map(lambda v: isinstance(v, Decimal)).any()
+        )
+        if col in percent:
+            out[col] = s.map(lambda v: f"{float(v):.2f}%" if pd.notna(v) else "")
+        elif col in currency_int:
+            out[col] = s.map(lambda v: f"{float(v):,.0f}" if pd.notna(v) else "")
+        elif col in ratio:
+            out[col] = s.map(lambda v: f"{float(v):.2f}" if pd.notna(v) else "")
+        elif is_num:
+            out[col] = s.map(lambda v: f"{float(v):,.2f}" if pd.notna(v) else "")
+    return HTML(out.rename(columns=labels).to_html(index=False))
 
 
 plt.rcParams.update({
@@ -119,7 +157,7 @@ recon = pd.DataFrame({
     "Match": ["yes" if BASELINE[k] == derived[k] else "NO"
               for k in BASELINE],
 })
-recon
+show(recon)
 ```
 
 ```{python}
@@ -133,7 +171,7 @@ split = pd.DataFrame({
     "Orders": [f"{dist_orders:,}", f"{basket_orders:,}",
                f"{basket_orders - dist_orders:,}"],
 })
-split
+show(split)
 ```
 
 The three headline totals match the baseline exactly. The population split is
@@ -164,7 +202,7 @@ plt.show()
 
 ```{python}
 #| label: tbl-recency
-rec[["recency_bucket", "customer_count", "min_days", "max_days"]]
+show(rec[["recency_bucket", "customer_count", "min_days", "max_days"]])
 ```
 
 The dataset ends in March 2026, so anchoring recency on `CURRENT_DATE()`
@@ -235,7 +273,7 @@ plt.show()
 #| label: tbl-outliers
 out = view("eda_order_value_outliers")
 out = out.sort_values("order_value", ascending=False).head(5)
-out[["order_id", "country", "order_value", "p99_threshold", "multiple_of_p99"]]
+show(out[["order_id", "country", "order_value", "p99_threshold", "multiple_of_p99"]], ratio=["multiple_of_p99"])
 ```
 
 The shape is hard right-skew: median EUR 35.03 against a mean of EUR 50.55,
@@ -305,8 +343,8 @@ plt.show()
 
 ```{python}
 #| label: tbl-geography
-geo[["country", "order_count", "customer_count", "avg_order_value",
-     "total_revenue", "revenue_share_pct"]]
+show(geo[["country", "order_count", "customer_count", "avg_order_value",
+     "total_revenue", "revenue_share_pct"]], currency_int=["total_revenue"], percent=["revenue_share_pct"])
 ```
 
 Germany dominates with 56.8% of revenue; the top three markets (DE, AT, PL)
@@ -379,9 +417,9 @@ plt.show()
 
 ```{python}
 #| label: tbl-quality
-bas[["country", "order_count", "line_count", "avg_items_per_order",
+show(bas[["country", "order_count", "line_count", "avg_items_per_order",
      "avg_declared_items_per_order", "declared_actual_mismatch_count",
-     "declared_actual_mismatch_pct"]]
+     "declared_actual_mismatch_pct"]], percent=["declared_actual_mismatch_pct"])
 ```
 
 Every order arrives with a declared basket size (`basket_item_count`); the
@@ -397,8 +435,9 @@ JOIN with an actual count of zero, because hiding them would hide precisely
 the mismatches the view exists to catch. Basket size itself is flat across
 markets (1.60-1.63 lines per order), consistent with the geography finding.
 
-*Where this lands:* ADR 0008; pipeline step `01_0` (cleaning/validation) -
-no dashboard page consumes this view directly [?]; measure family [?].
+*Where this lands:* ADR 0008; pipeline step `01_0` (cleaning/validation);
+no dashboard page or DAX measure family consumes this view directly - it is
+an EDA-only data-quality check.
 
 ## Synthesis
 
@@ -437,6 +476,6 @@ quarto render notebooks/eda_kupferkanne.qmd
 ```
 
 Caching note: Quarto's `freeze` (render caching) requires a Quarto *project*
-(`_quarto.yml`), which this repository intentionally does not introduce for a
-single document; the deferral is deliberate and can be revisited if more
-notebooks accumulate.
+(`_quarto.yml`). This repository now defines one - added so the notebook
+publishes to GitHub Pages - so the prerequisite is met; `freeze` itself stays
+disabled for a single document and can be enabled if more notebooks accumulate.
