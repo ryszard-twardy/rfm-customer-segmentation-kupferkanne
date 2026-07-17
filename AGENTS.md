@@ -41,6 +41,13 @@ Architectural decisions live in `docs/adr/`.
 - `/mp-triage`, `/mp-to-issues`, `/mp-to-prd` – consume `docs/agents/issue-tracker.md` + `docs/agents/triage-labels.md`
 - `/mp-handoff` – conversation compaction
 
+### Vendored Microsoft skills (Power BI / Fabric)
+
+Reference skills for Power BI and Fabric authoring are vendored in the vault at `$env:VAULT_ROOT\ai\vendor\microsoft-skills-for-fabric\skills\` (machine-local, not tracked in this repo – reference via the env-var path, never a hardcoded drive letter):
+
+- `semantic-model-authoring`, `powerbi-report-authoring` – implementation guidance for TMDL model and report-visual authoring.
+- `powerbi-report-design` – reviewer lens for report layout and visual-design critique.
+
 ## Conventions
 
 - **Typography**: en-dash `–` (never em-dash `U+2014`), ASCII quotes only, backticks for code/paths/identifiers.

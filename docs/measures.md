@@ -1,5 +1,5 @@
 # DAX Measures Reference
-## Kupferkanne – 98 DAX Measures (97 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 104 DAX Measures (103 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
@@ -57,14 +57,14 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 46 of 98 measures carry an explicit `FormatString`. The 52 without: 51 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 50 of 104 measures carry an explicit `FormatString`. The 54 without: 53 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
 
-**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13; all 13 remaining are intentional (12 text + 1 `SWITCH`-format).
+**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13 at the time; the flags that remained are all intentional (text measures + the one `SWITCH`-format `[Dynamic KPI Selector]`). The rule now reports 54 as further text measures have been added since (the 54 without-format measures noted above), all intentional.
 
-**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (all 10 percentage measures in the model use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`. No measure in the model uses 1dp (`0.0%`).
+**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 10 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`. The one 1dp (`0.0%`) exception is `Revenue YoY %` (added with the #31 time-intelligence pair), a Page 1 trend-tooltip reading where a single decimal is sufficient for a year-over-year delta.
 
 ### Column Behavior: SummarizeBy = None
 
@@ -237,6 +237,28 @@ SUM ( v_revenue_new_returning[Revenue] )
 | Avg F Score | `AVERAGE(dim_Customer[F Score])` | Dec 1dp | 2, 6 |
 | Avg M Score | `AVERAGE(dim_Customer[M Score])` | Dec 1dp | 2, 6 |
 | Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 1, 2, 4 |
+| Customer Recency Days | `SELECTEDVALUE(dim_Customer[Recency Days])` | `#,##0 "days"` | 7 |
+| Customer Health Score | `SELECTEDVALUE(dim_Customer[Health Score])` | `0 "/ 15"` | 7 |
+| Customer RFM Label | R/F/M score triplet of the drilled customer (see body) | Text | 7 |
+
+The `Customer *` measures are single-customer drillthrough readouts (Page 7); each is `BLANK` unless exactly one `dim_Customer` row is in context.
+
+```dax
+Customer RFM Label =
+VAR RScore =
+    SELECTEDVALUE ( dim_Customer[R Score] )
+VAR FScore =
+    SELECTEDVALUE ( dim_Customer[F Score] )
+VAR MScore =
+    SELECTEDVALUE ( dim_Customer[M Score] )
+RETURN
+    IF (
+        NOT ISBLANK ( RScore ),
+        "R" & RScore
+            & " · F" & FScore
+            & " · M" & MScore
+    )
+```
 
 ---
 
@@ -341,13 +363,15 @@ RETURN
 
 ---
 
-## Folder: 04 – Time Intelligence (Recency Buckets)
+## Folder: 04 – Time Intelligence
 
 | Measure | Format | Pages |
 |---|---|---|
 | Revenue Active (0–90d) | € 0dp | 4 |
 | Revenue Cooling (91–180d) | € 0dp | 4 |
 | Revenue Dormant (180d+) | € 0dp | 4 |
+| Revenue Rolling 12M | € 0dp | 1 |
+| Revenue YoY % | % 1dp | 1 |
 
 ```dax
 Revenue Active =
@@ -368,6 +392,45 @@ CALCULATE(
     SUM(dim_Customer[Total Spend]),
     dim_Customer[Recency Days] > 180
 )
+```
+
+`[Revenue Rolling 12M]` – Total Revenue over the trailing 12 months ending at the date context (EUR); blank past the last sales date and before the first full 12-month trailing window. The dual guard (`FirstSalesDate` / `LastSalesDate` / `PointDate` / `WindowStart`) stops the rolling series from decaying past real data and from ramping through a partial first window. Rendered on the Page 1 trend secondary axis (dashed, subordinate).
+
+```dax
+Revenue Rolling 12M =
+VAR FirstSalesDate =
+    CALCULATE ( MIN ( sales_curated[Order Date] ), REMOVEFILTERS () )
+VAR LastSalesDate =
+    CALCULATE ( MAX ( sales_curated[Order Date] ), REMOVEFILTERS () )
+VAR PointDate =
+    MAX ( dim_Date[Date] )
+VAR WindowStart =
+    EDATE ( PointDate, -12 ) + 1
+VAR Result =
+    CALCULATE (
+        [Total Revenue],
+        DATESINPERIOD ( dim_Date[Date], PointDate, -12, MONTH )
+    )
+RETURN
+    IF (
+        MIN ( dim_Date[Date] ) <= LastSalesDate
+            && WindowStart >= FirstSalesDate,
+        Result
+    )
+```
+
+`[Revenue YoY %]` – year-over-year change of Total Revenue vs the same period last year; surfaced on the Page 1 trend tooltip (the current open month reads low against a full prior-year month).
+
+```dax
+Revenue YoY % =
+VAR CurrentRevenue = [Total Revenue]
+VAR PriorRevenue =
+    CALCULATE (
+        [Total Revenue],
+        SAMEPERIODLASTYEAR ( dim_Date[Date] )
+    )
+RETURN
+    DIVIDE ( CurrentRevenue - PriorRevenue, PriorRevenue )
 ```
 
 ---
@@ -428,6 +491,7 @@ SWITCH(
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
 | Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, segment migration) | Text | 5 |
 | Subtitle Page 6 | Dynamic Page 6 subtitle with live market and city counts, singular/plural-aware | Text | 6 |
+| Subtitle Page 7 | Dynamic Page 7 drillthrough header (customer ID · segment · city, country); prompts the drill-through gesture when no single customer is in context | Text | 7 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -577,6 +641,21 @@ RETURN
         & _Markets & IF ( _Markets = 1, " market", " markets" )
         & " and "
         & _Cities & IF ( _Cities = 1, " city", " cities" )
+```
+
+```dax
+Subtitle Page 7 =
+VAR HasCustomer =
+    HASONEVALUE ( dim_Customer[Customer ID] )
+RETURN
+    IF (
+        HasCustomer,
+        SELECTEDVALUE ( dim_Customer[Customer ID] )
+            & " · " & SELECTEDVALUE ( dim_Customer[Segment] )
+            & " · " & SELECTEDVALUE ( dim_Customer[City] )
+            & ", " & SELECTEDVALUE ( dim_Customer[Country] ),
+        "Right-click a customer on any page and choose Drill through"
+    )
 ```
 
 **Design decision – Subtitle Page N convention:** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was refactored from static text to a dynamic measure. Subtitle Page 3 was added for the Page 3 build.
@@ -892,7 +971,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 98 measures – 97 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 104 measures – 103 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 

@@ -108,5 +108,7 @@ notebooks/eda_kupferkanne_files/
 .quarto/
 notebooks/_site/
 notebooks/_freeze/
+# Quarto jupyter-engine intermediate notebooks (generated on render from the .qmd)
+*.quarto_ipynb*
 # Quarto auto-generates this nested .gitignore on every project render
 notebooks/.gitignore

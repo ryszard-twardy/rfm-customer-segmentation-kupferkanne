@@ -2,6 +2,7 @@ table dim_Segment
 	lineageTag: 621bf52c-3cb6-4bce-b4f0-689ad9630086
 
 	column Segment
+		dataType: string
 		lineageTag: bbcb22da-3fa7-46c3-8d77-4df1fe832c7e
 		summarizeBy: none
 		isNameInferred
