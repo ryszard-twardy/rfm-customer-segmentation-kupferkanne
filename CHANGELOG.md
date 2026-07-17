@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Root `README.md` rewritten as a reviewer-facing landing page: answer-first structure (problem, system, method, seven report pages, engineering standards, repository map, reproduction, scope) replacing the prior tech-stack-first layout.
+- Factual claims reconciled against serialized state and live BigQuery: 104 DAX measures, 12 tables, 7 single-direction relationships (0 bidirectional), 6 product categories, ~460K source records, and the equal-weight brand margin corrected to 59.94% (weighted 59.78%).
+- Report page names verified from `page.json` (Page 6 = Regional Analysis); status badge aligned to the latest release tag v1.1.0.
+
 ---
 
 ## [1.1.0] – 2026-07-09

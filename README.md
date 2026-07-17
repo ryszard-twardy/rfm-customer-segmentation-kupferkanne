@@ -1,169 +1,120 @@
-# Kupferkanne – Retail Analytics Platform
+# Kupferkanne – RFM Customer Segmentation
+
+**End-to-end customer analytics: a BigQuery warehouse, a Kimball star schema, and a Power BI semantic model shipped as code.**
 
 [![Status](https://img.shields.io/badge/status-v1.1.0-blue)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![BigQuery](https://img.shields.io/badge/warehouse-BigQuery-4285F4)](docs/architecture.md)
-[![Power BI](https://img.shields.io/badge/BI-Power%20BI-F2C811)](pbip/)
+[![Power BI](https://img.shields.io/badge/BI-Power%20BI%20(PBIP%2FTMDL)-F2C811)](pbip/)
 [![SQLFluff](https://img.shields.io/badge/SQL-lint--clean-success)](.sqlfluff)
 
-End-to-end retail analytics platform for **Kupferkanne**, a fictional Erlangen-based direct-to-consumer e-commerce brand operating across nine European markets. The platform answers three commercial questions: which customers to invest in (segmentation), which products and brands drive profitability, and how much revenue sits at churn risk.
+Fifteen thousand customers, one retention budget. This project is what the analytics behind that allocation decision looks like when it is engineered end to end: which customers to invest in, which products actually make money, and how much revenue is quietly walking out the door. The company – Kupferkanne, an Erlangen-based direct-to-consumer coffee-equipment brand selling across nine European markets – is fictional. The engineering is not: every number on the dashboard traces back through a documented, linted, regression-checked pipeline that lives in this repository.
 
-## Overview
+> **Reviewing in 60 seconds?** Skim [the seven report pages](#the-report-seven-pages), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
+
+---
+
+## The problem
+
+A retailer with a fixed marketing budget cannot spend uniformly across 15,000 customers – some are worth protecting, some are worth winning back, and some are not worth the spend. Kupferkanne turns that intuition into three answerable questions:
+
+1. **Investment** – which customers deserve disproportionate retention spend, and why?
+2. **Profitability** – which products and brands actually drive margin, under which definition of margin?
+3. **Risk** – how much revenue sits in disengaging customers, and what is the upside of acting on it?
+
+Each question maps to specific report pages, and every figure on those pages is reproducible from the SQL in this repo.
+
+## The system
 
 ```
-┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│  synth-datagen   │───▶│    BigQuery      │───▶│   Power BI       │
-│  (Python CLI)    │    │  data warehouse  │    │   Desktop        │
-│                  │    │  + 9-step SQL    │    │   (Import mode)  │
-└──────────────────┘    └──────────────────┘    └──────────────────┘
-   80 CSV files            25 BQ objects          7-page dashboard
-   ~460K records          (11 tables + 14 views)  70 DAX measures
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  synth-datagen   │────▶│     BigQuery     │────▶│     Power BI     │
+│  (Python CLI)    │     │  data warehouse  │     │   Import mode    │
+│                  │     │  9-step SQL      │     │   PBIP / TMDL    │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+  80 CSV shards            audit → clean →          7-page report
+  ~460K raw records        EDA → RFM → marts        104 DAX measures
+  seeded defects           Kimball star schema      model as code
 ```
 
-_Object counts reflect the live warehouse. The eight EDA views defined in `sql/02_eda` are pending a rewrite against the restructured staging schema and are temporarily absent from the warehouse._
+| Scale | Value |
+|---|---|
+| Revenue | EUR 8,531,365.52 |
+| Profit | EUR 5,100,089.72 (weighted margin 59.78%) |
+| Customers | 14,967 scored |
+| Orders | 168,777 order-grain rows; ~275K line-grain rows |
+| Catalogue | 60 products, 5 brands, 6 categories |
+| Window | 2023-01 to 2026-03 (39 months), 9 European markets |
+| Semantic model | 104 DAX measures, 12 tables, 7 relationships (all single-direction) |
 
-- **39 months** of order data (2023-01 to 2026-03), ~169K orders from ~15,000 customers.
-- **Nine-step SQL pipeline** on Google BigQuery, idempotent, lint-clean, with explicit exception policy.
-- **Dual-grain Kimball star schema**: order-grain `sales_curated` (~169K) for revenue and segmentation, line-grain `v_items_for_bi` (~275K) for product detail.
-- **RFM customer segmentation** with `NTILE(5)` quintiles, six segments derived from composite score 3–15.
-- **Power BI Import-mode dashboard** with seven pages and 70 DAX measures.
+## The method
 
-## Tech stack
+**RFM segmentation.** Every customer is scored 1–5 on Recency, Frequency and Monetary value using `NTILE(5)` quintiles with deterministic tiebreakers, summed into a composite score (3–15) and banded into six segments – Champions, Loyal Customers, Potential Loyalists, Recent Customers, At Risk, Hibernating – each mapped to a recommended marketing action. Recency is anchored to `MAX(OrderDate)` rather than `CURRENT_DATE()`, so results are reproducible on a frozen dataset; quintile scoring is distribution-adaptive, so thresholds move with the data instead of hard-coding euro cutoffs. ([ADR 0006](docs/adr/0006-rfm-segmentation-with-ntile.md))
 
-| Layer | Tool | Purpose |
+**Two-tier margin.** Profitability is reported two ways on purpose: weighted (`SUM profit / SUM revenue` = 59.78%) and equal-weight across brands (59.94%). Today the two sit within 0.16 pp of each other – the dual view is the guard that keeps a future mix shift from hiding behind a single number. Both figures are labelled wherever they appear. ([ADR 0007](docs/adr/0007-two-tier-margin-calculation.md))
+
+**Dual-grain model.** A Kimball star schema with conformed dimensions and two fact grains: order-grain `sales_curated` (168,777 rows) for revenue and segmentation, line-grain `v_items_for_bi` (~275K rows) for product detail. Measure names carry the grain (`[Total *]` vs `[Line *]`), and a reconciliation measure asserts the two grains agree (invariant = 0). ([ADR 0005](docs/adr/0005-dual-grain-fact-model.md))
+
+## The report (seven pages)
+
+| # | Page | The question it answers |
 |---|---|---|
-| Data generation | [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) | Python 3.12 CLI producing realistic data with intentional quality issues |
-| Data warehouse | Google BigQuery (GoogleSQL) | Serverless, sharded fact tables, free-tier compatible |
-| Transformation | 9-step SQL pipeline | Idempotent (`CREATE OR REPLACE`), lint-clean |
-| Linting | SQLFluff 4.1.0 | BigQuery dialect, custom rule policy |
-| BI | Power BI Desktop (Import) | Seven-page dashboard, dual-grain semantic model |
-| DAX formatting | [daxformatter.com](https://www.daxformatter.com/) | SQLBI short-line conventions |
+| 1 | Executive Summary | Is the business healthy, and where should attention go first? |
+| 2 | Segment Deep Dive | Who are the six segments, and how do their R/F/M profiles differ? |
+| 3 | Product & Brand | Where is profit actually made – and under which margin definition? |
+| 4 | Churn Risk & What-If | How much revenue is at risk, and what is the upside of acting? A live reactivation parameter prices the scenario on the page. |
+| 5 | Customer Lifecycle Intelligence | How does value concentrate and retain over time? Pareto by customer decile, cohort retention, RFM distribution map. |
+| 6 | Regional Analysis | How do the nine markets compare? Includes a Deneb / Vega-Lite choropleth. |
+| 7 | Customer Drillthrough (hidden) | What does one specific customer look like? Reached by drillthrough from any customer context. |
 
-## Repository structure
+## Built like production
 
-```
-rfm-customer-segmentation-kupferkanne/
-├── README.md                  This file
-├── CHANGELOG.md               Release notes
-├── LICENSE
-├── .gitignore
-├── .sqlfluff                  Linter config (BigQuery dialect)
-│
-├── docs/                      Public documentation
-│   ├── architecture.md        System overview, tech stack, pipeline flow
-│   ├── data_model.md          Kimball star schema, ERD, dual-grain layer
-│   ├── methodology.md         RFM approach, EDA, margin, validation
-│   ├── measures.md            DAX measure catalogue
-│   ├── glossary.md            Domain terminology
-│   └── adr/                   Twelve Architecture Decision Records
-│
-├── sql/                       Nine-step pipeline (idempotent, lint-clean)
-├── pbip/                      Power BI project (PBIP / TMDL)
-├── theme/                     Power BI theme JSON
-├── data/                      Eighty monthly CSV shards from synth-datagen
-├── scripts/                   Python ingest utility
-├── graphics/                  Fluent UI icons + attribution
-├── tools/                     SQL blank-line analyzer (lint helper)
-└── screenshots/               Dashboard previews
-```
+- **Model as code.** The Power BI model ships in PBIP/TMDL format: 104 measures, 12 tables and 7 single-direction relationships live as plain text, diffable and reviewable like any other source. [`docs/measures.md`](docs/measures.md) is the synced catalogue, kept honest by a standing rule: any model change triggers a Best Practice Analyzer run and a docs sync in the same session.
+- **SQL that expects to be re-run.** Nine idempotent GoogleSQL scripts (audit → standardise → clean → validate → EDA → RFM transform → line-grain BI fact → BI customer dimension → analytics marts), SQLFluff lint-clean under a documented exception policy. Exploration runs *before* transformation, so segmentation thresholds come from observed distributions, not assumptions. ([ADR 0003](docs/adr/0003-pipeline-order-eda-before-transform.md))
+- **Regression invariants.** Canonical KPIs (Revenue 8,531,365.52 / Customers 14,967) are baselined and re-asserted after pipeline changes – a refactor cannot silently bend a number.
+- **Decisions on the record.** Fourteen architecture decision records, including two that were later superseded and deliberately kept in place – the model's history is part of the artifact. ([`docs/adr/`](docs/adr/))
+- **Dirty data on purpose.** The source is generated by [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) with seeded real-world defects – duplicate orders, cents-format inconsistency, orphan keys, type drift, header-row contamination – so the cleaning layer solves problems that actually occur in production. ([ADR 0008](docs/adr/0008-synthetic-data-with-realistic-quality-issues.md))
 
-`data/` contains 80 monthly CSV shards from `synth-datagen`, used as raw input for the BigQuery ingestion script. The cleaning, staging, and curation layers live in BigQuery (`kupferkanne-2026.sales`), not on the filesystem.
+## Repository map
 
-## SQL pipeline
+| Path | Contents |
+|---|---|
+| `sql/` | Nine-step BigQuery pipeline, numbered in execution order (`00_0` audit → `05` marts) + 2 standalone analytical views |
+| `pbip/` | Power BI project: report definition (PBIR) + semantic model (TMDL) |
+| `docs/` | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/` |
+| `notebooks/` | Quarto EDA notebook – analytical companion to the SQL EDA views |
+| `harness/` | KPI regression harness – baseline + verify for the canonical KPIs |
+| `scripts/` | BigQuery loader (schema-enforced ingest) |
+| `data/` | Source CSV shards (80 files, committed for reproducibility) |
+| `tools/` | Diagnostic DAX queries + Tabular Editor batch scripts |
 
-The pipeline runs in nine numbered steps. Each step is idempotent (`CREATE OR REPLACE` for views, `DROP+CREATE` for partitioned tables) so the full chain is re-runnable from any point (except step 5, pending the EDA rewrite).
+## Reproduce it
 
-| # | Script | Purpose | Output |
-|---|---|---|---|
-| 1 | `sql/00_0_data_quality_audit_raw_kupferkanne_2026.sql` | Pre-clean audit (29 checks) | `data_quality_audit_raw` |
-| 2 | `sql/00_1_standardize_dimensions_kupferkanne_2026.sql` | Dimension standardisation | `v_dim_customers_std`, `v_dim_products_std` |
-| 3 | `sql/01_0_data_cleaning_pipeline_kupferkanne_2026.sql` | Parallel cleaning streams | 7 staging tables + `cleaning_log` |
-| 4 | `sql/01_1_post_clean_validation_kupferkanne_2026.sql` | Post-clean audit (same 29 checks) | `data_quality_audit_cleaned` |
-| 5 | `sql/02_eda_kupferkanne_2026.sql` | Eight EDA views | `eda_*` views |
-| 6 | `sql/03_rfm_pipeline_kupferkanne_2026.sql` | Order-grain curation + NTILE(5) RFM scoring | `sales_curated`, `rfm_customer_segments`, `v_rfm_for_bi` |
-| 7 | `sql/04_items_for_bi_kupferkanne_2026.sql` | Line-grain fact view | `v_items_for_bi` |
-| 8 | `sql/04_5_dim_customers_for_bi_kupferkanne_2026.sql` | BI-facing customer dimension | `v_dim_customers_for_bi` |
-| 9 | `sql/05_analytics_marts_kupferkanne_2026.sql` | Six pre-aggregated BI views | `v_monthly_revenue`, `v_product_performance`, `v_brand_profitability`, `v_regional_performance`, `v_category_monthly_trend`, `v_country_summary` |
+1. **Generate the data.** [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) produces the 80 CSV shards deterministically from a seed (~460K records, ~22 MB).
+2. **Load to BigQuery.** One dataset (`kupferkanne-2026.sales`) with monthly-sharded fact tables (`orders20YYMM`, `items20YYMM`) plus two dimension tables. The free BigQuery sandbox covers the entire project – no billing account required.
+3. **Run the pipeline.** Execute the `sql/` scripts in numeric order. Every script is idempotent (`CREATE OR REPLACE` for views, `DROP TABLE IF EXISTS` + `CREATE TABLE` for partitioned tables), so re-runs are safe.
+4. **Open the report.** Open the `.pbip` in Power BI Desktop, authenticate the BigQuery connector (OAuth), and refresh.
 
-Two standalone view scripts – `v_cohort_retention` and `v_revenue_new_returning` – run after the main chain, downstream of `sales_curated`, to feed the Page 5 lifecycle visuals.
+## Scope, honestly
 
-**Why EDA before RFM transform**: exploratory analysis informs segmentation design (NTILE bucket count, recency anchor, outlier handling). The pipeline runs EDA on cleaned staging data before the RFM transform, not after. See [ADR 0003](docs/adr/0003-pipeline-order-eda-before-transform.md).
+- The company and its data are synthetic by design; the figures are real outputs of the pipeline, not market claims.
+- The pipeline runs manually per session. Orchestration (Dataform, dbt) was considered and consciously deferred – see the [CHANGELOG roadmap](CHANGELOG.md).
+- The What-If reactivation scenario is first-order and gross (no discount netting); it is labelled as a scenario, not a forecast, wherever it appears.
+- Import mode and a single-developer workflow: simplicity was chosen over enterprise plumbing wherever the plumbing adds no analytical signal.
 
-## Architecture Decision Records
+## Documentation
 
-Strategic decisions follow the [Michael Nygard format](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions): Context, Decision, Consequences, Alternatives.
+| Document | What it covers |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | System overview, tech stack, pipeline flow |
+| [`docs/data_model.md`](docs/data_model.md) | Star schema, ERD, table specifications |
+| [`docs/methodology.md`](docs/methodology.md) | RFM approach, segmentation, margin calculation |
+| [`docs/measures.md`](docs/measures.md) | Full DAX measure catalogue (104 measures) |
+| [`docs/glossary.md`](docs/glossary.md) | Domain terminology |
+| [`docs/adr/`](docs/adr/) | Fourteen architecture decision records |
+| [`CHANGELOG.md`](CHANGELOG.md) | Release history and roadmap |
 
-| # | Title | Status |
-|---|---|---|
-| [0001](docs/adr/0001-end-to-end-engineering-as-operating-standard.md) | End-to-end engineering as operating standard | Accepted |
-| [0002](docs/adr/0002-bigquery-as-data-warehouse.md) | BigQuery as data warehouse | Accepted |
-| [0003](docs/adr/0003-pipeline-order-eda-before-transform.md) | Pipeline order: EDA before transform | Accepted |
-| [0004](docs/adr/0004-star-schema-with-conformed-dimensions.md) | Star schema with conformed dimensions | Accepted |
-| [0005](docs/adr/0005-dual-grain-fact-model.md) | Dual-grain fact model (order + line) | Accepted |
-| [0006](docs/adr/0006-rfm-segmentation-with-ntile.md) | RFM segmentation with `NTILE(5)` | Accepted |
-| [0007](docs/adr/0007-two-tier-margin-calculation.md) | Two-tier margin calculation | Accepted |
-| [0008](docs/adr/0008-synthetic-data-with-realistic-quality-issues.md) | Synthetic data with realistic quality issues | Accepted |
-| 0009 | Analytical notebook with Quarto | Reserved (planned) |
-| [0010](docs/adr/0010-segment-dimensions-separation.md) | Segment dimensions separation | Superseded by 0013 |
-| [0011](docs/adr/0011-bidirectional-customer-satellite-relationship.md) | Bidirectional customer-satellite relationship | Superseded by 0012 |
-| [0012](docs/adr/0012-single-direction-customer-topology.md) | Single-direction customer topology | Accepted |
-| [0013](docs/adr/0013-unified-segment-dimension.md) | Unified segment dimension | Accepted |
+---
 
-## Reproducibility
-
-The Python environment for the ingest utility is managed with [uv](https://docs.astral.sh/uv/) and pinned to Python 3.12 (`pyproject.toml` + `uv.lock`).
-
-1. **Set up the Python environment** (creates `.venv` from the lock file):
-   ```bash
-   uv sync
-   ```
-2. **Authenticate to Google Cloud** with Application Default Credentials:
-   ```bash
-   gcloud auth application-default login
-   ```
-3. **Raw data**: the 80 monthly CSV shards are committed in `data/`, so no generation step is required. To regenerate them from scratch instead, use the companion [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) CLI:
-   ```bash
-   pip install synth-datagen
-   synth-datagen --scenario retail --seed <SEED>
-   ```
-4. **Ingest into BigQuery** with schema enforcement (defaults shown; override with flags):
-   ```bash
-   uv run python scripts/upload_to_bigquery_schema_enforced.py --data-dir ./data --project kupferkanne-2026 --dataset sales
-   ```
-5. **Run the SQL pipeline** in step order, from `00_0` through `05_analytics_marts` (see the SQL pipeline table above). Each script is idempotent; downstream steps consume upstream outputs by name.
-6. **Open** the Power BI project in `pbip/` with Power BI Desktop and refresh against your BigQuery dataset.
-
-The full dataset is regenerable from a single seed value; pipeline runs are byte-identical given the same inputs.
-
-## Dashboard preview
-
-The dashboard spans six analytical pages – Executive Summary, Segment Deep Dive, Product & Brand, Churn Risk & What-If, Customer Lifecycle Intelligence, and Regional Analysis – plus a Customer Drillthrough target page. Screenshots will be added to `screenshots/` as pages reach final polish. The Power BI project (PBIP / TMDL format) lives in `pbip/`.
-
-A web-published version will be hosted on [NovyPro](https://novypro.com/profile_projects/ryszard-twardy) after the dashboard completes.
-
-## Roadmap
-
-- **v1.2.0** – Quarto analytical notebook (`eda_kupferkanne.qmd`) companion to the SQL EDA views, rendered to HTML and published via GitHub Pages.
-- **Planned** – Customer Drillthrough detail page (customer-level drill target).
-- **Considered** – pipeline orchestration via Dataform or scheduled queries; `dbt` migration; Sankey migration-flow visual on Page 5.
-
-See [CHANGELOG.md](CHANGELOG.md) for full history.
-
-## Documentation map
-
-- [Architecture](docs/architecture.md) – system overview, tech stack, pipeline flow.
-- [Data model](docs/data_model.md) – Kimball star schema, ERD, dual-grain layer.
-- [Methodology](docs/methodology.md) – RFM approach, EDA, margin, validation.
-- [Measures](docs/measures.md) – DAX measure catalogue.
-- [Glossary](docs/glossary.md) – domain terminology.
-- [ADRs](docs/adr/) – twelve Architecture Decision Records.
-
-## About
-
-Built by **Ryszard Twardy**. Connect on [LinkedIn](https://linkedin.com/in/ryszard-twardy/) or browse other projects on [NovyPro](https://novypro.com/profile_projects/ryszard-twardy).
-
-Companion data generator: [synth-datagen](https://github.com/ryszard-twardy/synth-datagen).
-
-## License
-
-[MIT](LICENSE).
+**Ryszard Twardy** – Data Analyst, Erlangen (DE)
+[LinkedIn](https://linkedin.com/in/ryszard-twardy/) · [GitHub](https://github.com/ryszard-twardy)
