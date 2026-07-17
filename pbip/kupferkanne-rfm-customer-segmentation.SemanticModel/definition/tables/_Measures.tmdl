@@ -1155,18 +1155,28 @@ table _Measures
 		displayFolder: 02 - RFM Scores
 		lineageTag: 3c94c0b7-1607-4901-9d6f-405d6b0bace5
 
-	/// Total Revenue over the trailing 12 months ending at the current date context (EUR); blank past the last sales date.
+	/// Total Revenue over the trailing 12 months ending at the date context (EUR); blank past the last sales date and before the first full 12-month trailing window.
 	measure 'Revenue Rolling 12M' =
 			
+			VAR FirstSalesDate =
+			    CALCULATE ( MIN ( sales_curated[Order Date] ), REMOVEFILTERS () )
 			VAR LastSalesDate =
 			    CALCULATE ( MAX ( sales_curated[Order Date] ), REMOVEFILTERS () )
+			VAR PointDate =
+			    MAX ( dim_Date[Date] )
+			VAR WindowStart =
+			    EDATE ( PointDate, -12 ) + 1
 			VAR Result =
 			    CALCULATE (
 			        [Total Revenue],
-			        DATESINPERIOD ( dim_Date[Date], MAX ( dim_Date[Date] ), -12, MONTH )
+			        DATESINPERIOD ( dim_Date[Date], PointDate, -12, MONTH )
 			    )
 			RETURN
-			    IF ( MIN ( dim_Date[Date] ) <= LastSalesDate, Result )
+			    IF (
+			        MIN ( dim_Date[Date] ) <= LastSalesDate
+			            && WindowStart >= FirstSalesDate,
+			        Result
+			    )
 		formatString: "€"#,##0;-"€"#,##0
 		displayFolder: 04 - Time Intelligence
 		lineageTag: 8a1aae11-13e9-49a1-a612-40231ae60e1f

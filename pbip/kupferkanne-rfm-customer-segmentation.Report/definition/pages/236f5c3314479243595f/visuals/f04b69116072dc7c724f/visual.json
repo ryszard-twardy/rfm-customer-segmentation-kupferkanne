@@ -70,6 +70,34 @@
         "isDefaultSort": true
       }
     },
+    "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -203,7 +231,7 @@
             "right": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "10D"
                 }
               }
             }

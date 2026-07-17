@@ -277,6 +277,33 @@
             "metadata": "_Measures.Revenue Rolling 12M"
           }
         }
+      ],
+      "y2Axis": [
+        {
+          "properties": {
+            "secStart": {
+              "expr": {
+                "Literal": {
+                  "Value": "2000000D"
+                }
+              }
+            },
+            "secShowAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "secEnd": {
+              "expr": {
+                "Literal": {
+                  "Value": "3000000D"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -429,7 +456,7 @@
             "right": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "10D"
                 }
               }
             }

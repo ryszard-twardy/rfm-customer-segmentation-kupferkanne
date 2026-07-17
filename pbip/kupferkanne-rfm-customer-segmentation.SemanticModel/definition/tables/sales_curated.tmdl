@@ -53,13 +53,14 @@ table sales_curated
 	column 'Order Value'
 		dataType: double
 		isHidden
+		formatString: "€"#,##0;-"€"#,##0
 		lineageTag: 863007ba-c825-4b25-8400-775f0102a7bf
 		summarizeBy: none
 		sourceColumn: Order Value
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+		annotation PBI_FormatHint = {"isCustom":true}
 
 	column 'Order Cost'
 		dataType: double
@@ -84,13 +85,12 @@ table sales_curated
 
 	column 'Order Margin %'
 		dataType: double
+		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 2421be9e-387d-4860-abe9-fb5e321f3d60
 		summarizeBy: none
 		sourceColumn: Order Margin %
 
 		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column 'Total Units'
 		dataType: int64
