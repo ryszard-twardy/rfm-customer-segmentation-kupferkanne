@@ -239,9 +239,9 @@ SUM ( v_revenue_new_returning[Revenue] )
 | Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 1, 2, 4 |
 | Customer Recency Days | `SELECTEDVALUE(dim_Customer[Recency Days])` | `#,##0 "days"` | 7 |
 | Customer Health Score | `SELECTEDVALUE(dim_Customer[Health Score])` | `0 "/ 15"` | 7 |
-| Customer RFM Label | R/F/M score triplet of the drilled customer (see body) | Text | 7 |
+| Customer RFM Label | VAR pattern – see formula block below | Text | 7 |
 
-The `Customer *` measures are single-customer drillthrough readouts (Page 7); each is `BLANK` unless exactly one `dim_Customer` row is in context.
+The `Customer *` measures are single-customer drillthrough readouts for Page 7 (Customer Drillthrough) – a page hidden by design, reached from any customer context rather than shown as its own tab; each is `BLANK` unless exactly one `dim_Customer` row is in context.
 
 ```dax
 Customer RFM Label =

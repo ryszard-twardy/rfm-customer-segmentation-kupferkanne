@@ -13,7 +13,7 @@ Kupferkanne is a portfolio-grade retail analytics demonstration showing how a si
 │                  │    │  + 9-step SQL    │    │   (Import mode)  │
 └──────────────────┘    └──────────────────┘    └──────────────────┘
    80 CSV files            25 BQ objects           7-page dashboard
-   ~460K records           (11 tables + 14 views)  7 pages, 70 DAX
+   ~460K records           (11 tables + 14 views)  7 pages, 104 DAX
 ```
 
 _Object counts reflect the live warehouse. The eight EDA views defined in `sql/02_eda` are pending a rewrite against the restructured staging schema._
@@ -42,4 +42,4 @@ The data model uses a Kimball-style star schema with two conformed dimensions an
 - [methodology.md](methodology.md) – RFM approach, segmentation, margin calculation
 - [measures.md](measures.md) – DAX measure catalogue
 - [glossary.md](glossary.md) – domain terminology
-- [adr/](adr/) – twelve architecture decision records
+- [adr/](adr/) – fourteen architecture decision records

@@ -49,7 +49,7 @@ erDiagram
 | Table | Rows | Purpose |
 |---|---|---|
 | `dim_customers` | ~15,000 | Customer master with country, city, signup date |
-| `dim_products` | 60 | Product catalogue across 5 brands and 4 categories |
+| `dim_products` | 60 | Product catalogue across 5 brands and 6 categories |
 
 ### Facts (sharded by month, Jan 2023 – Mar 2026)
 
