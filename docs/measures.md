@@ -1,5 +1,5 @@
 # DAX Measures Reference
-## Kupferkanne – 104 DAX Measures (103 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 109 DAX Measures (108 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 
 > Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
@@ -57,14 +57,14 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 50 of 104 measures carry an explicit `FormatString`. The 54 without: 53 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 55 of 109 measures carry an explicit `FormatString`. The 54 without: 53 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
 
 **Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13 at the time; the flags that remained are all intentional (text measures + the one `SWITCH`-format `[Dynamic KPI Selector]`). The rule now reports 54 as further text measures have been added since (the 54 without-format measures noted above), all intentional.
 
-**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 10 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`. The one 1dp (`0.0%`) exception is `Revenue YoY %` (added with the #31 time-intelligence pair), a Page 1 trend-tooltip reading where a single decimal is sufficient for a year-over-year delta.
+**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three Page 1 year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
 
 ### Column Behavior: SummarizeBy = None
 
@@ -372,6 +372,11 @@ RETURN
 | Revenue Dormant (180d+) | € 0dp | 4 |
 | Revenue Rolling 12M | € 0dp | 1 |
 | Revenue YoY % | % 1dp | 1 |
+| Profit YoY % | % 1dp | 1 |
+| Profit Margin YoY (pp) | % 1dp | 1 |
+| Revenue PY | € 2dp | 1 |
+| Profit PY | € 2dp | 1 |
+| Profit Margin PY | % 2dp | 1 |
 
 ```dax
 Revenue Active =
@@ -431,6 +436,56 @@ VAR PriorRevenue =
     )
 RETURN
     DIVIDE ( CurrentRevenue - PriorRevenue, PriorRevenue )
+```
+
+`[Profit YoY %]` – year-over-year change of Total Profit vs the same period last year; shown as the prior-year reference on the Page 1 profit KPI card (the current open month reads low against a full prior-year month).
+
+```dax
+Profit YoY % =
+VAR CurrentProfit = [Total Profit]
+VAR PriorProfit =
+    CALCULATE (
+        [Total Profit],
+        SAMEPERIODLASTYEAR ( dim_Date[Date] )
+    )
+RETURN
+    DIVIDE ( CurrentProfit - PriorProfit, PriorProfit )
+```
+
+`[Profit Margin YoY (pp)]` – year-over-year change in the revenue-weighted profit margin vs the same period last year, as a percentage-point delta (stored as a ratio, so 0.02 renders 2.0%); shown as the prior-year reference on the Page 1 margin KPI card.
+
+```dax
+Profit Margin YoY (pp) =
+VAR CurrentMargin = [Profit Margin %]
+VAR PriorMargin =
+    CALCULATE (
+        [Profit Margin %],
+        SAMEPERIODLASTYEAR ( dim_Date[Date] )
+    )
+RETURN
+    IF ( NOT ISBLANK ( PriorMargin ), CurrentMargin - PriorMargin )
+```
+
+`[Revenue PY]`, `[Profit PY]`, `[Profit Margin PY]` – prior-year values of Total Revenue, Total Profit, and the revenue-weighted profit margin for the same period; each feeds the prior-year reference label on its Page 1 KPI card. All the time-intelligence measures above blank naturally in the first sales year, where there is no prior period, matching `[Revenue YoY %]`.
+
+```dax
+Revenue PY =
+CALCULATE (
+    [Total Revenue],
+    SAMEPERIODLASTYEAR ( dim_Date[Date] )
+)
+
+Profit PY =
+CALCULATE (
+    [Total Profit],
+    SAMEPERIODLASTYEAR ( dim_Date[Date] )
+)
+
+Profit Margin PY =
+CALCULATE (
+    [Profit Margin %],
+    SAMEPERIODLASTYEAR ( dim_Date[Date] )
+)
 ```
 
 ---
@@ -971,7 +1026,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 104 measures – 103 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 109 measures – 108 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
 
 ---
 

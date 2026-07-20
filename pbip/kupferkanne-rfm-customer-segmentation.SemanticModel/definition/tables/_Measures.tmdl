@@ -1196,6 +1196,69 @@ table _Measures
 		displayFolder: 04 - Time Intelligence
 		lineageTag: af2a1c88-dad3-4e14-82d6-f0c5873a92dd
 
+	/// Year-over-year change in Total Profit vs the same period last year; the current open month reads low against a full prior-year month, shown as the prior-year reference on the Page 1 profit KPI card.
+	measure 'Profit YoY %' =
+			
+			VAR CurrentProfit = [Total Profit]
+			VAR PriorProfit =
+			    CALCULATE (
+			        [Total Profit],
+			        SAMEPERIODLASTYEAR ( dim_Date[Date] )
+			    )
+			RETURN
+			    DIVIDE ( CurrentProfit - PriorProfit, PriorProfit )
+		formatString: 0.0%
+		displayFolder: 04 - Time Intelligence
+		lineageTag: 4fc1367b-9c92-47c5-97e6-9c47cf186fbb
+
+	/// Year-over-year change in the revenue-weighted profit margin vs the same period last year, expressed as a percentage-point delta; shown as the prior-year reference on the Page 1 margin KPI card.
+	measure 'Profit Margin YoY (pp)' =
+			
+			VAR CurrentMargin = [Profit Margin %]
+			VAR PriorMargin =
+			    CALCULATE (
+			        [Profit Margin %],
+			        SAMEPERIODLASTYEAR ( dim_Date[Date] )
+			    )
+			RETURN
+			    IF ( NOT ISBLANK ( PriorMargin ), CurrentMargin - PriorMargin )
+		formatString: 0.0%
+		displayFolder: 04 - Time Intelligence
+		lineageTag: 73d0efb0-7a45-41f5-9cdb-94ce73bd675b
+
+	/// Prior-year value of Total Revenue for the same period (EUR); shown as the prior-year reference on the Page 1 revenue KPI card.
+	measure 'Revenue PY' =
+			
+			CALCULATE (
+			    [Total Revenue],
+			    SAMEPERIODLASTYEAR ( dim_Date[Date] )
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 04 - Time Intelligence
+		lineageTag: 25267c83-4a31-4ee9-9c5a-e2aba10c278d
+
+	/// Prior-year value of Total Profit for the same period (EUR); shown as the prior-year reference on the Page 1 profit KPI card.
+	measure 'Profit PY' =
+			
+			CALCULATE (
+			    [Total Profit],
+			    SAMEPERIODLASTYEAR ( dim_Date[Date] )
+			)
+		formatString: "€"#,##0.00;-"€"#,##0.00
+		displayFolder: 04 - Time Intelligence
+		lineageTag: 03af0f46-8c22-4cfc-8914-2dcd9415b7cb
+
+	/// Prior-year value of the revenue-weighted profit margin for the same period; shown as the prior-year reference on the Page 1 margin KPI card.
+	measure 'Profit Margin PY' =
+			
+			CALCULATE (
+			    [Profit Margin %],
+			    SAMEPERIODLASTYEAR ( dim_Date[Date] )
+			)
+		formatString: 0.00%
+		displayFolder: 04 - Time Intelligence
+		lineageTag: 566f82e1-408f-42be-b6af-d4a1d948f969
+
 	column x
 		isHidden
 		formatString: 0

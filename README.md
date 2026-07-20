@@ -33,7 +33,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 │                  │     │  9-step SQL      │     │   PBIP / TMDL    │
 └──────────────────┘     └──────────────────┘     └──────────────────┘
   80 CSV shards            audit → clean →          7-page report
-  ~460K raw records        EDA → RFM → marts        104 DAX measures
+  ~460K raw records        EDA → RFM → marts        109 DAX measures
   seeded defects           Kimball star schema      model as code
 ```
 
@@ -45,7 +45,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 | Orders | 168,777 order-grain rows; ~275K line-grain rows |
 | Catalogue | 60 products, 5 brands, 6 categories |
 | Window | 2023-01 to 2026-03 (39 months), 9 European markets |
-| Semantic model | 104 DAX measures, 12 tables, 7 relationships (all single-direction) |
+| Semantic model | 109 DAX measures, 12 tables, 7 relationships (all single-direction) |
 
 ## The method
 
@@ -69,7 +69,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 
 ## Built like production
 
-- **Model as code.** The Power BI model ships in PBIP/TMDL format: 104 measures, 12 tables and 7 single-direction relationships live as plain text, diffable and reviewable like any other source. [`docs/measures.md`](docs/measures.md) is the synced catalogue, kept honest by a standing rule: any model change triggers a Best Practice Analyzer run and a docs sync in the same session.
+- **Model as code.** The Power BI model ships in PBIP/TMDL format: 109 measures, 12 tables and 7 single-direction relationships live as plain text, diffable and reviewable like any other source. [`docs/measures.md`](docs/measures.md) is the synced catalogue, kept honest by a standing rule: any model change triggers a Best Practice Analyzer run and a docs sync in the same session.
 - **SQL that expects to be re-run.** Nine idempotent GoogleSQL scripts (audit → standardise → clean → validate → EDA → RFM transform → line-grain BI fact → BI customer dimension → analytics marts), SQLFluff lint-clean under a documented exception policy. Exploration runs *before* transformation, so segmentation thresholds come from observed distributions, not assumptions. ([ADR 0003](docs/adr/0003-pipeline-order-eda-before-transform.md))
 - **Regression invariants.** Canonical KPIs (Revenue 8,531,365.52 / Customers 14,967) are baselined and re-asserted after pipeline changes – a refactor cannot silently bend a number.
 - **Decisions on the record.** Fourteen architecture decision records, including two that were later superseded and deliberately kept in place – the model's history is part of the artifact. ([`docs/adr/`](docs/adr/))
@@ -109,7 +109,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 | [`docs/architecture.md`](docs/architecture.md) | System overview, tech stack, pipeline flow |
 | [`docs/data_model.md`](docs/data_model.md) | Star schema, ERD, table specifications |
 | [`docs/methodology.md`](docs/methodology.md) | RFM approach, segmentation, margin calculation |
-| [`docs/measures.md`](docs/measures.md) | Full DAX measure catalogue (104 measures) |
+| [`docs/measures.md`](docs/measures.md) | Full DAX measure catalogue (109 measures) |
 | [`docs/glossary.md`](docs/glossary.md) | Domain terminology |
 | [`docs/adr/`](docs/adr/) | Fourteen architecture decision records |
 | [`CHANGELOG.md`](CHANGELOG.md) | Release history and roadmap |
