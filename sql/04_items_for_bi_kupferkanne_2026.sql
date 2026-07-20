@@ -10,7 +10,9 @@
 -- Grain: one row per order line (~275K rows)
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_items_for_bi` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_items_for_bi`
+OPTIONS (description = 'BI-facing order-line fact carrying quantity, line net amount, line profit, and margin, keyed to customer, product, and order date.')  -- noqa: LT05
+AS
 SELECT
     i.order_id,
     i.product_id,

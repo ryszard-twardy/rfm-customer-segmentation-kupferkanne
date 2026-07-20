@@ -10,7 +10,9 @@
 --   kupferkanne-2026.sales.v_dim_products_std
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_dim_customers_std` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_dim_customers_std`
+OPTIONS (description = 'Standardized customer lookup that trims and null-normalizes raw customer master fields and derives full name; one row per customer.')  -- noqa: LT05
+AS
 SELECT
     NULLIF(TRIM(CAST(CustomerID AS STRING)), '') AS customer_id,
     SAFE_CAST(NULLIF(TRIM(CAST(SignupDate AS STRING)), '') AS DATE) AS signup_date,
@@ -37,7 +39,9 @@ SELECT
     NULLIF(TRIM(CAST(Address AS STRING)), '') AS address
 FROM `kupferkanne-2026.sales.dim_customers`;
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_dim_products_std` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_dim_products_std`
+OPTIONS (description = 'Standardized product lookup that trims raw product attributes and casts retail price, unit cost, and margin to numeric; one row per product.')  -- noqa: LT05
+AS
 SELECT
     NULLIF(TRIM(CAST(ProductID AS STRING)), '') AS product_id,
     NULLIF(TRIM(CAST(ProductName AS STRING)), '') AS product_name,

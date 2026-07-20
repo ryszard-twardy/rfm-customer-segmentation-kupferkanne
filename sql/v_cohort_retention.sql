@@ -2,7 +2,9 @@
 -- ADR: adr/0003 (pipeline order) + methodology.md (cohort retention logic)
 -- Retention rate by acquisition cohort x months since first purchase
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_cohort_retention` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_cohort_retention`
+OPTIONS (description = 'Retention rate by acquisition-month cohort and months since first purchase.')  -- noqa: LT05
+AS
 WITH first_purchase AS (
     SELECT
         customer_id,

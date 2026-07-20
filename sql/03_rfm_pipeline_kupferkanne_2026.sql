@@ -147,7 +147,9 @@ SELECT
 FROM scored;
 
 -- STEP 3: SEMANTIC VIEWS -------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_rfm_for_bi` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_rfm_for_bi`
+OPTIONS (description = 'BI-facing customer RFM snapshot: recency, frequency, monetary value, R/F/M scores, health score, segment, and recommended action per customer.')  -- noqa: LT05
+AS
 SELECT
     customer_id,
     data_as_of_date AS analysis_date,
@@ -172,7 +174,9 @@ SELECT
     recommended_action AS action
 FROM `kupferkanne-2026.sales.rfm_customer_segments`;
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_analytics` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_analytics`
+OPTIONS (description = 'BI-facing order-line fact enriched with product, category, and brand plus line-level revenue, cost, and profit.')  -- noqa: LT05
+AS
 SELECT
     sc.order_id,
     sc.customer_id,

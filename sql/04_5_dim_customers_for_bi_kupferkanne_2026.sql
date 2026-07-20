@@ -45,7 +45,9 @@
 -- structural: s.* plus r.* EXCEPT (...) makes parity guaranteed by
 -- construction, so new columns added to either source view flow through
 -- without requiring this file to be edited in lockstep.
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_dim_customers_for_bi` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_dim_customers_for_bi`
+OPTIONS (description = 'BI-facing conformed customer dimension joining standardized master attributes with RFM segment and recency; one row per customer.')  -- noqa: LT05
+AS
 SELECT
     s.*,
     r.* EXCEPT (customer_id, country, state, city)

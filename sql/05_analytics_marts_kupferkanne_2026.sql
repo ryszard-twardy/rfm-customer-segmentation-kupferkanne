@@ -44,7 +44,9 @@
 -- Note: Incomplete (current) month is excluded – see CHANGELOG v2.
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_monthly_revenue` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_monthly_revenue`
+OPTIONS (description = 'Monthly revenue, profit, margin, orders, and active customers over complete months only; the trailing partial month is excluded using the dataset max order date, not the calendar date.')  -- noqa: LT05
+AS
 WITH data_boundary AS (
     -- Anchor: last order_date in dataset (not CURRENT_DATE)
     -- Same principle as RFM recency anchor – ensures reproducible output
@@ -85,7 +87,9 @@ GROUP BY 1, 2, 3, 4;
 -- VIEW 2: Product Performance (unchanged)
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_performance` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_performance`
+OPTIONS (description = 'Per-product revenue, units sold, cost, profit, and margin, with revenue and units ranks overall and within product category.')  -- noqa: LT05
+AS
 SELECT
     p.product_id,
     p.product_name,
@@ -126,7 +130,9 @@ GROUP BY
 -- VIEW 3: brand Profitability (unchanged)
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_brand_profitability` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_brand_profitability`
+OPTIONS (description = 'Per-brand product count, units sold, revenue, cost, profit, margin, and revenue share.')  -- noqa: LT05
+AS
 SELECT
     p.brand,
     COUNT(DISTINCT p.product_id) AS product_count,
@@ -151,7 +157,9 @@ GROUP BY p.brand;
 -- VIEW 4: Regional Performance (unchanged)
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_regional_performance` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_regional_performance`
+OPTIONS (description = 'Revenue, profit, margin, revenue per customer, and revenue share by country, state, and city.')  -- noqa: LT05
+AS
 SELECT
     country,
     state,
@@ -177,7 +185,9 @@ GROUP BY country, state, city;
 -- Uses same anchor logic as v_monthly_revenue for consistency.
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_category_monthly_trend` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_category_monthly_trend`
+OPTIONS (description = 'Monthly revenue, units, profit, and margin by product category and brand over complete months only; the trailing partial month is excluded using the dataset max order date.')  -- noqa: LT05
+AS
 WITH data_boundary AS (
     SELECT MAX(order_date) AS last_order_date
     FROM `kupferkanne-2026.sales.sales_curated`
@@ -219,7 +229,9 @@ GROUP BY 1, 2, 3, 4;
 -- VIEW 6: country Summary (unchanged)
 -- ============================================================================
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_country_summary` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_country_summary`
+OPTIONS (description = 'Country-level customers, orders, revenue, profit, margin, revenue per customer, and revenue share.')  -- noqa: LT05
+AS
 SELECT
     country,
     COUNT(DISTINCT customer_id) AS customers,

@@ -4,7 +4,9 @@
 --   New       = revenue in a customer's first-purchase month
 --   Returning = revenue in any later month
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_revenue_new_returning` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_revenue_new_returning`
+OPTIONS (description = 'Monthly revenue and active customers split into New (first-purchase month) versus Returning (any later month).')  -- noqa: LT05
+AS
 WITH first_purchase AS (
     SELECT
         customer_id,

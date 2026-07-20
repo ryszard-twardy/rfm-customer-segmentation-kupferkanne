@@ -37,7 +37,9 @@
 --            large gap between P90 and P99 indicates a long tail (whales).
 -- -----------------------------------------------------------------------------
 
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_order_value_distribution` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_order_value_distribution`
+OPTIONS (description = 'Exploratory percentile distribution (P10 to P99, plus min, max, mean) of per-order value, used to size the RFM Monetary bins.')  -- noqa: LT05
+AS
 WITH order_values AS (
     SELECT
         o.order_id,
@@ -70,7 +72,9 @@ FROM order_values;
 -- Reading:   Review outliers for plausibility. If artifacts, address in the
 --            cleaning layer. If legitimate, ensure RFM Monetary captures them.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_order_value_outliers` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_order_value_outliers`
+OPTIONS (description = 'Exploratory list of orders above the 99th-percentile value threshold, showing each order value as a multiple of P99, for outlier review.')  -- noqa: LT05
+AS
 WITH order_values AS (
     SELECT
         o.order_id,
@@ -112,7 +116,9 @@ ORDER BY ov.order_value DESC;
 -- Reading:   Identifies dominant markets by volume and high-value markets by
 --            AOV. Used to inform Regional dashboard page and filter design.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_country_breakdown` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_country_breakdown`
+OPTIONS (description = 'Exploratory order volume, customer count, average order value, and revenue share by customer country.')  -- noqa: LT05
+AS
 WITH order_values AS (
     SELECT
         o.order_id,
@@ -151,7 +157,9 @@ ORDER BY total_revenue DESC;
 -- Reading:   Look for seasonal patterns (e.g., Q4 lift), level shifts in
 --            recent months, and unexpected gaps.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_monthly_temporal_pattern` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_monthly_temporal_pattern`
+OPTIONS (description = 'Exploratory monthly order volume, active customers, revenue, and average order value, used to reveal seasonality and growth.')  -- noqa: LT05
+AS
 WITH order_values AS (
     SELECT
         o.order_id,
@@ -182,7 +190,9 @@ ORDER BY year_month;
 -- Reading:   If 80%+ of customers have exactly 1 order, Frequency loses
 --            signal. If spread is healthy, NTILE quintiles separate cleanly.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_customer_frequency_distribution` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_customer_frequency_distribution`
+OPTIONS (description = 'Exploratory distribution of order counts per customer, used to validate spread for the RFM Frequency quintiles.')  -- noqa: LT05
+AS
 WITH customer_orders AS (
     SELECT
         customer_id,
@@ -214,7 +224,9 @@ ORDER BY co.order_count;
 --            (the dataset ends in the past). MAX(order_date) preserves the
 --            true recency distribution. See ADR-0006 for full rationale.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_recency_distribution` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_recency_distribution`
+OPTIONS (description = 'Exploratory customer counts by days-since-last-order bucket, anchored on the dataset max order date, validating the recency anchor.')  -- noqa: LT05
+AS
 WITH anchor AS (
     SELECT MAX(order_date) AS data_as_of_date
     FROM `kupferkanne-2026.sales.stg_orders_validated`
@@ -255,7 +267,9 @@ ORDER BY recency_bucket;
 --            high-value segments for retention is well-justified. Lower
 --            concentration suggests a different strategic emphasis.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_pareto_concentration` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_pareto_concentration`
+OPTIONS (description = 'Exploratory revenue share by customer revenue decile, testing 80/20 concentration to guide retention focus.')  -- noqa: LT05
+AS
 WITH order_values AS (
     SELECT
         o.order_id,
@@ -313,7 +327,9 @@ ORDER BY r.revenue_decile;
 --            Power BI measure. Itemless orders stay visible here (LEFT JOIN,
 --            actual_line_count = 0) precisely because they are mismatches.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_basket_composition` AS
+CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_basket_composition`
+OPTIONS (description = 'Exploratory average items per order by country, cross-checking declared basket size against actual item lines as a data-quality signal.')  -- noqa: LT05
+AS
 WITH order_baskets AS (
     SELECT
         o.order_id,
