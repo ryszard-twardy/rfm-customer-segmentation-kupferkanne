@@ -72,7 +72,11 @@ desktop.ini
 
 # Cut P1: dead DDD-grilling husks kept local, not public
 /CONTEXT.md
-/docs/agents/domain.md
+
+# Agent tooling and config kept local, not public
+/docs/agents/
+.agents/
+skills-lock.json
 
 # Data / Python (workflow v3 data stack)
 .ipynb_checkpoints/

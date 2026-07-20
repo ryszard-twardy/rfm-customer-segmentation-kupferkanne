@@ -88,7 +88,7 @@ GROUP BY 1, 2, 3, 4;
 -- ============================================================================
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_product_performance`
-OPTIONS (description = 'Per-product revenue, units sold, cost, profit, and margin, with revenue and units ranks overall and within product category.')  -- noqa: LT05
+OPTIONS (description = 'One row per product: revenue, units, cost, profit, and margin with overall and within-category revenue and units ranks, to surface top and bottom performers.')  -- noqa: LT05
 AS
 SELECT
     p.product_id,
@@ -131,7 +131,7 @@ GROUP BY
 -- ============================================================================
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_brand_profitability`
-OPTIONS (description = 'Per-brand product count, units sold, revenue, cost, profit, margin, and revenue share.')  -- noqa: LT05
+OPTIONS (description = 'One row per brand: aggregated units, revenue, cost, profit, margin, and revenue share, to compare brand profitability and contribution to the range.')  -- noqa: LT05
 AS
 SELECT
     p.brand,
@@ -158,7 +158,7 @@ GROUP BY p.brand;
 -- ============================================================================
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_regional_performance`
-OPTIONS (description = 'Revenue, profit, margin, revenue per customer, and revenue share by country, state, and city.')  -- noqa: LT05
+OPTIONS (description = 'One row per country-state-city: revenue, profit, margin, revenue per customer, and revenue share, to rank geographies and feed the regional map and drill-down.')  -- noqa: LT05
 AS
 SELECT
     country,
@@ -230,7 +230,7 @@ GROUP BY 1, 2, 3, 4;
 -- ============================================================================
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.v_country_summary`
-OPTIONS (description = 'Country-level customers, orders, revenue, profit, margin, revenue per customer, and revenue share.')  -- noqa: LT05
+OPTIONS (description = 'One row per country: customers, orders, revenue, profit, margin, revenue per customer, and revenue share, for country-level comparison and the regional bar charts.')  -- noqa: LT05
 AS
 SELECT
     country,

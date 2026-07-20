@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Master agent configuration for `rfm-customer-segmentation-kupferkanne`. Read this file first when starting any session.
+Master configuration for `rfm-customer-segmentation-kupferkanne`. Read this file first when starting any session.
 
 ## Project
 
@@ -10,47 +10,35 @@ Master agent configuration for `rfm-customer-segmentation-kupferkanne`. Read thi
 - **Status**: v1.1.0 tagged; Customer Drillthrough page and Quarto analytical notebook ahead (see `CHANGELOG.md`).
 - **Primary objective**: RFM (Recency, Frequency, Monetary) customer segmentation for Kupferkanne e-commerce – BigQuery modeling + Power BI BI layer + Python pipelines.
 
-## How this repo works
+## Repository layout
 
-This repo follows the **workflow v3** convention. Key files and directories:
+| Location | Purpose |
+|---|---|
+| `sql/` | BigQuery pipeline and view DDL. |
+| `pbip/` | Power BI project: TMDL semantic model and report definition. |
+| `harness/` | Python KPI-parity harness (checks the model against BigQuery baselines); see `harness/README.md`. |
+| `notebooks/` | Quarto analytical notebook. |
+| `docs/` | Reviewer-facing narrative. |
+| `docs/adr/` | Architectural Decision Records. |
+| `.specify/memory/constitution-data.md` | Stack-specific invariants. |
 
-| Location | Purpose | Public? |
-|---|---|---|
-| `AGENTS.md` | This file. Master config. | ✅ |
-| `CLAUDE.md` | 3-line stub → redirects here. | ✅ |
-| `docs/adr/` | Architectural Decision Records. | ✅ |
-| `docs/agents/` | Per-repo mattpocock configuration. | ✅ |
-| `.specify/memory/constitution-data.md` | Stack-specific invariants. | ✅ |
+## Checks
 
-## Agent skills
+- SQL lint: `sqlfluff lint sql/ --dialect bigquery`
+- KPI-parity harness: see `harness/README.md`.
 
-### Issue tracker
+## Issue tracker
 
-GitHub Issues – operate via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+GitHub Issues, operated via the `gh` CLI.
 
-### Triage labels
+## Architectural decisions
 
-Canonical 5-role vocabulary + 4 type labels (workflow v3). See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Architectural decisions live in `docs/adr/`.
-
-### Configured skills
-
-- `/mp-triage`, `/mp-to-issues`, `/mp-to-prd` – consume `docs/agents/issue-tracker.md` + `docs/agents/triage-labels.md`
-- `/mp-handoff` – conversation compaction
-
-### Vendored Microsoft skills (Power BI / Fabric)
-
-Reference skills for Power BI and Fabric authoring are vendored in the vault at `$env:VAULT_ROOT\ai\vendor\microsoft-skills-for-fabric\skills\` (machine-local, not tracked in this repo – reference via the env-var path, never a hardcoded drive letter):
-
-- `semantic-model-authoring`, `powerbi-report-authoring` – implementation guidance for TMDL model and report-visual authoring.
-- `powerbi-report-design` – reviewer lens for report layout and visual-design critique.
+Recorded as ADRs in `docs/adr/`.
 
 ## Conventions
 
 - **Typography**: en-dash `–` (never em-dash `U+2014`), ASCII quotes only, backticks for code/paths/identifiers.
 - **Filesystem**: dot-prefix everywhere; underscore-prefixed directory names are legacy and must not appear.
+- **Report/model edits**: visual and report JSON edits are scripted; see `scripts/`.
 - **Backups**: `$env:PROJECTS_ROOT\.backups\rfm-customer-segmentation-kupferkanne\` (outside repo, per-machine).
 - **Cross-machine**: this repo syncs via git.

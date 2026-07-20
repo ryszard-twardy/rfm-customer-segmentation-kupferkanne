@@ -574,7 +574,7 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: 651b4502-be94-4783-827b-0c30a3a3fc73
 
-	/// Line-grain unit volume from v_items_for_bi; explicit SUM because F006 disables implicit aggregation on Quantity.
+	/// Line-grain unit volume from v_items_for_bi; explicit SUM because implicit aggregation is disabled on Quantity.
 	measure 'Line Quantity' =
 			
 			SUM ( v_items_for_bi[Quantity] )
@@ -647,7 +647,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 959ef8ce-a865-4b62-a72b-16887c5a08b3
 
-	/// Median of Recency Days in current filter context; P4 V3 vertical quadrant line.
+	/// Median of Recency Days in current filter context; Page 4 scatter quadrant line (vertical).
 	measure 'Median Recency Days' =
 			
 			MEDIAN ( dim_Customer[Recency Days] )
@@ -657,7 +657,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Median of Total Spend in current filter context; P4 V3 horizontal quadrant line.
+	/// Median of Total Spend in current filter context; Page 4 scatter quadrant line (horizontal).
 	measure 'Median Total Spend' =
 			
 			MEDIAN ( dim_Customer[Total Spend] )
@@ -701,7 +701,7 @@ table _Measures
 		displayFolder: 03 - Segment Analysis
 		lineageTag: d32adbb1-193e-4426-b220-c6f89fce902d
 
-	/// Dynamic subtitle for the Page 5 V3 Cohort Retention matrix - cohort count, span, tenure window.
+	/// Dynamic subtitle for the Page 5 cohort retention matrix - cohort count, span, tenure window.
 	measure 'Subtitle Cohort Retention' =
 			
 			VAR _cohorts =
@@ -719,7 +719,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: c63235b5-6922-405c-bb86-70b48eff677a
 
-	/// Diverging-gradient font contrast for the V3 cohort matrix - white on the dark blue high end and dark terracotta low end, dark ink in the cream center
+	/// Diverging-gradient font contrast for the Page 5 cohort retention matrix - white on the dark blue high end and dark terracotta low end, dark ink in the cream center
 	measure 'Retention Font Color' =
 			
 			VAR _rate =
@@ -863,7 +863,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 84fc3ed4-e479-486d-b649-7b33711e4d97
 
-	/// Drill signal for the P6 Deneb map: 1 only when a direct State/Region filter is active; ALLSELECTED strips the visual's own groupby context (F068).
+	/// Drill signal for the Page 6 regional Deneb map: 1 only when a direct State/Region filter is active; ALLSELECTED strips the visual's own groupby context.
 	measure 'Region Filter Active' =
 			
 			IF (
@@ -883,7 +883,7 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 457ff8a3-ab73-45d3-86a5-c608f0f99743
 
-	/// Country selection signal for P6 title measures: 1 only when a genuine proper-subset Country filter is active (select-all reads 0). ALLSELECTED-guarded (visual-groupby-immune). Unlike [Region Filter Active] (grain switch, select-all = 1 by design), this drives text only.
+	/// Country selection signal for Page 6 title measures: 1 only when a genuine proper-subset Country filter is active (select-all reads 0). ALLSELECTED-guarded (visual-groupby-immune). Unlike [Region Filter Active] (grain switch, select-all = 1 by design), this drives text only.
 	measure 'Country Filter Active' =
 			
 			VAR _IsFiltered =
