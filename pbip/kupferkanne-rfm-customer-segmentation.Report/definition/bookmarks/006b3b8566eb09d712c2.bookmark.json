@@ -438,10 +438,10 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "v_monthly_revenue"
+                          "Entity": "dim_Date"
                         }
                       },
-                      "Property": "Order Month"
+                      "Property": "Start of Week"
                     }
                   },
                   "howCreated": 0
@@ -450,18 +450,28 @@
                   "name": "2fdc0e8de7262862d669",
                   "type": "Advanced",
                   "expression": {
-                    "Aggregation": {
+                    "Measure": {
                       "Expression": {
-                        "Column": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Entity": "v_monthly_revenue"
-                            }
-                          },
-                          "Property": "Total Revenue"
+                        "SourceRef": {
+                          "Entity": "_Measures"
                         }
                       },
-                      "Function": 0
+                      "Property": "Total Revenue"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "ac950f63cb7192d9c8c9",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue Rolling 12M"
                     }
                   },
                   "howCreated": 0
@@ -478,10 +488,10 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "v_monthly_revenue"
+                          "Entity": "dim_Date"
                         }
                       },
-                      "Property": "Order Month"
+                      "Property": "Start of Week"
                     }
                   }
                 }
@@ -492,10 +502,10 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "v_monthly_revenue"
+                          "Entity": "dim_Date"
                         }
                       },
-                      "Property": "Order Month"
+                      "Property": "Start of Week"
                     }
                   }
                 ]
