@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.2.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
   "themeCollection": {
     "baseTheme": {
       "name": "CY26SU02",
@@ -72,6 +72,11 @@
       "name": "RegisteredResources",
       "type": "RegisteredResources",
       "items": [
+        {
+          "name": "kupferkanne_logo9847103635426315.svg",
+          "path": "kupferkanne_logo9847103635426315.svg",
+          "type": "Image"
+        },
         {
           "name": "nav_01_executive_active03459149860029287.svg",
           "path": "nav_01_executive_active03459149860029287.svg",
