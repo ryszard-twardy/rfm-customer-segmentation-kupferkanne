@@ -1,5 +1,5 @@
 // tools/format_summarize_by_batch.csx
-// F006: Set SummarizeBy = None on 32 non-additive numeric columns
+// Batch-set SummarizeBy = None on 32 non-additive numeric columns (Tabular Editor 2).
 //
 // Date:   2026-05-24
 // Author: Ryszard Twardy
@@ -7,10 +7,8 @@
 // Run in: Tabular Editor 2 -> Advanced Scripting tab -> paste -> F5 (Run)
 //
 // References:
-//   - .checkpoints/AUDIT_FINDINGS_kupferkanne_2026-05-15.md § F006 (HIGH)
+//   - docs/measures.md – "Column Behavior: SummarizeBy = None" section
 //   - BPA rule: "Do not summarize numeric columns" (enforced by this script)
-//   - R041 (BPA + docs/measures.md sync same session)
-//   - Issue: ryszard-twardy/rfm-customer-segmentation-kupferkanne#4
 //
 // Strategy:
 //   - Explicit (table, column) targets list – no pattern matching
@@ -21,8 +19,8 @@
 //   - Idempotent: skip if SummarizeBy already None
 //   - Per-target try/catch – log missing cols, continue (defensive against
 //     column rename / table reorg drift)
-//   - Uses KeyValuePair<string,string> for targets (TE2 Roslyn pre-C# 7.0,
-//     value tuples not supported per F006 first-paste compile errors)
+//   - Uses KeyValuePair<string,string> for targets (TE2's embedded Roslyn
+//     predates C# 7.0; value tuples fail to compile)
 //
 // Reusable for any future "set SummarizeBy=None on N cols" batch.
 
@@ -101,7 +99,7 @@ foreach (var target in targets) {
 string mode = dryRun ? "DRY RUN (no changes applied – flip dryRun=false to apply)" : "APPLIED";
 
 var sb = new System.Text.StringBuilder();
-sb.AppendLine("=== F006 SummarizeBy Batch – " + mode + " ===");
+sb.AppendLine("=== SummarizeBy Batch – " + mode + " ===");
 sb.AppendLine(string.Format("Targets: {0}", targets.Count));
 sb.AppendLine(string.Format("Changed: {0}", changes.Count));
 sb.AppendLine(string.Format("Skipped: {0}", skipped.Count));

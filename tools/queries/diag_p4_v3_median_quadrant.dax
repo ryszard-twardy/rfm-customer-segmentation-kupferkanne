@@ -3,7 +3,7 @@
     Purpose : Expected median quadrant line values for Page 4 V3 (Value-at-Risk scatter).
               Replicates the V3 visual-level filter: Segment IN { "At Risk", "Hibernating" }.
               Oracle for the [Median Recency Days] and [Median Total Spend] constant lines.
-    Context : P4 V3 scatter. X = dim_Customer[Recency Days] (D098, raw continuous).
+    Context : P4 V3 scatter. X = dim_Customer[Recency Days] (raw continuous scale).
               Y = dim_Customer[Total Spend]. Size = Order Count.
     Baseline as of 2026-06-16 : Median Recency Days = 481 days ; Median Total Spend = 29.22 EUR.
     Re-run after any RFM re-segmentation or data refresh; then update the baseline above.

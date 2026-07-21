@@ -6,7 +6,7 @@ This project applies RFM (Recency, Frequency, Monetary) segmentation to a 39-mon
 
 The end-to-end workflow follows the standard data engineering progression: audit raw data → clean and validate → explore distributions → transform into analytical structures → build presentation marts → expose through Power BI.
 
-Each step is implemented as an idempotent SQL script (`CREATE OR REPLACE`) so that the pipeline can be re-run from any point without side effects. The eight scripts in `sql/` execute in numerical order; see [architecture.md](architecture.md) for the high-level flow and [ADR 0003](adr/0003-pipeline-order-eda-before-transform.md) for the ordering rationale.
+Each step is implemented as an idempotent SQL script (`CREATE OR REPLACE`) so that the pipeline can be re-run from any point without side effects. The nine numbered pipeline scripts in `sql/` execute in numerical order, with two standalone view scripts alongside; see [architecture.md](architecture.md) for the high-level flow and [ADR 0003](adr/0003-pipeline-order-eda-before-transform.md) for the ordering rationale.
 
 ## Data origin
 

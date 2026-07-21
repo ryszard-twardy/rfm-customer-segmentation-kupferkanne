@@ -1,16 +1,13 @@
 // tools/format_string_batch.csx
-// F003: Set explicit Format String on ~40 measures
+// Batch-apply explicit format strings to model measures (Tabular Editor 2).
 //
 // Date:   2026-05-22
 // Author: Ryszard Twardy
 //
 // Run in: Tabular Editor 2 -> Advanced Scripting tab -> paste -> F5 (Run)
 //
-// References:
-//   - .checkpoints/AUDIT_FINDINGS_kupferkanne_2026-05-15.md § F003 (HIGH)
-//   - D044 (Format String batch for ~40 measures)
-//   - R041 (BPA + docs/measures.md sync same session)
-//   - Issue: ryszard-twardy/rfm-customer-segmentation-kupferkanne#1
+// Reference: docs/measures.md – "Format String Standards" section
+//   (the canonical format-string policy this script enforces)
 //
 // Strategy:
 //   1. Primary categorization by measure.DataType (String / DateTime / Int64)
@@ -26,11 +23,11 @@
 //   - Explicit manual-override list for measures with custom semantics
 //   - Explicit currency-override list for false-positives from IsCountLike
 //
-// Reusable for F006 (Summarize By = None) – see Step 2 of post-F003 work.
+// Companion script: format_summarize_by_batch.csx (SummarizeBy = None batch).
 
 bool dryRun = true;  // FLIP TO false AFTER REVIEWING DRY-RUN OUTPUT
 
-// Canonical format strings (per D044 + F003 spec)
+// Canonical format strings (see docs/measures.md – Format String Standards)
 const string FMT_CURRENCY = "\"€\"#,##0.00;-\"€\"#,##0.00";  // €
 const string FMT_PERCENT  = "0.00%";
 const string FMT_COUNT    = "#,##0";
@@ -176,7 +173,7 @@ foreach (var m in Model.AllMeasures) {
 string mode = dryRun ? "DRY RUN (no changes applied – flip dryRun=false to apply)" : "APPLIED";
 
 var sb = new System.Text.StringBuilder();
-sb.AppendLine("=== F003 Format String Batch – " + mode + " ===");
+sb.AppendLine("=== Format String Batch – " + mode + " ===");
 sb.AppendLine(string.Format("Changed: {0}", changes.Count));
 sb.AppendLine(string.Format("Skipped: {0}", skipped.Count));
 sb.AppendLine();

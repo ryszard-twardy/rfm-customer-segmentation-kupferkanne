@@ -1,5 +1,5 @@
 """
-SQL blank-line analyzer and applier for Phase F (Perfection Loop).
+SQL blank-line analyzer and applier for the sql/ pipeline scripts.
 
 Refined conventions (derived from existing file structure):
 
