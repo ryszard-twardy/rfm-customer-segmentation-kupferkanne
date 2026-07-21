@@ -10,6 +10,8 @@
 
 Fifteen thousand customers, one retention budget. This project is what the analytics behind that allocation decision looks like when it is engineered end to end: which customers to invest in, which products actually make money, and how much revenue is quietly walking out the door. The company – Kupferkanne, an Erlangen-based direct-to-consumer coffee-equipment brand selling across nine European markets – is fictional. The engineering is not: every number on the dashboard traces back through a documented, linted, regression-checked pipeline that lives in this repository.
 
+![Executive Summary – Kupferkanne RFM dashboard (Power BI)](docs/img/exec-summary.png)
+
 > **Reviewing in 60 seconds?** Skim [the seven report pages](#the-report-seven-pages), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
 
 ---
