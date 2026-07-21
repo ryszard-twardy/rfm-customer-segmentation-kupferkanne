@@ -40,3 +40,10 @@
 #     keeps git blame clean on the large synthetic dataset). Rule is last
 #     so it overrides the catch-all and *.csv rules above. ---
 data/*.csv -text
+
+# Surface analytical languages on the GitHub Languages bar
+sql/*.sql linguist-detectable=true
+*.tmdl linguist-detectable=true
+*.dax linguist-detectable=true
+# Auto-generated culture file must not skew the language stats
+**/definition/cultures/*.tmdl linguist-generated=true
