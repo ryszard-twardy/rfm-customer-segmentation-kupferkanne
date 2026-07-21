@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Factual claims reconciled against serialized state and live BigQuery: 109 DAX measures, 12 tables, 7 single-direction relationships (0 bidirectional), 6 product categories, ~460K source records, and the equal-weight brand margin corrected to 59.94% (weighted 59.78%).
 - Report page names verified from `page.json` (Page 6 = Regional Analysis); status badge aligned to the latest release tag v1.1.0.
 - EDA notebook fix pass and table presentation polish: author attribution, resolved WIP markers, corrected Quarto project note, 2-decimal formatting, suppressed index, Title-Case headers, percent and currency formats
+- README: added an "Engineering workflow" section describing the operator-gated, AI-assisted development process.
 
 ---
 
