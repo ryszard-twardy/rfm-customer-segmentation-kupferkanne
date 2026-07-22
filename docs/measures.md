@@ -276,37 +276,50 @@ RETURN
 ```dax
 Segment % of Total =
 VAR SegmentCount =
-    CALCULATE(
-        COUNTROWS(dim_Customer),
-        NOT ISBLANK(dim_Customer[Order Count])
+    CALCULATE (
+        COUNTROWS ( dim_Customer ),
+        NOT ISBLANK ( dim_Customer[Order Count] )
     )
 VAR TotalCount =
-    CALCULATE(
-        COUNTROWS(dim_Customer),
-        ALL(dim_Customer),
-        NOT ISBLANK(dim_Customer[Order Count])
+    CALCULATE (
+        COUNTROWS ( dim_Customer ),
+        ALL ( dim_Customer ),
+        NOT ISBLANK ( dim_Customer[Order Count] )
     )
 RETURN
-DIVIDE(SegmentCount, TotalCount, 0)
+    DIVIDE (
+        SegmentCount,
+        TotalCount,
+        0
+    )
 ```
 
 ```dax
 Revenue % of Total =
-VAR SegmentRevenue = SUM(dim_Customer[Total Spend])
+VAR SegmentRevenue =
+    SUM ( dim_Customer[Total Spend] )
 VAR TotalRevenue =
-    CALCULATE(
-        SUM(dim_Customer[Total Spend]),
-        ALL(dim_Customer)
+    CALCULATE (
+        SUM ( dim_Customer[Total Spend] ),
+        ALL ( dim_Customer )
     )
 RETURN
-DIVIDE(SegmentRevenue, TotalRevenue, 0)
+    DIVIDE (
+        SegmentRevenue,
+        TotalRevenue,
+        0
+    )
 ```
 
 ```dax
 Revenue at Risk =
-CALCULATE(
-    SUM(dim_Customer[Total Spend]),
-    dim_Customer[Segment] IN {"At Risk", "Hibernating"}
+CALCULATE (
+    SUM ( dim_Customer[Total Spend] ),
+    dim_Customer[Segment]
+        IN {
+            "At Risk",
+            "Hibernating"
+        }
 )
 ```
 
@@ -380,21 +393,21 @@ RETURN
 
 ```dax
 Revenue Active =
-CALCULATE(
-    SUM(dim_Customer[Total Spend]),
+CALCULATE (
+    SUM ( dim_Customer[Total Spend] ),
     dim_Customer[Recency Days] <= 90
 )
 
 Revenue Cooling =
-CALCULATE(
-    SUM(dim_Customer[Total Spend]),
+CALCULATE (
+    SUM ( dim_Customer[Total Spend] ),
     dim_Customer[Recency Days] > 90
         && dim_Customer[Recency Days] <= 180
 )
 
 Revenue Dormant =
-CALCULATE(
-    SUM(dim_Customer[Total Spend]),
+CALCULATE (
+    SUM ( dim_Customer[Total Spend] ),
     dim_Customer[Recency Days] > 180
 )
 ```
@@ -501,30 +514,40 @@ CALCULATE (
 ```dax
 What-If Revenue Impact =
 VAR AtRiskRev =
-    CALCULATE(
-        SUM(dim_Customer[Total Spend]),
-        dim_Customer[Segment] IN {"At Risk", "Hibernating"}
+    CALCULATE (
+        SUM ( dim_Customer[Total Spend] ),
+        dim_Customer[Segment]
+            IN {
+                "At Risk",
+                "Hibernating"
+            }
     )
 VAR Rate =
-    SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10) / 100
+    SELECTEDVALUE (
+        'Reactivation Rate'[Reactivation Rate],
+        10
+    ) / 100
 RETURN
-AtRiskRev * Rate
+    AtRiskRev * Rate
 ```
 
 ```dax
 Dynamic KPI Selector =
 VAR Selected =
-    SELECTEDVALUE(dim_KPI_Selector[KPI], "Total Revenue")
+    SELECTEDVALUE (
+        dim_KPI_Selector[KPI],
+        "Total Revenue"
+    )
 RETURN
-SWITCH(
-    Selected,
-    "Total Revenue",    [Total Revenue],
-    "Total Customers",  [Total Customers],
-    "Average Order Value",  [Avg Order Value],
-    "Average Recency Days",      [Avg Recency Days],
-    "Revenue at Risk",  [Revenue at Risk],
-    [Total Revenue]
-)
+    SWITCH (
+        Selected,
+        "Total Revenue", [Total Revenue],
+        "Total Customers", [Total Customers],
+        "Average Order Value", [Avg Order Value],
+        "Average Recency Days", [Avg Recency Days],
+        "Revenue at Risk", [Revenue at Risk],
+        [Total Revenue]
+    )
 ```
 
 **What-If parameter measure (no display folder):** `Reactivation Rate Value` = `SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)` (format `0`) lives on the `Reactivation Rate` what-if parameter table, not in a display folder. It is the auto-generated parameter value; `[What-If Revenue Impact]` consumes the parameter. Not bound to any visual.
@@ -592,23 +615,24 @@ SWITCH(
 
 ```dax
 Health Indicator =
-VAR Score = AVERAGE(dim_Customer[Health Score])
+VAR Score =
+    AVERAGE ( dim_Customer[Health Score] )
 RETURN
-SWITCH(
-    TRUE(),
-    Score >= 11, "● Healthy",
-    Score >= 7,  "◐ Monitor",
-    "○ Critical"
-)
+    SWITCH (
+        TRUE (),
+        Score >= 11, "● Healthy",
+        Score >= 7, "◐ Monitor",
+        "○ Critical"
+    )
 ```
 
 ```dax
 ARPU by Country =
-DIVIDE(
-    SUM(dim_Customer[Total Spend]),
-    CALCULATE(
-        COUNTROWS(dim_Customer),
-        NOT ISBLANK(dim_Customer[Order Count])
+DIVIDE (
+    SUM ( dim_Customer[Total Spend] ),
+    CALCULATE (
+        COUNTROWS ( dim_Customer ),
+        NOT ISBLANK ( dim_Customer[Order Count] )
     ),
     0
 )
@@ -616,11 +640,11 @@ DIVIDE(
 
 ```dax
 Country Revenue Share =
-DIVIDE(
-    SUM(dim_Customer[Total Spend]),
-    CALCULATE(
-        SUM(dim_Customer[Total Spend]),
-        ALL(dim_Customer)
+DIVIDE (
+    SUM ( dim_Customer[Total Spend] ),
+    CALCULATE (
+        SUM ( dim_Customer[Total Spend] ),
+        ALL ( dim_Customer )
     ),
     0
 )
@@ -628,14 +652,14 @@ DIVIDE(
 
 ```dax
 Segment Color =
-SWITCH(
-    SELECTEDVALUE(dim_Customer[Segment]),
-    "Champions",            "#4A7AA0",
-    "Loyal Customers",      "#7BA8B8",
-    "Potential Loyalists",  "#8FA87E",
-    "Recent Customers",     "#D4A762",
-    "At Risk",              "#A05A55",
-    "Hibernating",          "#A5A29A",
+SWITCH (
+    SELECTEDVALUE ( dim_Customer[Segment] ),
+    "Champions", "#4A7AA0",
+    "Loyal Customers", "#7BA8B8",
+    "Potential Loyalists", "#8FA87E",
+    "Recent Customers", "#D4A762",
+    "At Risk", "#A05A55",
+    "Hibernating", "#A5A29A",
     "#94A3B8"
 )
 ```
@@ -663,10 +687,10 @@ Subtitle Page 1 =
 **Design decision – Subtitle Page 1 market count:** the market count is now dynamic via `DISTINCTCOUNT ( dim_Customer[Country] )`, matching the rolling-months pattern; both counters self-correct as geography or the calendar extends (replacing the static `9 European markets` literal).
 
 ```dax
-Subtitle Page 2 = 
-"RFM profile comparison across " & 
-DISTINCTCOUNT(dim_Segment[Segment]) & 
-" segments"
+Subtitle Page 2 =
+"RFM profile comparison across "
+    & DISTINCTCOUNT ( dim_Segment[Segment] )
+    & " segments"
 ```
 
 ```dax
