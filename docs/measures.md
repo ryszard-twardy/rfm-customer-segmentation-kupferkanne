@@ -64,7 +64,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 
 **Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13 at the time; the flags that remained are all intentional (text measures + the one `SWITCH`-format `[Dynamic KPI Selector]`). The rule now reports 54 as further text measures have been added since (the 54 without-format measures noted above), all intentional.
 
-**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three Page 1 year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
+**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
 
 ### Column Behavior: SummarizeBy = None
 
@@ -134,19 +134,19 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 | Measure | Formula | Format | Pages |
 |---|---|---|---|
-| Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 4 |
-| Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2 |
+| Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 5, 6, 7 |
+| Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2, 4, 5, 6 |
 | Customers at Risk | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), dim_Customer[Segment] IN {"At Risk", "Hibernating"}, NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 4 |
-| Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 1 |
-| Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 1 |
-| Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | 1 |
+| Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 7 |
+| Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 7 |
+| Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | – |
 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
 | Median Recency Days | `MEDIAN(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 4 |
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
 | Median Total Spend | `MEDIAN(dim_Customer[Total Spend])` | € Currency, 2dp | 4 |
-| Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | – |
-| Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1, 3, 4 |
+| Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 4 |
+| Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1 |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
 | Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | – |
 | Line Profit | `SUM(v_items_for_bi[Line Profit])` | € Currency, 2dp | – |
@@ -157,7 +157,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Total Brands | `DISTINCTCOUNT(dim_Product[Brand])` | # 0dp | 3 |
 | Top Brand Revenue | `MAXX(VALUES(dim_Product[Brand]), [Line Revenue])` | € Currency, display Millions | 3 |
 | Top Brand Name | VAR pattern – see formula block below | Text | 3 |
-| Avg Brand Margin % | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | 3 |
+| Avg Brand Margin % | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | – |
 | Margin Baseline | `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` | % 2dp | 3 |
 | Top Category Revenue | `MAXX(VALUES(dim_Product[Product Category]), [Line Revenue])` | € Currency, display Millions | 3 |
 | Top Category Name | VAR pattern – see formula block below | Text | 3 |
@@ -165,7 +165,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 **Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand/category measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
 
-**`[Distinct Orders]` (Pages = –):** order-grain distinct order count from `sales_curated[Order ID]`. Not slice-able by `dim_Product` – `sales_curated` has no relationship path to `dim_Product` in the single-direction star, so a product slice returns the unfiltered grand total. Currently bound to no visual; do not place on a product axis.
+**`[Distinct Orders]` (Pages = 4):** order-grain distinct order count from `sales_curated[Order ID]`. Not slice-able by `dim_Product` – `sales_curated` has no relationship path to `dim_Product` in the single-direction star, so a product slice returns the unfiltered grand total. Bound on the Page 4 scatter; do not place on a product axis.
 
 **Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
@@ -233,10 +233,10 @@ SUM ( v_revenue_new_returning[Revenue] )
 
 | Measure | Formula | Format | Pages |
 |---|---|---|---|
-| Avg R Score | `AVERAGE(dim_Customer[R Score])` | Dec 1dp | 2, 6 |
-| Avg F Score | `AVERAGE(dim_Customer[F Score])` | Dec 1dp | 2, 6 |
-| Avg M Score | `AVERAGE(dim_Customer[M Score])` | Dec 1dp | 2, 6 |
-| Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 1, 2, 4 |
+| Avg R Score | `AVERAGE(dim_Customer[R Score])` | Dec 1dp | 2 |
+| Avg F Score | `AVERAGE(dim_Customer[F Score])` | Dec 1dp | 2 |
+| Avg M Score | `AVERAGE(dim_Customer[M Score])` | Dec 1dp | 2 |
+| Avg Health Score | `AVERAGE(dim_Customer[Health Score])` | Dec 1dp | 2 |
 | Customer Recency Days | `SELECTEDVALUE(dim_Customer[Recency Days])` | `#,##0 "days"` | 7 |
 | Customer Health Score | `SELECTEDVALUE(dim_Customer[Health Score])` | `0 "/ 15"` | 7 |
 | Customer RFM Label | VAR pattern – see formula block below | Text | 7 |
@@ -371,12 +371,12 @@ RETURN
 | Revenue Cooling (91–180d) | € 0dp | 4 |
 | Revenue Dormant (180d+) | € 0dp | 4 |
 | Revenue Rolling 12M | € 0dp | 1 |
-| Revenue YoY % | % 1dp | 1 |
-| Profit YoY % | % 1dp | 1 |
-| Profit Margin YoY (pp) | % 1dp | 1 |
-| Revenue PY | € 2dp | 1 |
-| Profit PY | € 2dp | 1 |
-| Profit Margin PY | % 2dp | 1 |
+| Revenue YoY % | % 1dp | – |
+| Profit YoY % | % 1dp | – |
+| Profit Margin YoY (pp) | % 1dp | – |
+| Revenue PY | € 2dp | – |
+| Profit PY | € 2dp | – |
+| Profit Margin PY | % 2dp | – |
 
 ```dax
 Revenue Active =
@@ -424,7 +424,7 @@ RETURN
     )
 ```
 
-`[Revenue YoY %]` – year-over-year change of Total Revenue vs the same period last year; surfaced on the Page 1 trend tooltip (the current open month reads low against a full prior-year month).
+`[Revenue YoY %]` – year-over-year change of Total Revenue vs the same period last year (the current open month reads low against a full prior-year month).
 
 ```dax
 Revenue YoY % =
@@ -438,7 +438,7 @@ RETURN
     DIVIDE ( CurrentRevenue - PriorRevenue, PriorRevenue )
 ```
 
-`[Profit YoY %]` – year-over-year change of Total Profit vs the same period last year; shown as the prior-year reference on the Page 1 profit KPI card (the current open month reads low against a full prior-year month).
+`[Profit YoY %]` – year-over-year change of Total Profit vs the same period last year (the current open month reads low against a full prior-year month).
 
 ```dax
 Profit YoY % =
@@ -452,7 +452,7 @@ RETURN
     DIVIDE ( CurrentProfit - PriorProfit, PriorProfit )
 ```
 
-`[Profit Margin YoY (pp)]` – year-over-year change in the revenue-weighted profit margin vs the same period last year, as a percentage-point delta (stored as a ratio, so 0.02 renders 2.0%); shown as the prior-year reference on the Page 1 margin KPI card.
+`[Profit Margin YoY (pp)]` – year-over-year change in the revenue-weighted profit margin vs the same period last year, as a percentage-point delta (stored as a ratio, so 0.02 renders 2.0%).
 
 ```dax
 Profit Margin YoY (pp) =
@@ -466,7 +466,7 @@ RETURN
     IF ( NOT ISBLANK ( PriorMargin ), CurrentMargin - PriorMargin )
 ```
 
-`[Revenue PY]`, `[Profit PY]`, `[Profit Margin PY]` – prior-year values of Total Revenue, Total Profit, and the revenue-weighted profit margin for the same period; each feeds the prior-year reference label on its Page 1 KPI card. All the time-intelligence measures above blank naturally in the first sales year, where there is no prior period, matching `[Revenue YoY %]`.
+`[Revenue PY]`, `[Profit PY]`, `[Profit Margin PY]` – prior-year values of Total Revenue, Total Profit, and the revenue-weighted profit margin for the same period. All the time-intelligence measures above blank naturally in the first sales year, where there is no prior period, matching `[Revenue YoY %]`.
 
 ```dax
 Revenue PY =
@@ -535,10 +535,10 @@ SWITCH(
 
 | Measure | Purpose | Format | Pages |
 |---|---|---|---|
-| Health Indicator | Status text from health_score | Text | 1, 6 |
-| ARPU by Country | Revenue per customer (context-aware) | € 2dp | 5 |
-| Country Revenue Share | Country share of total revenue | % 2dp | 5 |
-| Segment Color | Hex color per segment (SWITCH) – USE ONLY IF dim_Segment[SegmentColor] column is not used for conditional formatting | Hex text | All |
+| Health Indicator | Status text from health_score | Text | – |
+| ARPU by Country | Revenue per customer (context-aware) | € 2dp | 6 |
+| Country Revenue Share | Country share of total revenue | % 2dp | 6 |
+| Segment Color | Hex color per segment (SWITCH) – USE ONLY IF dim_Segment[SegmentColor] column is not used for conditional formatting | Hex text | – |
 | Revenue Trend Chart Title | Dynamic line chart title with live month count | Text | 1 |
 | Subtitle Page 1 | Dynamic Page 1 subtitle with live market + month counts | Text | 1 |
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
