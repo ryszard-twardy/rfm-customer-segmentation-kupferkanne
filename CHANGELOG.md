@@ -10,7 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Year-over-year and prior-year measures for Profit and Profit Margin, plus a prior-year Revenue measure, in the `04 - Time Intelligence` folder – they power the prior-year reference labels on the Executive Summary KPI cards.
+- Year-over-year and prior-year measures for Profit and Profit Margin, plus a prior-year Revenue measure, in the `04 - Time Intelligence` folder.
+- Customer Drillthrough (Page 7) built as a hidden, entry-wired drill target reached through customer-level measures.
+- Two Architecture Decision Records: analytical notebook with Quarto (ADR 0009) and Deneb Vega-Lite regional map (ADR 0014).
+- Quarto analytical EDA notebook (`notebooks/eda_kupferkanne.qmd` plus project config) as a reasoning companion to the SQL EDA views.
+- All visual titles and subtitles converted to dynamic, measure-driven DAX bound through the format pane, so headings track the active filter context.
+- Revenue Rolling 12M measure for trailing-twelve-month revenue on the Executive Summary trend.
+- Brand logo applied across all seven report pages.
 
 ### Changed
 
@@ -127,7 +133,7 @@ Model-hygiene release. Five SQLBI / Best Practice Analyzer findings resolved plu
 
 ---
 
-## [1.0.0] – 2026-05-12
+## [1.0.0] – 2026-05-14
 
 First public release. Complete data warehouse with eight-step SQL pipeline on BigQuery, dual-grain dimensional model, RFM customer segmentation, and a Power BI Import-mode dashboard. Five core documentation files plus eight Architecture Decision Records describe the design.
 
@@ -194,7 +200,7 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 - **April 2026** – initial architecture lock: star schema, RFM methodology with NTILE quintiles, weighted margin principle, dual-grain semantic layer designed during page-by-page Power BI build.
 - **Early May 2026** – sqlfluff adoption as SQL quality gate; lint exception policy documented; baseline tag pre-restructure.
 - **Mid May 2026** – pipeline reorder (EDA before transform), eight ADRs drafted, public documentation rewritten from scratch.
-- **2026-05-12** – v1.0.0 ship: git reset, ADR audit (production-decision voice over portfolio-piece framing), documentation final pass, tag.
+- **2026-05-14** – v1.0.0 ship: git reset, ADR audit (production-decision voice over portfolio-piece framing), documentation final pass, tag.
 
 ---
 
@@ -202,15 +208,13 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ### [1.2.0] – planned
 
-- **Quarto analytical notebook** (`eda_kupferkanne.qmd`) as companion to the SQL EDA views, rendered to HTML and published via GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`.
-- New ADR documenting the analytical notebook decision.
-- Customer Drillthrough detail page (customer-level drill target).
+- Publish the committed notebook (`notebooks/eda_kupferkanne.qmd`, `_quarto.yml`) to GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`; the notebook is authored and the rendered `_site/` is gitignored, so only the gh-pages deploy step is outstanding.
 
 ### Considered, not committed
 
 - Pipeline orchestration via Dataform or scheduled queries (currently runs manually per session).
 - `dbt` migration (would require `.sqlfluff` config harmonisation).
-- Sankey migration-flow visual on Page 5, gated by synthetic-data behavioural verification.
+- Sankey migration-flow visual on Page 5 – considered and dropped after synthetic-data behavioural verification showed the migration signal too weak to justify the visual.
 
 ---
 
