@@ -55,7 +55,7 @@ erDiagram
 
 | Pattern | Total rows | Grain | Purpose |
 |---|---|---|---|
-| `orders20YYMM` | ~169,000 across 39 shards | Order | Header-level transactions |
+| `orders20YYMM` | ~170,000 across 39 shards | Order | Header-level transactions |
 | `items20YYMM` | ~275,000 across 39 shards | Line item | Product-level detail |
 
 Sharding by month allows BigQuery to prune scans when querying date ranges. Single-month queries hit one shard; cross-period queries use wildcard tables (`orders20*`).
@@ -81,6 +81,47 @@ Two pre-aggregated views feed specific Page 5 visuals. Each is imported standalo
 | `v_cohort_retention` | One row per acquisition cohort per tenure month (cohort month by months since acquisition) | Cohort Month (date), Months Since Acquisition (int), Active Customers (int), Cohort Customers (int), Retention Rate (percent) | Page 5 Cohort Retention heatmap |
 
 `v_revenue_new_returning` joins the date dimension on `Revenue Month` to `dim_Date[Date]` (many-to-one, single-direction), so the calendar slicer and the closed-month trim reach it. `v_cohort_retention` is deliberately left unrelated to the calendar: its grain is cohort-by-tenure rather than a point in time, so it is sliced only by its own axes.
+
+### Semantic model topology
+
+The Power BI semantic model as built, complementing the warehouse star above. Its customer dimension `dim_Customer` sources the BI customer view (`v_dim_customers_for_bi`, built in step 04_5), which carries the RFM scores and segment assignment alongside the customer master, so segmentation lives on the customer dimension itself (ADR 0012) rather than a snowflaked table. Segment display attributes are factored into a small conformed dimension, `dim_Segment` (the six RFM segments with their palette colours), per ADR 0013.
+
+This is where the model intentionally diverges from the warehouse star above: geography (`Country`) is carried on `dim_Customer`, not on the order fact, and there is no fact-to-fact (order-to-item) relationship – the two grains join only through shared conformed dimensions. All seven relationships are many-to-one with single-direction cross-filtering (filters propagate dimension to fact); there are zero bidirectional and zero inactive relationships.
+
+The topology splits into two views around the conformed dimensions `dim_Customer` and `dim_Date`, which are shared across both grains.
+
+**Order-grain fact and the standalone monthly view:**
+
+```mermaid
+erDiagram
+    dim_Segment ||--o{ dim_Customer : "Segment"
+    dim_Customer ||--o{ sales_curated : "Customer ID"
+    dim_Date ||--o{ sales_curated : "Order Date"
+    dim_Date ||--o{ v_revenue_new_returning : "Revenue Month"
+```
+
+**Line-grain star:**
+
+```mermaid
+erDiagram
+    dim_Customer ||--o{ v_items_for_bi : "Customer ID"
+    dim_Product ||--o{ v_items_for_bi : "Product ID"
+    dim_Date ||--o{ v_items_for_bi : "Order Date"
+```
+
+**Active relationships (7 – all M:1, single-direction):**
+
+| # | Relationship (FK -> PK) | Cardinality | Cross-filter | Purpose |
+|---|---|---|---|---|
+| 1 | `sales_curated[Customer ID] -> dim_Customer[Customer ID]` | M:1 | Single | Order-grain fact to customer dimension |
+| 2 | `sales_curated[Order Date] -> dim_Date[Date]` | M:1 | Single | Order-grain fact to calendar |
+| 3 | `v_items_for_bi[Customer ID] -> dim_Customer[Customer ID]` | M:1 | Single | Line-grain fact to customer dimension |
+| 4 | `v_items_for_bi[Product ID] -> dim_Product[Product ID]` | M:1 | Single | Line-grain fact to product dimension |
+| 5 | `v_items_for_bi[Order Date] -> dim_Date[Date]` | M:1 | Single | Line-grain fact to calendar; date-slices the `[Line *]` measures and the Page 3 Product & Brand trend |
+| 6 | `dim_Customer[Segment] -> dim_Segment[Segment]` | M:1 | Single | Segment attribution onto the merged segment dimension |
+| 7 | `v_revenue_new_returning[Revenue Month] -> dim_Date[Date]` | M:1 | Single | Monthly calendar slice for the Page 5 New vs Returning area chart |
+
+Five model tables carry no relationship: `dim_KPI_Selector` (disconnected KPI slicer), `RFM Score Selector` (field parameter over `dim_Customer[R/F/M Score]`), `Reactivation Rate` (What-If parameter), `_Measures` (hidden measures host), and `v_cohort_retention` (standalone analytical view backing the Page 5 cohort retention heatmap). Seven related plus five unrelated is twelve model tables.
 
 ## Naming conventions
 
