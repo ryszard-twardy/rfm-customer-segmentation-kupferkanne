@@ -49,5 +49,5 @@ Segments are derived from `r_score + f_score + m_score`:
 ## Alternatives Considered
 
 - **k-means clustering** – rejected: clusters are not interpretable without inspection of centroids; thresholds aren't human-readable; results depend on initialisation seed.
-- **Single composite formula** (e.g., `0.5*R + 0.3*F + 0.2*M`) – rejected: arbitrary weights, loses per-dimension information, harder to defend in a review.
+- **Single composite formula** (e.g., `0.5*R + 0.3*F + 0.2*M`) – rejected: arbitrary weights, loses per-dimension information, harder to justify analytically.
 - **`CURRENT_DATE()` as recency anchor** – rejected: distorts recency when the dataset is bounded in the past.

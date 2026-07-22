@@ -5,7 +5,7 @@
 
 ## Context
 
-The project needs a cloud data warehouse to host the curated star schema, run the SQL pipeline, and serve Power BI in Import mode. Constraints: zero infrastructure overhead, free or near-free for ~440K records, dialect familiar enough that the code reads as production-grade.
+The project needs a cloud data warehouse to host the curated star schema, run the SQL pipeline, and serve Power BI in Import mode. Constraints: zero infrastructure overhead, free or near-free for ~460K records, dialect familiar enough that the code reads as production-grade.
 
 ## Decision
 

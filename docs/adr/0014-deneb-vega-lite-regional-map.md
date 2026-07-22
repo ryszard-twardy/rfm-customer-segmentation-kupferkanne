@@ -26,5 +26,6 @@ The basemap is derived from Natural Earth 10m cultural vectors, filtered to the 
 
 - **Tile-based maps (Bing, Mapbox, OpenStreetMap tiles)** – rejected. Tile fetches are external calls: they fail certification or require an uncertified visual, and uncertified visuals do not render in a publish-to-web embed.
 - **Azure Maps** – rejected. The current native mapping visual, but unsupported in publish-to-web at the time of evaluation (June 2026).
+- **ArcGIS Maps** – rejected. External service dependency, account-gated, and not viable in a publish-to-web embed.
 - **Filled Map (Bing)** – rejected. Rendered in publish-to-web at the time of evaluation, but scheduled for deprecation, and its provider-locked styling cannot follow the report palette.
 - **Shape Map** – rejected. The one native visual that accepts a custom TopoJSON, but in preview at the time of evaluation, with limited styling control.

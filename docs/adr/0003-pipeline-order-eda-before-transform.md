@@ -13,7 +13,7 @@ Standard data engineering practice places EDA between cleaning and transformatio
 
 Reorder the pipeline to: **audit → standardise → clean → validate → EDA → transform → line-grain BI fact → analytics marts**.
 
-The eight SQL files reflect this order via their numeric prefixes:
+The nine SQL files reflect this order via their numeric prefixes:
 
 1. `00_0_data_quality_audit_raw_kupferkanne_2026.sql`
 2. `00_1_standardize_dimensions_kupferkanne_2026.sql`
@@ -21,8 +21,9 @@ The eight SQL files reflect this order via their numeric prefixes:
 4. `01_1_post_clean_validation_kupferkanne_2026.sql`
 5. `02_eda_kupferkanne_2026.sql` – true exploratory views, prefix `eda_`
 6. `03_rfm_pipeline_kupferkanne_2026.sql` – RFM informed by EDA findings
-7. `04_items_for_bi_kupferkanne_2026.sql`
-8. `05_analytics_marts_kupferkanne_2026.sql` – pre-aggregated BI views
+7. `04_5_dim_customers_for_bi_kupferkanne_2026.sql`
+8. `04_items_for_bi_kupferkanne_2026.sql`
+9. `05_analytics_marts_kupferkanne_2026.sql` – pre-aggregated BI views
 
 ## Consequences
 

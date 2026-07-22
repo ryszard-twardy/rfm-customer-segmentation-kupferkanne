@@ -5,7 +5,7 @@
 
 ## Context
 
-Profit margin is shown on multiple dashboard pages: segment-level (Page 2), brand-level (Page 3), country-level (Page 5). The naïve approach – `AVG(margin_per_order)` – produces misleading numbers because it treats a €5 order and a €5,000 order as equally weighted in the segment average.
+Profit margin is shown on multiple dashboard pages: segment-level (Page 2), brand-level (Page 3), country-level (Page 5). The naive approach – `AVG(margin_per_order)` – produces misleading numbers because it treats a €5 order and a €5,000 order as equally weighted in the segment average.
 
 For a segment of 100 customers where 90 placed €5 orders at 80% margin and 10 placed €5,000 orders at 20% margin:
 

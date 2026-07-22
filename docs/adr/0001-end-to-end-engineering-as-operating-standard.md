@@ -13,7 +13,7 @@ A single analyst is responsible for the analytics platform end-to-end: data inge
 
 Adopt **end-to-end engineering discipline** as the operating standard. The platform covers the full data engineering cycle: data generation with documented quality issues, schema-enforced ingestion, idempotent SQL pipelines, exploratory data analysis preceding transformation, dimensional modelling, BI consumption with grain-strict measure naming, and architecture documentation via ADRs.
 
-Scope stays narrow (one business problem, six dashboard pages, ~440K records) so each layer meets production quality.
+Scope stays narrow (one business problem, six dashboard pages, ~460K records) so each layer meets production quality.
 
 ## Consequences
 
@@ -28,6 +28,6 @@ Scope stays narrow (one business problem, six dashboard pages, ~440K records) so
 - **Anonymised real customer data** – rejected on privacy grounds. Cleaning rules feel arbitrary when the data shape cannot be controlled.
 - **Public dataset (Kaggle, UCI Online Retail II)** – rejected. Such datasets are pre-cleaned, eliminating the cleaning pipeline's purpose as a working processing step.
 - **Quick exploratory dashboards without full pipeline** – rejected. Kupferkanne's question set requires reproducibility (audit trail, recovery from upstream changes, regenerable training data). A notebook-style approach loses these properties.
-- **Multiple smaller analytical exercises** – rejected. One end-to-end platform demonstrates integration discipline that disconnected exercises cannot.
+- **Multiple smaller analytical exercises** – rejected. One end-to-end platform builds integration discipline that disconnected exercises do not.
 
 Note (2026-06-09): the report now has 7 pages (Customer Lifecycle Intelligence added at page 5). Canonical page list: methodology.md.
