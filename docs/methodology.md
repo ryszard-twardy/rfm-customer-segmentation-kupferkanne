@@ -1,6 +1,6 @@
 # Methodology
 
-This project applies RFM (Recency, Frequency, Monetary) segmentation to a 39-month synthetic dataset representing a Erlangen-based D2C e-commerce brand operating in nine European markets. The methodology is grounded in dimensional modelling, transparent statistical thresholds, and decisions documented through Architecture Decision Records.
+This project applies RFM (Recency, Frequency, Monetary) segmentation to a 39-month synthetic dataset representing an Erlangen-based D2C e-commerce brand operating in nine European markets. The methodology is grounded in dimensional modelling, transparent statistical thresholds, and decisions documented through Architecture Decision Records.
 
 ## Approach
 
@@ -96,4 +96,4 @@ The dashboard uses Import mode with the dual-grain semantic layer described in [
 6. Regional Analysis – country and city breakdown.
 7. Customer Drillthrough – individual customer inspection.
 
-All DAX measures are formatted via [daxformatter.com](https://www.daxformatter.com/) and catalogued in [measures.md](measures.md).
+All DAX measures are formatted to the SQLBI convention via [daxformatter.com](https://www.daxformatter.com/) and catalogued in [measures.md](measures.md).

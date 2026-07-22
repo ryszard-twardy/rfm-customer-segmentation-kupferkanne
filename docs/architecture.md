@@ -16,7 +16,7 @@ Kupferkanne is a portfolio-grade retail analytics demonstration showing how a si
    ~460K records           (11 tables + 14 views)  7 pages, 109 DAX
 ```
 
-_Object counts reflect the live warehouse. The eight EDA views defined in `sql/02_eda` are pending a rewrite against the restructured staging schema._
+_Object counts reflect the live warehouse._
 
 ## Tech stack
 
