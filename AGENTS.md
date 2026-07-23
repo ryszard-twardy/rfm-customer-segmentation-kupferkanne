@@ -7,7 +7,7 @@ Master configuration for `rfm-customer-segmentation-kupferkanne`. Read this file
 - **Name**: rfm-customer-segmentation-kupferkanne
 - **Stack**: data
 - **Owner**: Ryszard Twardy ([LinkedIn](https://www.linkedin.com/in/ryszard-twardy/))
-- **Status**: v1.1.0 tagged; Customer Drillthrough page and Quarto analytical notebook ahead (see `CHANGELOG.md`).
+- **Status**: v1.1.0 tagged (see `CHANGELOG.md`).
 - **Primary objective**: RFM (Recency, Frequency, Monetary) customer segmentation for Kupferkanne e-commerce – BigQuery modeling + Power BI BI layer + Python pipelines.
 
 ## Repository layout

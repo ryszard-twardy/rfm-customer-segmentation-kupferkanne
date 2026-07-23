@@ -1,6 +1,6 @@
 # Constitution: rfm-customer-segmentation-kupferkanne (data stack)
 
-Invariant rules for this project. These do not change session-to-session. If a rule needs to change, it requires a recorded decision in `.checkpoints/L2_DECISIONS.md` AND a corresponding ADR in `docs/adr/`.
+Invariant rules for this project. These do not change session-to-session. If a rule needs to change, it requires a recorded decision in the project decision ledger AND a corresponding ADR in `docs/adr/`.
 
 ## Stack
 
@@ -16,7 +16,7 @@ Invariant rules for this project. These do not change session-to-session. If a r
 
 - **Grain Reconciliation must equal zero.** Always-on validation measure. If it's not zero, the model is broken – stop and fix before any other work.
 - **No silent type coercions.** All BigQuery `CAST` operations are explicit. No implicit conversion via comparisons.
-- **Foreign keys are documented in `.checkpoints/L2_SCHEMA.md`.** Skills must consult this file before suggesting JOIN modifications.
+- **Foreign keys are documented in `docs/data_model.md`.** Skills must consult this file before suggesting JOIN modifications.
 
 ### Modeling rules
 
@@ -34,8 +34,8 @@ Invariant rules for this project. These do not change session-to-session. If a r
 ### Python rules
 
 - **`uv` for env management, NOT pip-tools, poetry, or conda.** One canonical tool per stack.
-- **Type hints required for any public function.** `mypy --strict` runs in pre-commit.
-- **No raw SQL strings in Python code.** Use parameterized queries or templated SQL files in `sql/` folder.
+- **Type hints required for any public function.** Checked in review, not by an automated gate.
+- **Pipeline SQL lives in `sql/`, never inline in Python.** The parity harness is the one exception: its fixed reference queries interpolate table identifiers only.
 
 ### Repository rules
 
@@ -45,11 +45,12 @@ Invariant rules for this project. These do not change session-to-session. If a r
 
 ## When to amend this file
 
-- Add a decision in `.checkpoints/L2_DECISIONS.md` first.
+- Add a decision in the project decision ledger first.
 - Write an ADR in `docs/adr/`.
 - Update this file with a brief change note at the bottom.
-- Reference the decision ID in the change note.
+- Reference the ADR in the change note.
 
 ## Change log
 
 - 2026-05-21 – Initial constitution for `rfm-customer-segmentation-kupferkanne` (data stack).
+- 2026-07-23 – Cross-references repointed to public documentation, the SQL-in-Python rule restated to match the code, and an unenforced pre-commit claim removed.
