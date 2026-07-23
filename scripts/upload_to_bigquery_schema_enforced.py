@@ -225,7 +225,7 @@ def main() -> None:
             continue
         table_id = f"{dataset_ref}.{table_name}"
         rows = upload_csv(client, filepath, table_id, autodetect=True)
-        print(f"  ✓ {table_name}: {rows:,} rows loaded (autodetect)")
+        print(f"  [OK] {table_name}: {rows:,} rows loaded (autodetect)")
 
     # -----------------------------------------------------------------------
     # PHASE 2: Upload monthly order files with enforced schema
@@ -244,7 +244,7 @@ def main() -> None:
         table_id = f"{dataset_ref}.{filename}"
         rows = upload_csv(client, filepath, table_id, schema=ORDER_RAW_SCHEMA)
         total_order_rows += rows
-        print(f"  ✓ {filename}: {rows:,} rows loaded with fixed raw schema")
+        print(f"  [OK] {filename}: {rows:,} rows loaded with fixed raw schema")
 
     print(f"  TOTAL ORDER ROWS: {total_order_rows:,}")
 
@@ -265,7 +265,7 @@ def main() -> None:
         table_id = f"{dataset_ref}.{filename}"
         rows = upload_csv(client, filepath, table_id, schema=ITEM_RAW_SCHEMA)
         total_item_rows += rows
-        print(f"  ✓ {filename}: {rows:,} rows loaded with fixed raw schema")
+        print(f"  [OK] {filename}: {rows:,} rows loaded with fixed raw schema")
 
     print(f"  TOTAL ITEM ROWS: {total_item_rows:,}")
 
@@ -281,7 +281,7 @@ def main() -> None:
     print(f"  Total:       {2 + len(order_files) + len(item_files)} tables")
     print(f"\n  Dataset: {dataset_ref}")
     print("  Raw monthly schemas are now wildcard-safe and cast-friendly for SQL.")
-    print("\n  Next step: run sql/00_data_quality_audit.sql in BigQuery Console")
+    print("\n  Next step: run sql/00_0_data_quality_audit_raw_kupferkanne_2026.sql in BigQuery Console")
 
 
 if __name__ == "__main__":

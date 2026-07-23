@@ -12,11 +12,11 @@ Canonical positions where exactly ONE blank line is required ABOVE:
   6. Main SELECT after last CTE: blank above the top-level SELECT after closing `)`
 
 Special handling (attached blocks, no blank between):
-  - DROP TABLE IF EXISTS immediately above CREATE OR REPLACE TABLE → paired,
+  - DROP TABLE IF EXISTS immediately above CREATE OR REPLACE TABLE -> paired,
     they are glued. The DROP gets the blank-above; CREATE does not.
-  - WITH immediately below `CREATE ... AS` (any line ending in `AS`) → glued.
+  - WITH immediately below `CREATE ... AS` (any line ending in `AS`) -> glued.
   - CREATE/DROP with leading inline comments (`-- ...`) attached above (no blank
-    gap) → the comment block is part of the statement; blank goes ABOVE the
+    gap) -> the comment block is part of the statement; blank goes ABOVE the
     topmost comment line, not between comment and CREATE.
 
 Anti-patterns (NOT touched):
@@ -27,7 +27,7 @@ Anti-patterns (NOT touched):
     above if separated by a blank, but never required.
 
 Cleanup actions (always applied):
-  - Collapse 2+ consecutive blank lines anywhere → 1 blank line.
+  - Collapse 2+ consecutive blank lines anywhere -> 1 blank line.
   - Strip trailing blank lines, guarantee exactly one trailing newline.
 """
 
@@ -294,7 +294,7 @@ def apply_fixes(text: str, rep: dict) -> tuple[str, dict]:
             lines.insert(idx, "")
             inserted += 1
 
-    # Collapse 2+ consecutive blanks → 1
+    # Collapse 2+ consecutive blanks -> 1
     out: list[str] = []
     blank_run = 0
     collapsed = 0
