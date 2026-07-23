@@ -85,14 +85,16 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 
 | Path | Contents |
 |---|---|
-| `sql/` | Nine-step BigQuery pipeline, numbered in execution order (`00_0` audit → `05` marts) + 2 standalone analytical views |
-| `pbip/` | Power BI project: report definition (PBIR) + semantic model (TMDL) |
-| `docs/` | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/` |
-| `notebooks/` | Quarto EDA notebook – analytical companion to the SQL EDA views |
-| `harness/` | KPI regression harness – baseline + verify for the canonical KPIs |
-| `scripts/` | BigQuery loader (schema-enforced ingest) |
-| `data/` | Source CSV shards (80 files, committed for reproducibility) |
-| `tools/` | Diagnostic DAX queries + Tabular Editor batch scripts |
+| [`sql/`](sql/) | Nine-step BigQuery pipeline, numbered in execution order (`00_0` audit → `05` marts) + 2 standalone analytical views |
+| [`pbip/`](pbip/) | Power BI project: report definition (PBIR) + semantic model (TMDL) |
+| [`graphics/`](graphics/) | Navigation icons (SVG): four states for each of the six navigable pages, plus a reset control and the icon-set license |
+| [`theme/`](theme/) | Power BI report theme: `rfm_dashboard_theme.json` |
+| [`docs/`](docs/) | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/` |
+| [`notebooks/`](notebooks/) | Quarto EDA notebook – analytical companion to the SQL EDA views |
+| [`harness/`](harness/) | KPI regression harness – baseline + verify for the canonical KPIs |
+| [`scripts/`](scripts/) | BigQuery loader (schema-enforced ingest) |
+| [`data/`](data/) | Source CSV shards (80 files, committed for reproducibility) |
+| [`tools/`](tools/) | Diagnostic DAX and SQL queries (`queries/`) + Tabular Editor batch scripts + a SQL whitespace utility |
 
 ## Reproduce it
 
