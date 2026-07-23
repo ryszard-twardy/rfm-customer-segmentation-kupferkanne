@@ -22,7 +22,7 @@ Invariant rules for this project. These do not change session-to-session. If a r
 
 - **One fact table per grain.** Order-grain, line-grain, customer-grain – separate fact tables, not denormalized.
 - **Dimensions follow `dim_<name>_std` convention.** `_std` suffix indicates standardized dimension (deduplicated, surrogate-keyed).
-- **Pre-aggregation views are forbidden.** Use measures in Power BI, not pre-aggregated SQL views (this caused the v0.x → v1.0 model refactor).
+- **Aggregation for the star schema belongs in DAX measures, not in SQL views.** Where a visual needs its own grain, the pre-aggregated view is imported standalone, outside the star (this rule caused the v0.x → v1.0 model refactor).
 
 ### Power BI rules
 
@@ -48,9 +48,9 @@ Invariant rules for this project. These do not change session-to-session. If a r
 - Add a decision in the project decision ledger first.
 - Write an ADR in `docs/adr/`.
 - Update this file with a brief change note at the bottom.
-- Reference the ADR in the change note.
+- Reference the ADR in the change note where one applies.
 
 ## Change log
 
 - 2026-05-21 – Initial constitution for `rfm-customer-segmentation-kupferkanne` (data stack).
-- 2026-07-23 – Cross-references repointed to public documentation, the SQL-in-Python rule restated to match the code, and an unenforced pre-commit claim removed.
+- 2026-07-23 – Cross-references repointed to public documentation, the SQL-in-Python and pre-aggregation rules restated to match the shipped model, and an unenforced pre-commit claim removed.

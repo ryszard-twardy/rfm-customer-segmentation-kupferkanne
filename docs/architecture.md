@@ -16,7 +16,7 @@ Kupferkanne is a portfolio-grade retail analytics demonstration showing how a si
   ~460K raw records       11 tables + 22 views      109 DAX measures
 ```
 
-_Twenty-five of those objects are BI-facing (11 tables + 14 `v_*` views); the remaining 8 `eda_*` views back the exploratory notebook._
+_Eight of the views (`eda_*`) exist for the exploratory notebook; the other 25 objects are the transformation pipeline and the views built on top of it._
 
 ## Tech stack
 
