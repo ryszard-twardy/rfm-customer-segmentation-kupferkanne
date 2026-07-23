@@ -29,9 +29,9 @@
 - sales_curated[Order Date] → dim_Date[Date] | M:1 | Single
 - v_items_for_bi[Customer ID] → dim_Customer[Customer ID] | M:1 | Single
 - v_items_for_bi[Product ID] → dim_Product[Product ID] | M:1 | Single
-- v_items_for_bi[Order Date] → dim_Date[Date] | M:1 | Single - **date-slicing for the line-grain measures (Page 3 build)**
+- v_items_for_bi[Order Date] → dim_Date[Date] | M:1 | Single - **date-slicing for the line-grain measures**
 - dim_Customer[Segment] → dim_Segment[Segment] | M:1 | Single - **re-pointed onto the merged dim_Segment**
-- v_revenue_new_returning[Revenue Month] → dim_Date[Date] | M:1 | Single - **monthly date-slicing for the New vs Returning area chart (Page 5 V4)**
+- v_revenue_new_returning[Revenue Month] → dim_Date[Date] | M:1 | Single - **monthly date-slicing for the New vs Returning area chart**
 
 **Retiring `v_rfm_for_bi`:** dropped the table and its 3 relationships – `[Customer ID] ↔ dim_Customer` (a former bidirectional join, since superseded), `[Last Order Date] → dim_Date`, and `[Segment] → dim_SegmentOrder`. Segment filter propagation is preserved single-direction via `dim_Customer[Segment] → dim_Segment[Segment]`. Bidirectional count: 2 → **1**.
 
@@ -39,9 +39,9 @@
 
 ---
 
-## Model Hygiene (v1.0.1 BPA batch)
+## Model Hygiene
 
-The conventions below are model-wide metadata policies established during the v1.0.1 BPA batch (sessions 2026-05-22 and 2026-05-24) and carried forward through the single-direction refactor. They change no measure expressions and no display-folder structure. Every measure and column in this document conforms to them.
+The conventions below are model-wide metadata policies. They change no measure expressions and no display-folder structure. Every measure and column in this document conforms to them.
 
 ### Format String Standards
 
@@ -62,17 +62,17 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
 
-**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The batch reduced the BPA "Provide format string for measures" rule from 45 flags to 13 at the time; the flags that remained are all intentional (text measures + the one `SWITCH`-format `[Dynamic KPI Selector]`). The rule now reports 54 as further text measures have been added since (the 54 without-format measures noted above), all intentional.
+**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The BPA "Provide format string for measures" rule currently reports 54 flags, all intentional – see the coverage note above.
 
 **BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
 
 ### Column Behavior: SummarizeBy = None
 
-Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measure pattern (issue #4), every non-additive numeric column on the fact and dimension tables has `SummarizeBy = None`. Users cannot drag a column onto a visual and get an implicit `SUM`, `COUNT`, or `AVERAGE` – they must select a named measure.
+Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measure pattern, every non-additive numeric column on the fact and dimension tables has `SummarizeBy = None`. Users cannot drag a column onto a visual and get an implicit `SUM`, `COUNT`, or `AVERAGE` – they must select a named measure.
 
 **Why:** implicit aggregations have no `FormatString`, no documentation, no name. They drift silently as schemas evolve. Forcing explicit measures keeps the semantic layer honest and visible in the Fields pane.
 
-**Scope – 38 columns (32 from the v1.0.1 batch in `tools/format_summarize_by_batch.csx`; +4 on the `v_cohort_retention` import; +2 on the `v_revenue_new_returning` import):**
+**Scope – 38 columns (applied via `tools/format_summarize_by_batch.csx`):**
 
 | Table | Cols | Columns |
 |---|---|---|
@@ -574,9 +574,9 @@ RETURN
 | M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
 | Combo Chart Title | Dynamic Page 3 combo chart title with top brand name + revenue | Text | 3 |
-| Subtitle Cohort Retention | Dynamic Page 5 V3 subtitle: cohort count, span, tenure window | Text | 5 |
-| Retention Font Color | Per-cell font contrast for the V3 diverging cohort heatmap | Hex text | 5 |
-| Lifecycle Headline | Dynamic Page 5 V4 title: repeat-customer share of revenue | Text | 5 |
+| Subtitle Cohort Retention | Dynamic Page 5 cohort-matrix subtitle: cohort count, span, tenure window | Text | 5 |
+| Retention Font Color | Per-cell font contrast for the diverging cohort heatmap | Hex text | 5 |
+| Lifecycle Headline | Dynamic Page 5 headline: repeat-customer share of revenue | Text | 5 |
 | Map Title | Dynamic Page 6 map title, three-state: region drill, country selection, default DACH headline | Text | 6 |
 | Map Subtitle | Dynamic Page 6 map subtitle: grain word plus EUR total, selection-aware | Text | 6 |
 | Market Ranking Title | Page 6 combo title: reach-not-basket claim by default, neutral under filters | Text | 6 |
@@ -737,9 +737,9 @@ RETURN
     )
 ```
 
-**Design decision – Subtitle Page N convention:** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes. Subtitle Page 2 was refactored from static text to a dynamic measure. Subtitle Page 3 was added for the Page 3 build.
+**Design decision – Subtitle Page N convention:** All page subtitles follow `Subtitle Page N` naming convention for consistency across Pages 1-7. All bound via fx → Field value to subtitle text boxes.
 
-`[Subtitle Page 3]` is **bound** – rebound via fx → Field value on the Page 3 subtitle text box (B.4 slice 3), replacing the prior static literal. All three page subtitles (Pages 1-3) now follow the dynamic `Subtitle Page N` pattern.
+`[Subtitle Page 3]` is **bound** – via fx → Field value on the Page 3 subtitle text box.
 
 `[Subtitle Page 5]` is **static** – a plain literal (unlike the live, dynamic Pages 1-4 subtitles).
 
@@ -782,7 +782,7 @@ RETURN
     )
 ```
 
-**Design decision – Page 5 V3 cohort measures:** `[Subtitle Cohort Retention]` is bound via fx (Field value) to the V3 matrix subtitle, reporting the live cohort count, calendar span, and tenure window. `[Retention Font Color]` drives per-cell font color on the diverging heatmap – white at both extremes (retention >= 0.70 and <= 0.25) and dark ink (`#3D4752`) in the cream center, because a single threshold rule whitens the light center of a diverging scheme. Both reference the standalone `v_cohort_retention` import.
+**Design decision – Page 5 cohort measures:** `[Subtitle Cohort Retention]` is bound via fx (Field value) to the cohort matrix subtitle, reporting the live cohort count, calendar span, and tenure window. `[Retention Font Color]` drives per-cell font color on the diverging heatmap – white at both extremes (retention >= 0.70 and <= 0.25) and dark ink (`#3D4752`) in the cream center, because a single threshold rule whitens the light center of a diverging scheme. Both reference the standalone `v_cohort_retention` import.
 
 ```dax
 Lifecycle Headline =
