@@ -29,14 +29,14 @@ Each question maps to specific report pages, and every figure on those pages is 
 ## The system
 
 ```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  synth-datagen   │────▶│     BigQuery     │────▶│     Power BI     │
-│  (Python CLI)    │     │  data warehouse  │     │   Import mode    │
-│                  │     │  9-step SQL      │     │   PBIP / TMDL    │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
-  80 CSV shards            audit → clean →          7-page report
-  ~460K raw records        EDA → RFM → marts        109 DAX measures
-  seeded defects           Kimball star schema      model as code
++------------------+     +------------------+     +------------------+
+|  synth-datagen   |---->|     BigQuery     |---->|     Power BI     |
+|  (Python CLI)    |     |  data warehouse  |     |   Import mode    |
+|                  |     |    9-step SQL    |     |   PBIP / TMDL    |
++------------------+     +------------------+     +------------------+
+  80 CSV shards           audit -> clean ->         7-page report
+  ~460K raw records       EDA -> RFM -> marts       109 DAX measures
+  seeded defects          Kimball star schema       model as code
 ```
 
 | Scale | Value |
