@@ -6,15 +6,15 @@
 --   brand, regional, and monthly trend analysis.
 --
 -- Prerequisites:
---   Run Step 02 first.
+--   Run Step 03 first.
 --
 -- Output: 6 views
 --   v_monthly_revenue         → Page 1 (monthly trend line)
 --   v_product_performance     → Page 3 (top products, ranks)
 --   v_brand_profitability     → Page 3 (brand margin comparison)
---   v_regional_performance    → Page 5 (country/state/city map)
+--   v_regional_performance    → Page 6 (country/state/city map)
 --   v_category_monthly_trend  → Page 3 (category × brand × month)
---   v_country_summary         → Page 5 (country-level bars)
+--   v_country_summary         → Page 6 (country-level bars)
 --
 -- ============================================================================
 -- CHANGELOG

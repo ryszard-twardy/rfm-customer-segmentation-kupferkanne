@@ -22,8 +22,7 @@
 --            order_discount_pct is not applied, consistent with the curated
 --            layer. Country is a customer attribute (v_dim_customers_std,
 --            LEFT JOIN on customer_id); NULL country stays NULL.
---            Rewritten against the post-migration snake_case staging schema
---            (issue #11).
+--            Rewritten against the post-migration snake_case staging schema.
 --
 -- See ADR-0003 (pipeline order: EDA before transform).
 -- =============================================================================
@@ -33,7 +32,7 @@
 -- -----------------------------------------------------------------------------
 -- Purpose:   Percentile distribution of order value to understand the spread
 --            of transaction sizes. Informs Monetary dimension binning in RFM.
--- Reading:   Q10/Q25/Q50/Q75/Q90/Q99 give the shape of the distribution. A
+-- Reading:   P10/P25/P50/P75/P90/P99 give the shape of the distribution. A
 --            large gap between P90 and P99 indicates a long tail (whales).
 -- -----------------------------------------------------------------------------
 

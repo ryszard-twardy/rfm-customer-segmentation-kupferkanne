@@ -28,8 +28,8 @@
 --     instance of the customer conformed dimension).
 -- ============================================================================
 -- EXCEPT list rationale:
---   BigQuery resolves identifiers case-insensitively, so two columns that
---   collide by name in the same SELECT list. The two source
+--   BigQuery resolves identifiers case-insensitively, so columns that share a
+--   name collide in the same SELECT list regardless of case. The two source
 --   views share four such collisions:
 --     * v_dim_customers_std.customer_id vs v_rfm_for_bi.customer_id
 --       (the join key; identical values after the join).
