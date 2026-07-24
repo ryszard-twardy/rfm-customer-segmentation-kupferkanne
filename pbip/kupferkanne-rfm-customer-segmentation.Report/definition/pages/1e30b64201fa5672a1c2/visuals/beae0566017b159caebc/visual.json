@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "beae0566017b159caebc",
   "position": {
     "x": 960.83333333333337,
@@ -41,7 +41,7 @@
             "numericStart": {
               "expr": {
                 "Literal": {
-                  "Value": "40D"
+                  "Value": "10D"
                 }
               }
             },
@@ -92,7 +92,7 @@
                         },
                         "Right": {
                           "Literal": {
-                            "Value": "40D"
+                            "Value": "10D"
                           }
                         }
                       }

@@ -3,76 +3,20 @@
   "displayName": "Reset All Filters",
   "name": "006b3b8566eb09d712c2",
   "options": {
-    "targetVisualNames": []
+    "targetVisualNames": [],
+    "suppressActiveSection": true
   },
   "explorationState": {
     "version": "1.3",
-    "activeSection": "46bfe20b629145b40be4",
+    "activeSection": "1e30b64201fa5672a1c2",
     "sections": {
-      "46bfe20b629145b40be4": {
+      "1e30b64201fa5672a1c2": {
         "visualContainers": {
-          "14830b22f6c343ef3a7b": {
-            "singleVisual": {
-              "visualType": "actionButton",
-              "objects": {}
-            }
-          },
-          "b53c2f24de7e97914b29": {
-            "singleVisual": {
-              "visualType": "actionButton",
-              "objects": {}
-            }
-          },
-          "26ee0f781d27c6441827": {
-            "singleVisual": {
-              "visualType": "actionButton",
-              "objects": {}
-            }
-          },
-          "4fc06307aa71074408d0": {
-            "singleVisual": {
-              "visualType": "actionButton",
-              "objects": {}
-            }
-          },
-          "1e99deb8eb005900c40d": {
-            "singleVisual": {
-              "visualType": "actionButton",
-              "objects": {}
-            }
-          },
-          "4c64de366f8c684b9556": {
-            "singleVisual": {
-              "visualType": "actionButton",
-              "objects": {}
-            }
-          },
-          "abf280924fe31233d4a5": {
-            "singleVisual": {
-              "visualType": "shape",
-              "objects": {}
-            }
-          },
-          "0768cb2a94b0ddc3b61b": {
+          "0617a9403b05251c50ad": {
             "filters": {
               "byExpr": [
                 {
-                  "name": "570ce8f5add07243ab98",
-                  "type": "Categorical",
-                  "expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Segment"
-                        }
-                      },
-                      "Property": "Segment"
-                    }
-                  },
-                  "howCreated": 0
-                },
-                {
-                  "name": "fb83a0b149c30b0ed4ca",
+                  "name": "ef68f626e0da02e80107",
                   "type": "Advanced",
                   "expression": {
                     "Measure": {
@@ -81,7 +25,7 @@
                           "Entity": "_Measures"
                         }
                       },
-                      "Property": "Total Revenue"
+                      "Property": "Customers at Risk"
                     }
                   },
                   "howCreated": 0
@@ -89,30 +33,205 @@
               ]
             },
             "singleVisual": {
-              "visualType": "clusteredBarChart",
+              "visualType": "cardVisual",
               "objects": {},
-              "activeProjections": {
-                "Category": [
-                  {
-                    "Column": {
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Measure": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "dim_Segment"
+                          "Entity": "_Measures"
                         }
                       },
-                      "Property": "Segment"
+                      "Property": "Customers at Risk"
                     }
                   }
-                ]
-              }
+                }
+              ]
             }
           },
-          "6ef509afa603b289064b": {
+          "0e6e4574b99d3a64b5b2": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "12c4b0d1d5c9dc85e944": {
             "filters": {
               "byExpr": [
                 {
-                  "name": "f79fb8958650be0d2033",
+                  "name": "e0cb1e078d8b982049e3",
                   "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue at Risk"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "cardVisual",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue at Risk"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "144c4592c174c0286820": {
+            "singleVisual": {
+              "visualType": "textbox",
+              "objects": {}
+            }
+          },
+          "254e93da7b48030cb1d8": {
+            "singleVisual": {
+              "visualType": "textbox",
+              "objects": {}
+            }
+          },
+          "7b3777e0340b9071da49": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "699c34bc2deaa1ac85b7",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue Active"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "8a2e56a4990e116a903d",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue Cooling"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "92c1757db66a81bdb092",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue Dormant"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "hundredPercentStackedBarChart",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue Active"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "7d35446b4010d0890bb0": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "322682b4104498c6319d",
+                  "type": "Categorical",
+                  "filter": {
+                    "Version": 2,
+                    "From": [
+                      {
+                        "Name": "d",
+                        "Entity": "dim_Customer",
+                        "Type": 0
+                      }
+                    ],
+                    "Where": [
+                      {
+                        "Condition": {
+                          "In": {
+                            "Expressions": [
+                              {
+                                "Column": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Source": "d"
+                                    }
+                                  },
+                                  "Property": "Segment"
+                                }
+                              }
+                            ],
+                            "Values": [
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'At Risk'"
+                                  }
+                                }
+                              ],
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'Hibernating'"
+                                  }
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
                   "expression": {
                     "Column": {
                       "Expression": {
@@ -120,13 +239,33 @@
                           "Entity": "dim_Customer"
                         }
                       },
-                      "Property": "Recency Days (bins)"
+                      "Property": "Segment"
                     }
                   },
                   "howCreated": 0
                 },
                 {
-                  "name": "a2c3253ece5609764726",
+                  "name": "0af357ac6e901617802e",
+                  "type": "Advanced",
+                  "expression": {
+                    "Aggregation": {
+                      "Expression": {
+                        "Column": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "dim_Customer"
+                            }
+                          },
+                          "Property": "Total Spend"
+                        }
+                      },
+                      "Function": 0
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "bef0ddc10e97286c0587",
                   "type": "Advanced",
                   "expression": {
                     "Measure": {
@@ -136,6 +275,536 @@
                         }
                       },
                       "Property": "Total Customers"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "pivotTable",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Aggregation": {
+                      "Expression": {
+                        "Column": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "dim_Customer"
+                            }
+                          },
+                          "Property": "Total Spend"
+                        }
+                      },
+                      "Function": 0
+                    }
+                  }
+                }
+              ],
+              "activeProjections": {
+                "Rows": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Segment"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "9bb1d975c76ea1e4891d": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "e3e6dcbeb10555e96626",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Distinct Orders"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "22dda9c7b9a70a7c36e0",
+                  "type": "Advanced",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Recency Days"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "c67b9ed04421cb331e76",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Segment"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "d5bde598b5eca149eced",
+                  "type": "Categorical",
+                  "filter": {
+                    "Version": 2,
+                    "From": [
+                      {
+                        "Name": "d",
+                        "Entity": "dim_Customer",
+                        "Type": 0
+                      }
+                    ],
+                    "Where": [
+                      {
+                        "Condition": {
+                          "In": {
+                            "Expressions": [
+                              {
+                                "Column": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Source": "d"
+                                    }
+                                  },
+                                  "Property": "Segment"
+                                }
+                              }
+                            ],
+                            "Values": [
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'At Risk'"
+                                  }
+                                }
+                              ],
+                              [
+                                {
+                                  "Literal": {
+                                    "Value": "'Hibernating'"
+                                  }
+                                }
+                              ]
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Segment"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "a844559fe1bddc2208c1",
+                  "type": "Advanced",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Total Spend"
+                    }
+                  },
+                  "howCreated": 1
+                },
+                {
+                  "name": "03c1b30d906a560da000",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Customer ID"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "56fb04acab50e8110314",
+                  "type": "Advanced",
+                  "expression": {
+                    "Aggregation": {
+                      "Expression": {
+                        "Column": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "dim_Customer"
+                            }
+                          },
+                          "Property": "Recency Days"
+                        }
+                      },
+                      "Function": 0
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "3ae016c0d6b00a0da399",
+                  "type": "Advanced",
+                  "expression": {
+                    "Aggregation": {
+                      "Expression": {
+                        "Column": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "dim_Customer"
+                            }
+                          },
+                          "Property": "Total Spend"
+                        }
+                      },
+                      "Function": 0
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "scatterChart",
+              "objects": {},
+              "activeProjections": {
+                "Category": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Customer"
+                        }
+                      },
+                      "Property": "Customer ID"
+                    }
+                  }
+                ],
+                "X": [
+                  {
+                    "Aggregation": {
+                      "Expression": {
+                        "Column": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "dim_Customer"
+                            }
+                          },
+                          "Property": "Recency Days"
+                        }
+                      },
+                      "Function": 0
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "9be3892dd409093d502e": {
+            "singleVisual": {
+              "visualType": "shape",
+              "objects": {}
+            }
+          },
+          "a934df7c48b1106bb055": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "b3876d05115c9bcae417": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "b3960831d09b0d97a62b": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "b77e52afd6a31b0cd328": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "beae0566017b159caebc": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "5e9ecf156db0171763da",
+                  "type": "Advanced",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Reactivation Rate"
+                        }
+                      },
+                      "Property": "Reactivation Rate"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {
+                "merge": {
+                  "general": [
+                    {
+                      "properties": {
+                        "filter": {
+                          "filter": {
+                            "Version": 2,
+                            "From": [
+                              {
+                                "Name": "r",
+                                "Entity": "Reactivation Rate",
+                                "Type": 0
+                              }
+                            ],
+                            "Where": [
+                              {
+                                "Condition": {
+                                  "Comparison": {
+                                    "ComparisonKind": 0,
+                                    "Left": {
+                                      "Column": {
+                                        "Expression": {
+                                          "SourceRef": {
+                                            "Source": "r"
+                                          }
+                                        },
+                                        "Property": "Reactivation Rate"
+                                      }
+                                    },
+                                    "Right": {
+                                      "Literal": {
+                                        "Value": "10D"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "data": [
+                    {
+                      "properties": {
+                        "numericStart": {
+                          "expr": {
+                            "Literal": {
+                              "Value": "10D"
+                            }
+                          }
+                        },
+                        "mode": {
+                          "expr": {
+                            "Literal": {
+                              "Value": "'Single'"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "selection": [
+                    {
+                      "properties": {
+                        "strictSingleSelect": {
+                          "expr": {
+                            "Literal": {
+                              "Value": "true"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "activeProjections": {
+                "Values": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Reactivation Rate"
+                        }
+                      },
+                      "Property": "Reactivation Rate"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "c3e112027ea77c21e1c3": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "a4bbb94d640db0ae8c9a",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "% Revenue at Risk"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "cardVisual",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "% Revenue at Risk"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "cf59de1d2b973d13aee5": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "eb0efe4705dcb82c0523": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "efcc794202cea3eae048": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "b50fc0f08b260b893022",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "What-If Revenue Impact"
+                    }
+                  },
+                  "howCreated": 0
+                }
+              ]
+            },
+            "singleVisual": {
+              "visualType": "cardVisual",
+              "objects": {},
+              "orderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "What-If Revenue Impact"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "f453b6e39b30ac6c7103": {
+            "filters": {
+              "byExpr": [
+                {
+                  "name": "253b8728227a496811c4",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Revenue at Risk"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "31cd757f4560eb50b40e",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "What-If Revenue Impact"
                     }
                   },
                   "howCreated": 0
@@ -155,100 +824,6 @@
                           "Entity": "_Measures"
                         }
                       },
-                      "Property": "Total Customers"
-                    }
-                  }
-                }
-              ],
-              "activeProjections": {
-                "Category": [
-                  {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Customer"
-                        }
-                      },
-                      "Property": "Recency Days (bins)"
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "0079f6bf149a000878b9": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "e77eb99b9e68396db6db",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Customers"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "cardVisual",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Customers"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "459eee55c90b56595b71": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "0022b4fddb0a67e01a1a",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Revenue at Risk"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "cardVisual",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
                       "Property": "Revenue at Risk"
                     }
                   }
@@ -256,333 +831,31 @@
               ]
             }
           },
-          "ad2f97420a09d438717c": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "e9a250876c0e386bbc61",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Avg Recency Days"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
+          "fa68ef9340ed0be2e37e": {
             "singleVisual": {
-              "visualType": "cardVisual",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Avg Recency Days"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "cf340a19a6e070e9d583": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "5248e5f6e2cc4446ce59",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Revenue"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "cardVisual",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Revenue"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "c3f99f807d3b81361700": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "b6adfbe5ad2043a19324",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Profit"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "cardVisual",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Profit"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "f4ad57576d620dc0a197": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "ade1a5502b0206a4e066",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Profit Margin %"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "cardVisual",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Profit Margin %"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "7cda3d04832d13072ba3": {
-            "singleVisual": {
-              "visualType": "textbox",
+              "visualType": "image",
               "objects": {}
             }
-          },
-          "0762d025b3ea5450c81a": {
-            "singleVisual": {
-              "visualType": "textbox",
-              "objects": {}
-            }
-          },
-          "48e89990a07c4b6b70c6": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "f81cebd406075e5ea086",
-                  "type": "Categorical",
-                  "expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Date"
-                        }
-                      },
-                      "Property": "Start of Week"
-                    }
-                  },
-                  "howCreated": 0
-                },
-                {
-                  "name": "2fdc0e8de7262862d669",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Revenue"
-                    }
-                  },
-                  "howCreated": 0
-                },
-                {
-                  "name": "ac950f63cb7192d9c8c9",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Revenue Rolling 12M"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "lineChart",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 1,
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Date"
-                        }
-                      },
-                      "Property": "Start of Week"
-                    }
-                  }
-                }
-              ],
-              "activeProjections": {
-                "Category": [
-                  {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Date"
-                        }
-                      },
-                      "Property": "Start of Week"
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "8dcaf6f043290be671e5": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "99b0417675e5eda27009",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Total Customers"
-                    }
-                  },
-                  "howCreated": 0
-                },
-                {
-                  "name": "00a1ca603cb8c5968d9a",
-                  "type": "Categorical",
-                  "expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Segment"
-                        }
-                      },
-                      "Property": "Segment"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "donutChart",
-              "objects": {},
-              "activeProjections": {
-                "Category": [
-                  {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Segment"
-                        }
-                      },
-                      "Property": "Segment"
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "visualContainerGroups": {
-          "4917a3491498a1641dc8": {
-            "isHidden": false
-          },
-          "0af0b920801ddac37b33": {
-            "isHidden": false
-          },
-          "f51f87c12e17a4d43363": {
-            "isHidden": false
-          },
-          "6361ed938922024a316c": {
-            "isHidden": false
           }
         }
       }
     },
-    "objects": {}
+    "objects": {
+      "merge": {
+        "outspacePane": [
+          {
+            "properties": {
+              "expanded": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
   }
 }
