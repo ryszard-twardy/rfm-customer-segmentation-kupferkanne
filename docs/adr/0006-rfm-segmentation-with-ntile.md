@@ -43,7 +43,7 @@ Segments are derived from `r_score + f_score + m_score`:
 
 - Pure SQL implementation, no Python or sklearn required.
 - Thresholds are transparent – anyone can read the `NTILE` call and the score band.
-- Segment sizes are roughly balanced by construction (NTILE forces equal bucket sizes).
+- NTILE balances each score dimension individually; composite-band segment sizes are not equalized and vary with the joint score distribution (shipped shares run from roughly 9% to 21% of customers per segment).
 - The composite score is monotonic against revenue contribution, verified via EDA.
 
 ## Alternatives Considered

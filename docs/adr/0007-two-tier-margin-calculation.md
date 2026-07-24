@@ -10,7 +10,7 @@ Profit margin is shown on multiple dashboard pages: segment-level (Page 2), bran
 For a segment of 100 customers where 90 placed €5 orders at 80% margin and 10 placed €5,000 orders at 20% margin:
 
 - `AVG(margin_per_order)` ≈ **74%** – but this is meaningless for P&L purposes.
-- True margin = `SUM(profit) / SUM(revenue)` = (90·4 + 10·1,000) / (90·5 + 10·5,000) = **22.6%**.
+- True margin = `SUM(profit) / SUM(revenue)` = (90·4 + 10·1,000) / (90·5 + 10·5,000) = **20.5%**.
 
 The two numbers diverge dramatically. Reporting the wrong one in a customer-segment context misleads the reader about which segments are profitable.
 
@@ -37,3 +37,7 @@ For transparency, two complementary measures are exposed in the dashboard toolti
 - **Margin per customer (LTV-style)** – out of scope: would require a separate measure and conflate revenue-share with profitability.
 
 Note (2026-06-09): report page numbering changed after this ADR – Customer Lifecycle Intelligence inserted at page 5; Regional Analysis is now page 6, Customer Drillthrough page 7. Canonical page list: methodology.md.
+
+## Addendum (2026-07-23) – shipped measure names
+
+The decision stands: headline margins are revenue-weighted everywhere. The measure names and the comparison grain evolved during implementation: the weighted tier ships as `[Profit Margin %]` (59.78%) and the equal-weight tier ships at brand grain as `[Avg Brand Margin %]` (`AVERAGEX` over brands, 59.94%), replacing the order-grain tooltip measure sketched above. Qualifying labels remain mandatory wherever either figure appears. Current catalogue: `docs/measures.md`.

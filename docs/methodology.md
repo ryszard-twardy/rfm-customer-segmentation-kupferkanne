@@ -64,6 +64,8 @@ Each dimension is bucketed 1–5 using `NTILE(5)` quintiles. The composite RFM s
 
 The choice of `NTILE(5)` over alternatives (k-means clustering, single composite score) is documented in [ADR 0006](adr/0006-rfm-segmentation-with-ntile.md). The choice of `MAX(order_date)` as recency anchor – rather than `CURRENT_DATE()` – is covered in the same ADR, since using current date would inflate all recency values uniformly when the dataset ends in the past.
 
+**Limitation – additive scoring.** Summing R+F+M into a single composite discards which dimension drives the total: a lapsed high-value customer (R=1, F=5, M=5) and a recently active mid-value one can land in the same band despite different lifecycle positions, and the segment names carry recency connotations the sum alone does not enforce. This is an accepted trade-off for a transparent, SQL-only scoring rule; a production variant would gate segment membership on the R score explicitly (the classic RFM-cell approach).
+
 ## Margin calculation
 
 Profit margin is calculated as a **weighted** quantity: `SUM(profit) / SUM(revenue)` aggregated at the segment, country, or product grain. This contrasts with `AVG(margin_per_order)`, which double-weights small orders and produces misleading segment-level summaries. See [ADR 0007](adr/0007-two-tier-margin-calculation.md).
@@ -74,13 +76,13 @@ All DAX measures follow the SQLBI short-line convention – the de-facto communi
 
 ## Reactivation modelling
 
-The Churn page (PBI Page 4) includes a What-If parameter allowing the user to simulate reactivation of cold customers at different success rates (5%–25%). The model projects incremental revenue under the assumption that the reactivated cohort behaves at the average of the next-warmer segment. This is **illustrative**, not predictive – no machine learning is applied, and the simplification is documented in the dashboard subtitle.
+The Churn page (PBI Page 4) includes a What-If parameter allowing the user to simulate reactivation of cold customers at success rates from 0% to 50% in 5-point steps (default 10%); 5%–25% is the realistic planning band for win-back campaigns. The model projects incremental revenue under the assumption that the reactivated cohort behaves at the average of the next-warmer segment. This is **illustrative**, not predictive – no machine learning is applied, and the simplification is documented in the dashboard subtitle.
 
 ## Validation
 
 In addition to the pre/post-clean audits, three cross-checks run during transformation:
 
-1. **Row-count parity** between `sales_curated` (order-grain) and `v_items_for_bi` aggregated to order-grain – confirms the dual-grain join is consistent.
+1. **Grain parity** – order-grain revenue equals line-grain revenue aggregated to orders, asserted in the semantic model via the `[Grain Reconciliation]` measure (expected 0) – confirms the dual-grain join is consistent.
 2. **Segment monotonicity** – the average Monetary score increases monotonically from Hibernating to Champions, confirming the composite score is well-behaved.
 3. **Country coverage** – every country in `dim_customers` appears in the segmented output.
 
