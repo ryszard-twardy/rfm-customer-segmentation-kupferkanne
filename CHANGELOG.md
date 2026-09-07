@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Report page names verified from `page.json` (Page 6 = Regional Analysis); status badge aligned to the latest release tag v1.1.0.
 - EDA notebook fix pass and table presentation polish: author attribution, resolved WIP markers, corrected Quarto project note, 2-decimal formatting, suppressed index, Title-Case headers, percent and currency formats
 - README: added an "Engineering workflow" section describing the operator-gated, AI-assisted development process.
+- Loader sets no default table or partition expiration on a dataset it creates, and reports when the dataset it targets already carries one.
 
 ---
 

@@ -23,6 +23,10 @@ Dimensions:
   - Dimension tables remain autodetected by default. They are single tables,
     so wildcard compatibility is not a concern there.
 
+Retention:
+  - The warehouse keeps its tables between pipeline runs, so a dataset created
+    here is given no default table or partition expiration.
+
 Usage:
   python upload_to_bigquery_schema_enforced.py
   python upload_to_bigquery_schema_enforced.py --data-dir ./data --project kupferkanne-2026
@@ -88,13 +92,23 @@ def resolve_input_layout(data_dir: str) -> tuple[str, str]:
 
 
 def ensure_dataset(client: bigquery.Client, dataset_ref: str, location: str) -> None:
-    """Create dataset if needed."""
+    """Create dataset if needed, with no default table or partition expiration."""
     try:
-        client.get_dataset(dataset_ref)
+        dataset = client.get_dataset(dataset_ref)
         print(f"Dataset {dataset_ref} already exists.")
+        if (
+            dataset.default_table_expiration_ms
+            or dataset.default_partition_expiration_ms
+        ):
+            print(
+                f"  [WARN] {dataset_ref} carries a default expiration; "
+                "tables loaded here are deleted when it elapses."
+            )
     except NotFound:
         dataset = bigquery.Dataset(dataset_ref)
         dataset.location = location
+        dataset.default_table_expiration_ms = None
+        dataset.default_partition_expiration_ms = None
         client.create_dataset(dataset, exists_ok=True)
         print(f"Created dataset {dataset_ref} in {location}")
 
