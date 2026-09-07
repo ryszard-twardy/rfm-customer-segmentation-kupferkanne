@@ -27,3 +27,5 @@ Use **Google BigQuery** with the GoogleSQL dialect. The project lives under one 
 - **DuckDB** – used in parallel internal tooling but rejected here: not aligned with the hosted-warehouse operational model Kupferkanne required.
 
 Note (2026-07-10): the object counts in this decision (22: 10 tables + 12 views) reflect the dataset at decision time. The warehouse has since grown and been restructured; current object counts are maintained in README.md and architecture.md.
+
+Note (2026-09-07): the sandbox tier referenced in Consequences no longer applies. The project runs with billing enabled and the dataset carries no default table or partition expiration; see [ADR 0015](0015-warehouse-table-retention.md).

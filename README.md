@@ -99,7 +99,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 ## Reproduce it
 
 1. **Generate the data.** [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) produces the 80 CSV shards deterministically from a seed (~460K records, ~22 MB).
-2. **Load to BigQuery.** One dataset (`kupferkanne-2026.sales`) with monthly-sharded fact tables (`orders20YYMM`, `items20YYMM`) plus two dimension tables. The free BigQuery sandbox covers the entire project – no billing account required.
+2. **Load to BigQuery.** One dataset (`kupferkanne-2026.sales`) with monthly-sharded fact tables (`orders20YYMM`, `items20YYMM`) plus two dimension tables. Load them with `scripts/upload_to_bigquery_schema_enforced.py`, passing `--data-dir data --project kupferkanne-2026 --dataset sales --location EU`. The project runs with billing enabled and the dataset carries no default table or partition expiration, so warehouse tables persist between pipeline runs ([ADR 0015](docs/adr/0015-warehouse-table-retention.md)).
 3. **Run the pipeline.** Execute the `sql/` scripts in numeric order. Every script is idempotent (`CREATE OR REPLACE` for views, `DROP TABLE IF EXISTS` + `CREATE TABLE` for partitioned tables), so re-runs are safe.
 4. **Open the report.** Open the `.pbip` in Power BI Desktop, authenticate the BigQuery connector (OAuth), and refresh.
 

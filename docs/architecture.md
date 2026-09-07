@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kupferkanne is a portfolio-grade retail analytics demonstration showing how a single-author analyst can deliver a complete data warehouse plus BI solution. It analyses 39 months of synthetic order data for a fictional Erlangen-based D2C e-commerce brand operating in nine European markets, identifies customer segments via RFM scoring, and surfaces findings through a seven-page Power BI dashboard.
+Kupferkanne is a retail analytics platform: a complete data warehouse and the BI solution built on top of it. It analyses 39 months of synthetic order data for a fictional Erlangen-based D2C e-commerce brand operating in nine European markets, identifies customer segments via RFM scoring, and surfaces findings through a seven-page Power BI dashboard.
 
 ## System diagram
 
@@ -12,11 +12,11 @@ Kupferkanne is a portfolio-grade retail analytics demonstration showing how a si
 |  (Python CLI)    |     |  data warehouse  |     |   Import mode    |
 |                  |     |    9-step SQL    |     |   PBIP / TMDL    |
 +------------------+     +------------------+     +------------------+
-  80 CSV shards           33 objects created        7-page report
+  80 CSV shards           33 pipeline objects       7-page report
   ~460K raw records       11 tables + 22 views      109 DAX measures
 ```
 
-_Eight of the views (`eda_*`) exist for the exploratory notebook; the other 25 objects are the transformation pipeline and the views built on top of it._
+_The counts above cover the objects the SQL pipeline creates; the 80 CSV shards load into 80 source tables in the same dataset. Eight of the views (`eda_*`) exist for the exploratory notebook; the other 25 objects are the transformation pipeline and the views built on top of it._
 
 ## Tech stack
 

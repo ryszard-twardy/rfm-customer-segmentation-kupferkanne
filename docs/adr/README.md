@@ -22,3 +22,4 @@ ADRs are intentionally focused – they capture **strategic** decisions where th
 | [0012](0012-single-direction-customer-topology.md) | Single-Direction Customer Topology | Accepted |
 | [0013](0013-unified-segment-dimension.md) | Unified Segment Dimension | Accepted |
 | [0014](0014-deneb-vega-lite-regional-map.md) | Deneb Vega-Lite Regional Map | Accepted |
+| [0015](0015-warehouse-table-retention.md) | Warehouse Table Retention | Accepted |

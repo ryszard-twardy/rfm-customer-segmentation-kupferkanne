@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - All visual titles and subtitles converted to dynamic, measure-driven DAX bound through the format pane, so headings track the active filter context.
 - Revenue Rolling 12M measure for trailing-twelve-month revenue on the Executive Summary trend.
 - Brand logo applied across all seven report pages.
+- Architecture Decision Record 0015, warehouse table retention: billing enabled and no dataset-level table or partition expiration.
 
 ### Changed
 
@@ -26,6 +27,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - EDA notebook fix pass and table presentation polish: author attribution, resolved WIP markers, corrected Quarto project note, 2-decimal formatting, suppressed index, Title-Case headers, percent and currency formats
 - README: added an "Engineering workflow" section describing the operator-gated, AI-assisted development process.
 - Loader sets no default table or partition expiration on a dataset it creates, and reports when the dataset it targets already carries one.
+- `architecture.md` object counts scoped explicitly to the objects the SQL pipeline creates, separating them from the 80 source tables loaded from `data/`.
+- Editorial correction in the `architecture.md` overview and the `methodology.md` data-origin paragraph: both now describe the platform and the cleaning pipeline in operational terms.
+- `README.md` reproduction steps updated to the current platform configuration: the load step names the loader script and its flags, and the warehouse requires a billing-enabled project with no dataset-level expiration.
+- Clarified the v1.1.0 entry for `v_rfm_for_bi`: the retirement removed the table from the Power BI semantic model. The BigQuery view of that name remains in the pipeline, where `v_dim_customers_for_bi` reads it.
 
 ---
 
