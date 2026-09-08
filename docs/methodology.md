@@ -76,7 +76,40 @@ All DAX measures follow the SQLBI short-line convention – the de-facto communi
 
 ## Reactivation modelling
 
-The Churn page (PBI Page 4) includes a What-If parameter allowing the user to simulate reactivation of cold customers at success rates from 0% to 50% in 5-point steps (default 10%); 5%–25% is the realistic planning band for win-back campaigns. The model projects incremental revenue under the assumption that the reactivated cohort behaves at the average of the next-warmer segment. This is **illustrative**, not predictive – no machine learning is applied, and the simplification is documented in the dashboard subtitle.
+The Churn page (PBI Page 4) carries a What-If parameter that simulates reactivation of cold customers at success rates from 0 to 50 percent in 5-point steps, default 10 percent, as a planning band for win-back campaigns. `[What-If Revenue Impact]` multiplies the selected rate by the lifetime spend of the At Risk and Hibernating segments. The result is a scenario figure, not a forecast: it applies no churn probability, no time horizon and no cost netting, and it prices a share of a historical spend stock rather than a projected forward flow. The parameter is defined at `pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/Reactivation Rate.tmdl:22-32` and consumed at `pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/_Measures.tmdl:230-248`.
+
+## Win-back discount allocation
+
+### Revenue base
+
+`sales_curated[Order Value]` is net of `order_discount_pct`. Across 274,734 line rows `unit_price` equals the `dim_Product` retail price without exception, and order value over summed line gross tracks `1 - order_discount_pct` within 0.001 for 168,064 of 168,777 orders. The margins below are realised margins, not list margins.
+
+### Cost basis
+
+The model prices no campaign action. `dim_Segment[Discount Approach]` records a playbook label per segment (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), and those labels are the only action cost the repository carries: 15 percent for At Risk, 20 percent for Hibernating. The figures below therefore price the discount itself, a revenue concession, and not contact, send or fulfilment cost, none of which exist in the model, the SQL layer or this documentation. On the What-If parameter's default rate of 10 percent, which is a planning assumption rather than a measured reactivation rate, and on one recovered order per reactivated customer, ten contacts stand behind each recovered order and contribution is exhausted at a contact cost of 1.51 EUR in At Risk and 0.67 EUR in Hibernating. The playbook assigns both segments an email cadence (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`).
+
+The assumption, stated so it can be challenged: the win-back discount is a percentage off order value and per-unit COGS is unchanged by it. Contribution then equals (gross margin - discount rate) x order value, an identity rather than an approximation, because both rates share the same denominator. `unit_cost` is a fixed attribute of `dim_Product`, so per-unit COGS is invariant to price. Basket mix is not, and a discount-motivated basket need not resemble the segment's historical one.
+
+### Derivation
+
+| Segment | Customers | Orders | Revenue | Cost | Profit | AOV | Gross margin | Discount | Contribution per order | Contribution per euro of discount |
+|---|---|---|---|---|---|---|---|---|---|---|
+| At Risk | 1,366 | 2,635 | 107,123.12 | 51,157.70 | 55,965.42 | 40.65 | 52.2440% | 15% | 15.14 | 2.4829 |
+| Hibernating | 2,543 | 2,587 | 64,645.72 | 34,467.90 | 30,177.82 | 24.99 | 46.6819% | 20% | 6.67 | 1.3341 |
+
+### Recommendation
+
+Shift win-back discount budget from Hibernating to At Risk: for every 1,000 EUR of discount granted, expected contribution is 2,483 EUR in At Risk against 1,334 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
+
+The playbook grants its deepest discount to its thinnest margin. At Risk retains 37.2440 points of contribution after a 15-point concession; Hibernating retains 26.6819 points after 20. The ranking is the finding, and it is robust to the assumptions stated in this section. The absolute per-euro figures carry the limitations below.
+
+### Limitations
+
+- Segment membership is a single snapshot. Every figure describes customers who sit in a segment as of the analysis date, not revenue earned while in it. Segment migration is not computable from this data.
+- These cohorts already transact at a discount: mean realised `order_discount_pct` is 0.2573 for At Risk and 0.3313 for Hibernating. A further 15 or 20 points compounds to roughly 36.9 and 46.5 percent off list, against an observed maximum of 0.55. Whether a cohort already at a third off warrants a further concession is a commercial judgement this analysis does not settle.
+- No campaign cost exists in the repository, so the recommendation prices the concession alone.
+- The dataset is synthetic and regenerable. The margin, discount and AOV gradients are properties of the generator, so the figures demonstrate pipeline integrity rather than a market observation.
+- The reallocation is bounded by the playbook itself. `dim_Segment[Budget Allocation]` reads "Low (7%)" for At Risk and "Minimal (3%)" for Hibernating (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), so the move is directionally right and small in absolute budget terms.
 
 ## Validation
 
@@ -91,10 +124,10 @@ In addition to the pre/post-clean audits, three cross-checks run during transfor
 The dashboard uses Import mode with the dual-grain semantic layer described in [data_model.md](data_model.md). Seven pages cover:
 
 1. Executive Summary – KPIs and time-series.
-2. Segment Deep Dive – segment behaviour and migration.
+2. Segment Deep Dive – segment composition and value concentration at the snapshot date.
 3. Product & Brand – line-grain product performance.
 4. Churn Risk & What-If – reactivation modelling.
-5. Customer Lifecycle Intelligence – RFM-space position, revenue concentration, cohort retention and segment migration.
+5. Customer Lifecycle Intelligence – RFM-space position, revenue concentration and cohort retention.
 6. Regional Analysis – country and city breakdown.
 7. Customer Drillthrough – individual customer inspection.
 
