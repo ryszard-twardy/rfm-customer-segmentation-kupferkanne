@@ -665,10 +665,10 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: af26c8c2-eafc-4662-b781-3831d490f399
 
-	/// Page 5 static subtitle: RFM distribution, revenue concentration, cohort retention, segment migration.
+	/// Page 5 static subtitle: RFM distribution, revenue concentration, cohort retention, new vs returning revenue.
 	measure 'Subtitle Page 5' =
 			
-			"RFM space distribution, revenue concentration, cohort retention, segment migration"
+			"RFM space distribution, revenue concentration, cohort retention, new vs returning revenue"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 4b02ede1-e14f-4f91-b4e5-5ae497ae31d4
 

@@ -569,7 +569,7 @@ RETURN
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
 | Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
-| Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, segment migration) | Text | 5 |
+| Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, new vs returning revenue) | Text | 5 |
 | Subtitle Page 6 | Dynamic Page 6 subtitle with live market and city counts, singular/plural-aware | Text | 6 |
 | Subtitle Page 7 | Dynamic Page 7 drillthrough header (customer ID · segment · city, country); prompts the drill-through gesture when no single customer is in context | Text | 7 |
 | R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
@@ -708,7 +708,7 @@ Subtitle Page 4 =
 ```
 
 ```dax
-Subtitle Page 5 = "RFM space distribution, revenue concentration, cohort retention, segment migration"
+Subtitle Page 5 = "RFM space distribution, revenue concentration, cohort retention, new vs returning revenue"
 ```
 
 ```dax
