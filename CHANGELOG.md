@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] – 2026-09-23
+
+Report completion and public release. The report gains its hidden Customer Drillthrough page and measure-driven titles, the Quarto notebook joins the SQL EDA, the executive analysis ships in `docs/methodology.md` with a quantified win-back recommendation, and the report is public as a live Power BI link with offline assets attached to the release. KPI invariants unchanged (Total Revenue 8,531,365.52, Customers 14,967).
+
 ### Added
 
 - Year-over-year and prior-year measures for Profit and Profit Margin, plus a prior-year Revenue measure, in the `04 - Time Intelligence` folder.
@@ -18,6 +24,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Revenue Rolling 12M measure for trailing-twelve-month revenue on the Executive Summary trend.
 - Brand logo applied across all seven report pages.
 - Architecture Decision Record 0015, warehouse table retention: billing enabled and no dataset-level table or partition expiration.
+- Win-back discount allocation analysis in `docs/methodology.md`: revenue base, cost basis and a per-segment derivation behind a quantified recommendation to shift win-back discount budget from Hibernating to At Risk, with its limitations stated.
+- Public live report via Power BI publish to web, linked from `README.md`; no sign-in required.
+- Offline release assets: the Power BI file with its data (`.pbix`) and a PDF export of the six visible report pages.
 
 ### Changed
 
@@ -31,6 +40,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Editorial correction in the `architecture.md` overview and the `methodology.md` data-origin paragraph: both now describe the platform and the cleaning pipeline in operational terms.
 - `README.md` reproduction steps updated to the current platform configuration: the load step names the loader script and its flags, and the warehouse requires a billing-enabled project with no dataset-level expiration.
 - Clarified the v1.1.0 entry for `v_rfm_for_bi`: the retirement removed the table from the Power BI semantic model. The BigQuery view of that name remains in the pipeline, where `v_dim_customers_for_bi` reads it.
+
+### Fixed
+
+- Page 5 subtitle names new vs returning revenue instead of segment migration, which a single-snapshot segment table cannot compute.
+- Reset All Filters bookmark re-captured at the clean default state without page navigation, with stale references to a retired mart rebound so Desktop saves no longer re-inject a phantom sort.
+- EDA views in `sql/02` rewritten against the post-migration staging schema.
+
+### Documentation
+
+- Analytical claims reconciled with the shipped model: corrected worked margin example in ADR 0007, precise NTILE balance statement, additive-RFM limitation, and Revenue at Risk defined as a value-exposure metric.
+- ADR count corrected to fifteen in `README.md` and `architecture.md`.
 
 ---
 
@@ -212,7 +232,7 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ## Roadmap
 
-### [1.2.0] – planned
+### [1.3.0] – planned
 
 - Publish the committed notebook (`notebooks/eda_kupferkanne.qmd`, `_quarto.yml`) to GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`; the notebook is authored and the rendered `_site/` is gitignored, so only the gh-pages deploy step is outstanding.
 
@@ -224,7 +244,8 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ---
 
-[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.2.0
 [1.1.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.1.0
 [1.0.2]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.2
 [1.0.1]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.1
