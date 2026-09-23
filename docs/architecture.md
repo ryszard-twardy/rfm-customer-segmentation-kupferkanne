@@ -42,4 +42,4 @@ The data model uses a Kimball-style star schema with two conformed dimensions an
 - [methodology.md](methodology.md) – RFM approach, segmentation, margin calculation
 - [measures.md](measures.md) – DAX measure catalogue
 - [glossary.md](glossary.md) – domain terminology
-- [adr/](adr/) – fourteen architecture decision records
+- [adr/](adr/) – fifteen architecture decision records
