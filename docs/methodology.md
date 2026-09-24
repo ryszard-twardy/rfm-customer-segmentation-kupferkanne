@@ -112,7 +112,7 @@ The figures above measure how efficiently a euro of discount converts into margi
 - Randomise eligible customers in each segment into an offer group and a holdout group that receives no win-back discount.
 - Primary metric: incremental contribution per euro of discount – offer-group contribution minus holdout contribution, divided by the discount granted.
 - Decision rule: move budget to At Risk only if its incremental contribution per euro of discount exceeds that of Hibernating; otherwise keep the current allocation.
-- Record contact cost per send; the break-even contact costs in the cost basis above (1.51 EUR and 0.67 EUR) show how sensitive the result is to it.
+- Record contact cost per contacted customer; the break-even contact costs in the cost basis above (1.51 EUR and 0.67 EUR) show how sensitive the result is to it.
 - Group sizes and duration follow from the response observed in the first wave; the repository holds no campaign response history to set them in advance.
 
 ### Limitations
