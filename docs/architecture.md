@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kupferkanne is a retail analytics platform: a complete data warehouse and the BI solution built on top of it. It analyses 39 months of synthetic order data for a fictional Erlangen-based D2C e-commerce brand operating in nine European markets, identifies customer segments via RFM scoring, and surfaces findings through a seven-page Power BI dashboard.
+Kupferkanne is a retail analytics platform: a complete data warehouse and the BI solution built on top of it. It analyses 39 months of synthetic order data for a fictional Erlangen-based D2C e-commerce brand operating in nine European markets, identifies customer segments via RFM scoring, and surfaces findings in Power BI across six report pages plus a customer drillthrough.
 
 ## System diagram
 

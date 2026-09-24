@@ -16,7 +16,7 @@ Fifteen thousand customers, one retention budget. This project is what the analy
 
 **Offline:** the Power BI file with its data (`.pbix`) and a PDF of the six visible report pages are attached to the [latest release](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/latest).
 
-> **Reviewing in 60 seconds?** Skim [the seven report pages](#the-report-seven-pages), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
+> **Reviewing in 60 seconds?** Skim [the six report pages](#the-report-six-report-pages-plus-a-customer-drillthrough), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
 
 ---
 
@@ -61,7 +61,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 
 **Dual-grain model.** A Kimball star schema with conformed dimensions and two fact grains: order-grain `sales_curated` (168,777 rows) for revenue and segmentation, line-grain `v_items_for_bi` (~275K rows) for product detail. Measure names carry the grain (`[Total *]` vs `[Line *]`), and a reconciliation measure asserts the two grains agree (invariant = 0). ([ADR 0005](docs/adr/0005-dual-grain-fact-model.md))
 
-## The report (seven pages)
+## The report (six report pages plus a customer drillthrough)
 
 | # | Page | The question it answers |
 |---|---|---|
