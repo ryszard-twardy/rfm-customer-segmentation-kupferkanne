@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Theme name in `theme/rfm_dashboard_theme.json` stored an em-dash as a JSON escape; it now decodes to an en-dash and matches the theme registered in the report.
+- Dash typography in the analytical notebook (`notebooks/eda_kupferkanne.qmd`): the title and the prose use en-dashes where spaced hyphens stood in for them; code chunks are unchanged.
+
+### Documentation
+
+- Win-back recommendation in `docs/methodology.md` reframed as a controlled pilot with a randomised holdout, an incremental primary metric and a decision rule, and extended with scale figures: the two segments' share of scored customers, the revenue at risk and the contribution gained per 1,000 EUR of discount moved.
+- Palette description in `docs/architecture.md` corrected to the live theme: muted-blue primary (`#4A7AA0`) on white, with a `#F7F5F1` page background.
+- `AGENTS.md` tracker statement matches the repository settings: issue tracking is disabled and planned work is listed under Roadmap in this file.
+- Forward note in ADR 0003: the pipeline now has eleven `sql/` scripts, the nine the record lists plus two view scripts.
+- Euro format notation in `docs/measures.md` aligned with the model: five measures documented as `€ 0dp` carry a two-decimal format string and now read `€ 2dp`.
+
 ---
 
 ## [1.2.0] – 2026-09-23
@@ -234,7 +247,7 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ### [1.3.0] – planned
 
-- Publish the committed notebook (`notebooks/eda_kupferkanne.qmd`, `_quarto.yml`) to GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`; the notebook is authored and the rendered `_site/` is gitignored, so only the gh-pages deploy step is outstanding.
+- Publish the analytical notebook, an executive report and a companion deck to GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`; all three are rendered locally with Quarto from the committed sources.
 
 ### Considered, not committed
 

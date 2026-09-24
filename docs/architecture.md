@@ -27,7 +27,7 @@ _The counts above cover the objects the SQL pipeline creates; the 80 CSV shards 
 | Transformation | 9-step SQL pipeline | Idempotent (`CREATE OR REPLACE`), lint-clean |
 | Linting | SQLFluff | Custom rule policy |
 | BI | Power BI (PBIP / TMDL) | Import mode, dual-grain semantic layer, model as code |
-| Theme | Custom JSON | Segoe UI, navy primary on light grey background |
+| Theme | Custom JSON | Segoe UI, muted-blue primary (#4A7AA0) on white, with a #F7F5F1 page background |
 | DAX formatting | [daxformatter.com](https://www.daxformatter.com/) | SQLBI short-line conventions |
 
 ## Pipeline flow

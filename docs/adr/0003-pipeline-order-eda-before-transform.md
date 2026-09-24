@@ -36,3 +36,5 @@ The nine SQL files reflect this order via their numeric prefixes:
 
 - **Keep the old order, just rename the misleading file** – rejected because it leaves an architectural smell: design decisions made without exploration.
 - **Move all EDA to a Quarto notebook only** – rejected because notebooks complement but don't replace queryable SQL views. The views are inspectable in BigQuery, joinable, and reproducible without a runtime.
+
+Note (2026-09-24): the pipeline now has eleven `sql/` scripts – the nine listed here plus two view scripts, `sql/v_cohort_retention.sql` and `sql/v_revenue_new_returning.sql`.

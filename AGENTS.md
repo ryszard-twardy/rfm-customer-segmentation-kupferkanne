@@ -29,7 +29,7 @@ Master configuration for `rfm-customer-segmentation-kupferkanne`. Read this file
 
 ## Issue tracker
 
-GitHub Issues, operated via the `gh` CLI.
+Issue tracking is disabled on this repository; planned work is listed under Roadmap in CHANGELOG.md.
 
 ## Architectural decisions
 

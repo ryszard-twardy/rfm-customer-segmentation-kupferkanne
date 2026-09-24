@@ -268,7 +268,7 @@ RETURN
 |---|---|---|
 | Segment % of Total | % 2dp | 1, 2 |
 | Revenue % of Total | % 2dp | 2 |
-| Revenue at Risk | € 0dp | 1, 4 |
+| Revenue at Risk | € 2dp | 1, 4 |
 | % Revenue at Risk | % 2dp | 4 |
 | Cumulative Revenue % | % 2dp | 5 |
 | Pareto Threshold 80% | % 2dp | 5 |
@@ -382,9 +382,9 @@ RETURN
 
 | Measure | Format | Pages |
 |---|---|---|
-| Revenue Active (0–90d) | € 0dp | 4 |
-| Revenue Cooling (91–180d) | € 0dp | 4 |
-| Revenue Dormant (180d+) | € 0dp | 4 |
+| Revenue Active (0–90d) | € 2dp | 4 |
+| Revenue Cooling (91–180d) | € 2dp | 4 |
+| Revenue Dormant (180d+) | € 2dp | 4 |
 | Revenue Rolling 12M | € 0dp | 1 |
 | Revenue YoY % | % 1dp | – |
 | Profit YoY % | % 1dp | – |
@@ -509,7 +509,7 @@ CALCULATE (
 
 | Measure | Format | Pages |
 |---|---|---|
-| What-If Revenue Impact | € 0dp | 4 |
+| What-If Revenue Impact | € 2dp | 4 |
 | Dynamic KPI Selector | varies | 2 |
 | Dynamic KPI Label | Text | 2 |
 
