@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Euro format notation in `docs/measures.md` aligned with the model: five measures documented as `€ 0dp` carry a two-decimal format string and now read `€ 2dp`.
 - Recorded the likely root cause of the pre-fix staging row loss – sandbox partition expiration rather than a `PARTITION BY` interaction – as a dated note in ADR 0002.
 - `README.md` and `docs/architecture.md` page count aligned to six report pages plus a customer drillthrough.
+- Known issue recorded in docs/methodology.md Limitations: 713 of 168,777 orders fall outside the 0.001 order-value tolerance; investigation scheduled for 1.3.0.
 
 ---
 

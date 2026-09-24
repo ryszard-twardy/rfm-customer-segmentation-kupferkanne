@@ -122,6 +122,7 @@ The figures above measure how efficiently a euro of discount converts into margi
 - No campaign cost exists in the repository, so the recommendation prices the concession alone.
 - The dataset is synthetic and regenerable. The margin, discount and AOV gradients are properties of the generator, so the figures demonstrate pipeline integrity rather than a market observation.
 - The reallocation is bounded by the playbook itself. `dim_Segment[Budget Allocation]` reads "Low (7%)" for At Risk and "Minimal (3%)" for Hibernating (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), so the move is directionally right and small in absolute budget terms.
+- Order-value reconciliation: 713 of 168,777 orders fall outside the 0.001 tolerance stated above; they remain unexplained and are tracked as a known issue for the next release.
 
 ## Validation
 
