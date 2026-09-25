@@ -15,6 +15,7 @@ execute:
 
 ```{python}
 #| label: setup
+import logging
 import re
 import textwrap
 from pathlib import Path
@@ -26,6 +27,7 @@ import pandas as pd
 import yaml
 from google.cloud import bigquery
 from IPython.display import HTML, display
+from matplotlib import font_manager
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
@@ -179,6 +181,13 @@ mpl.rcParams.update({
     "savefig.facecolor": "none",
     "savefig.transparent": True,
 })
+# The stack lists Lato after Segoe UI, so matplotlib logs a findfont warning per text layout
+# whenever Lato is not installed. Mute that log and assert the resolved family instead:
+# matplotlib must lay out the exhibits and rasterise the PNGs in a brand face, not the DejaVu
+# fallback. The SVGs keep live text, so on the page the viewer's installed fonts decide.
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
+RESOLVED_FONT = font_manager.findfont(font_manager.FontProperties(family=FONT_STACK))
+assert font_manager.get_font(RESOLVED_FONT).family_name in NAMED_FONTS, RESOLVED_FONT
 
 
 def fmt_int(v) -> str:
@@ -342,7 +351,7 @@ for col in ("discount_rate", "gross_margin", "contribution_per_eur", "contributi
 RATIO = per_1000["contribution_per_eur"].iloc[0] / per_1000["contribution_per_eur"].iloc[1]
 ```
 
-## Assertions against the published literals
+::: {.callout-note collapse="true" title="Checks against docs/methodology.md: the render fails if any check fails"}
 
 ```{python}
 #| label: assertions
@@ -459,6 +468,8 @@ failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
 assert not failed, f"live results differ from docs/methodology.md: {failed}"
 ```
 
+:::
+
 ```{python}
 #| label: e1-heading
 #| output: asis
@@ -537,8 +548,6 @@ label_sum_customers = sum(float(d["Customers label"].rstrip("%")) for d in displ
 label_sum_revenue = sum(float(d["Revenue label"].rstrip("%")) for d in displayed)
 assert fmt_pct(label_sum_customers) == total_customers_label, (label_sum_customers, total_customers_label)
 assert fmt_pct(label_sum_revenue) == total_revenue_label, (label_sum_revenue, total_revenue_label)
-show(pd.DataFrame(displayed + [{"Segment": "Displayed total", "Customers label": total_customers_label,
-                                "Revenue label": total_revenue_label}]))
 ```
 
 ![](../docs/img/exhibits/e1_segment_share.svg){width="100%" fig-alt="A quarter of scored customers sit in At Risk or Hibernating, and their lifetime spend is 2% of the revenue base"}
@@ -580,13 +589,9 @@ assert title == HEADING_E2, title
 def draw_e2(variant):
     ax = variant.ax
     ys = [1, 0]
-    tints = []
     for y, row in zip(ys, focus.itertuples()):
         color = SEGMENT_COLOR[row.segment]
         light = tint(color, TINT_SHARE)
-        tints.append({"Segment": row.segment, "Before (tint)": light, "After (full)": color,
-                      "Tint contrast on white": f"{contrast(light, '#FFFFFF'):.2f}:1",
-                      "Tint delta E vs gridline": f"{delta_e(light, GRID):.2f}"})
         before, after, drop = row.gross_margin * 100, row.contribution * 100, row.discount * 100
         ax.annotate("", xy=(after, y), xytext=(before, y),
                     arrowprops=dict(arrowstyle="-|>", color=light, linewidth=2, shrinkA=6, shrinkB=6,
@@ -614,11 +619,9 @@ def draw_e2(variant):
         Line2D([], [], marker="o", markersize=10, markerfacecolor=FG, markeredgecolor="none",
                linestyle="none", label="Contribution after the discount"),
     ])
-    return tints
 
 
-tints = render("e2_margin_after_discount", title, FOOTER_E23, [0.17, 0.20, 0.77, 0.58], draw_e2)
-show(pd.DataFrame(tints))
+render("e2_margin_after_discount", title, FOOTER_E23, [0.17, 0.20, 0.77, 0.58], draw_e2)
 ```
 
 ![](../docs/img/exhibits/e2_margin_after_discount.svg){width="100%" fig-alt="The playbook gives the deeper discount to the thinner margin: after its offer At Risk keeps 37 points of order value, Hibernating 27"}

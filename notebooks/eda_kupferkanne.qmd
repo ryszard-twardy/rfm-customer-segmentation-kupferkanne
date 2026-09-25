@@ -164,7 +164,7 @@ show(recon)
 #| label: population-split
 split = pd.DataFrame({
     "Population": [
-        "Item-bearing orders (order-value views, INNER JOIN - matches sales_curated)",
+        "Item-bearing orders (order-value views, INNER JOIN – matches sales_curated)",
         "All validated orders (eda_basket_composition, LEFT JOIN)",
         "Delta: itemless orders (explained, not an error)",
     ],
@@ -468,14 +468,17 @@ the rendered report needs no credentials. To re-render:
    `kupferkanne-2026.sales` dataset.
 2. **Python environment** (covered by the manifest): `uv sync` at the repo
    root reproduces the full environment (`pyproject.toml` + `uv.lock`).
-3. **Render** (PowerShell, from the repo root):
+3. **Render** (PowerShell, from the repo root). The second command renders the
+   win-back exhibits page and rewrites `docs/img/exhibits/`; it needs Segoe UI
+   or Lato installed, or its font check stops the render:
 
 ```powershell
 $env:QUARTO_PYTHON = ".venv\Scripts\python.exe"
 quarto render notebooks/eda_kupferkanne.qmd
+quarto render notebooks/exhibits_win_back.qmd
 ```
 
 Caching note: Quarto's `freeze` (render caching) requires a Quarto *project*
-(`_quarto.yml`). This repository now defines one – added so the notebook
-publishes to GitHub Pages – so the prerequisite is met; `freeze` itself stays
-disabled for a single document and can be enabled if more notebooks accumulate.
+(`_quarto.yml`). This repository defines one in `notebooks/` that renders two
+documents – this notebook as the site landing page and the win-back exhibits
+page – and it does not enable `freeze`, so every render re-runs the queries.

@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Brand file `notebooks/_brand.yml` derived from the Power BI theme: the ten data colours, the segment colours, the page and border surfaces and the Segoe UI type stack.
-- `notebooks/exhibits_win_back.qmd` with three win-back exhibits (segment shares, margin before and after the discount, contribution per 1,000 EUR of discount), each asserted against the `docs/methodology.md` literals at render time.
+- `notebooks/exhibits_win_back.qmd` with three win-back exhibits (segment shares, margin before and after the discount, contribution per 1,000 EUR of discount), each asserted against the `docs/methodology.md` literals at render time. The checks sit in a collapsed callout and a failed check stops the render; the page also asserts that matplotlib lays out the exhibits and rasterises the PNGs in a brand face (Segoe UI or Lato), not the DejaVu fallback.
 - Six exhibit images under `docs/img/exhibits/`: the three exhibits in an embedded variant (no heading, responsive SVG root) and a titled variant, each saved as SVG and PNG.
 
 ### Changed
@@ -22,10 +22,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - Theme name in `theme/rfm_dashboard_theme.json` stored an em-dash as a JSON escape; it now decodes to an en-dash and matches the theme registered in the report.
-- Dash typography in the analytical notebook (`notebooks/eda_kupferkanne.qmd`): the title and the prose use en-dashes where spaced hyphens stood in for them; code chunks are unchanged.
+- Dash typography in the analytical notebook (`notebooks/eda_kupferkanne.qmd`): the title, the prose and the population-split table label use en-dashes where spaced hyphens stood in for them.
 
 ### Documentation
 
+- Appendix of the analytical notebook (`notebooks/eda_kupferkanne.qmd`): the caching note states what the Quarto project renders and that `freeze` is not enabled; the render step adds the exhibits page and the Segoe UI or Lato requirement its font check enforces.
 - Win-back recommendation in `docs/methodology.md` reframed as a controlled pilot with a randomised holdout, an incremental primary metric and a decision rule, and extended with scale figures: the two segments' share of scored customers, the revenue at risk and the contribution gained per 1,000 EUR of discount moved.
 - Palette description in `docs/architecture.md` corrected to the live theme: muted-blue primary (`#4A7AA0`) on white, with a `#F7F5F1` page background.
 - `AGENTS.md` tracker statement matches the repository settings: issue tracking is disabled and planned work is listed under Roadmap in this file.
