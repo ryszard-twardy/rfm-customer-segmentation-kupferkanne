@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1200pt" height="675pt" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 675 
+L 1200 675 
+L 1200 0 
+L 0 0 
+L 0 675 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 204 540 
+L 1128 540 
+L 1128 148.5 
+L 204 148.5 
+L 204 540 
+z
+" style="fill: none"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 204 540 
+L 204 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="204" y="553.692383" transform="rotate(-0 204 553.692383)">0%</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 358 540 
+L 358 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="358" y="553.692383" transform="rotate(-0 358 553.692383)">10%</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 512 540 
+L 512 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="512" y="553.692383" transform="rotate(-0 512 553.692383)">20%</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 666 540 
+L 666 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="666" y="553.692383" transform="rotate(-0 666 553.692383)">30%</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 820 540 
+L 820 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10"/>
+     <g id="text_5">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="820" y="553.692383" transform="rotate(-0 820 553.692383)">40%</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_11">
+      <path d="M 974 540 
+L 974 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12"/>
+     <g id="text_6">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="974" y="553.692383" transform="rotate(-0 974 553.692383)">50%</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_13">
+      <path d="M 1128 540 
+L 1128 148.5 
+" clip-path="url(#p5aeab76c15)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14"/>
+     <g id="text_7">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="1128" y="553.692383" transform="rotate(-0 1128 553.692383)">60%</text>
+     </g>
+    </g>
+    <g id="text_8">
+     <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="666" y="570.400859" transform="rotate(-0 666 570.400859)">Margin and contribution, % of pre-offer order value</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_15"/>
+     <g id="text_9">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="200.5" y="265.53933" transform="rotate(-0 200.5 265.53933)">At Risk</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_16"/>
+     <g id="text_10">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="200.5" y="451.967902" transform="rotate(-0 200.5 451.967902)">Hibernating</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 1002.555146 260.357143 
+Q 893.055385 260.357143 785.791692 260.357143 
+" style="fill: none; stroke: #c59a97; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 792.191692 263.557143 
+L 785.791692 260.357143 
+L 792.191692 257.157143 
+z
+" style="fill: #c59a97; stroke: #c59a97; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 916.899011 446.785714 
+Q 768.901971 446.785714 623.140999 446.785714 
+" style="fill: none; stroke: #c8c6c1; stroke-width: 2; stroke-linecap: round"/>
+    <path d="M 629.540999 449.985714 
+L 623.140999 446.785714 
+L 629.540999 443.585714 
+z
+" style="fill: #c8c6c1; stroke: #c8c6c1; stroke-width: 2; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 204 540 
+L 1128 540 
+" style="fill: none; stroke: #ddd6cc; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_17">
+    <defs>
+     <path id="ma9b28b448e" d="M 0 6 
+C 1.591219 6 3.117479 5.367802 4.242641 4.242641 
+C 5.367802 3.117479 6 1.591219 6 0 
+C 6 -1.591219 5.367802 -3.117479 4.242641 -4.242641 
+C 3.117479 -5.367802 1.591219 -6 0 -6 
+C -1.591219 -6 -3.117479 -5.367802 -4.242641 -4.242641 
+C -5.367802 -3.117479 -6 -1.591219 -6 0 
+C -6 1.591219 -5.367802 3.117479 -4.242641 4.242641 
+C -3.117479 5.367802 -1.591219 6 0 6 
+z
+" style="stroke: #000000; stroke-opacity: 0"/>
+    </defs>
+    <g clip-path="url(#p5aeab76c15)">
+     <use xlink:href="#ma9b28b448e" x="1008.557847" y="260.357143" style="fill: #c59a97; stroke: #000000; stroke-opacity: 0"/>
+    </g>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="1027.037847" y="263.721401" transform="rotate(-0 1027.037847 263.721401)">52.24%</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="759.077847" y="263.721401" transform="rotate(-0 759.077847 263.721401)">37.24%</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="893.057847" y="227.538571" transform="rotate(-0 893.057847 227.538571)">-15 pts: win-back 15% discount</text>
+   </g>
+   <g id="line2d_18">
+    <defs>
+     <path id="md7f79ba2be" d="M 0 6 
+C 1.591219 6 3.117479 5.367802 4.242641 4.242641 
+C 5.367802 3.117479 6 1.591219 6 0 
+C 6 -1.591219 5.367802 -3.117479 4.242641 -4.242641 
+C 3.117479 -5.367802 1.591219 -6 0 -6 
+C -1.591219 -6 -3.117479 -5.367802 -4.242641 -4.242641 
+C -5.367802 -3.117479 -6 -1.591219 -6 0 
+C -6 1.591219 -5.367802 3.117479 -4.242641 4.242641 
+C -3.117479 5.367802 -1.591219 6 0 6 
+z
+" style="stroke: #000000; stroke-opacity: 0"/>
+    </defs>
+    <g clip-path="url(#p5aeab76c15)">
+     <use xlink:href="#md7f79ba2be" x="922.900537" y="446.785714" style="fill: #c8c6c1; stroke: #000000; stroke-opacity: 0"/>
+    </g>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="941.380537" y="450.149972" transform="rotate(-0 941.380537 450.149972)">46.68%</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="596.420537" y="450.149972" transform="rotate(-0 596.420537 450.149972)">26.68%</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="768.900537" y="413.967143" transform="rotate(-0 768.900537 413.967143)">-20 pts: win-back 20% discount</text>
+   </g>
+   <g id="line2d_19">
+    <defs>
+     <path id="m4e31dd7563" d="M 0 6 
+C 1.591219 6 3.117479 5.367802 4.242641 4.242641 
+C 5.367802 3.117479 6 1.591219 6 0 
+C 6 -1.591219 5.367802 -3.117479 4.242641 -4.242641 
+C 3.117479 -5.367802 1.591219 -6 0 -6 
+C -1.591219 -6 -3.117479 -5.367802 -4.242641 -4.242641 
+C -5.367802 -3.117479 -6 -1.591219 -6 0 
+C -6 1.591219 -5.367802 3.117479 -4.242641 4.242641 
+C -3.117479 5.367802 -1.591219 6 0 6 
+z
+" style="stroke: #000000; stroke-opacity: 0"/>
+    </defs>
+    <g clip-path="url(#p5aeab76c15)">
+     <use xlink:href="#m4e31dd7563" x="777.557847" y="260.357143" style="fill: #a05a55; stroke: #000000; stroke-opacity: 0"/>
+    </g>
+   </g>
+   <g id="line2d_20">
+    <defs>
+     <path id="m4f78656efb" d="M 0 6 
+C 1.591219 6 3.117479 5.367802 4.242641 4.242641 
+C 5.367802 3.117479 6 1.591219 6 0 
+C 6 -1.591219 5.367802 -3.117479 4.242641 -4.242641 
+C 3.117479 -5.367802 1.591219 -6 0 -6 
+C -1.591219 -6 -3.117479 -5.367802 -4.242641 -4.242641 
+C -5.367802 -3.117479 -6 -1.591219 -6 0 
+C -6 1.591219 -5.367802 3.117479 -4.242641 4.242641 
+C -3.117479 5.367802 -1.591219 6 0 6 
+z
+" style="stroke: #000000; stroke-opacity: 0"/>
+    </defs>
+    <g clip-path="url(#p5aeab76c15)">
+     <use xlink:href="#m4f78656efb" x="614.900537" y="446.785714" style="fill: #a5a29a; stroke: #000000; stroke-opacity: 0"/>
+    </g>
+   </g>
+  </g>
+  <g id="text_17">
+   <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 48.956084)">The playbook gives the deeper discount to the thinner margin: after its offer At</text>
+   <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 74.764189)">Risk keeps 37 points of order value, Hibernating 27</text>
+  </g>
+  <g id="text_18">
+   <text style="font-size: 12px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #64748b" x="48" y="641.80125" transform="rotate(-0 48 641.80125)">Source: v_rfm_for_bi and sales_curated, kupferkanne-2026.sales; docs/methodology.md</text>
+  </g>
+  <g id="legend_1">
+   <g id="line2d_21">
+    <defs>
+     <path id="mcab93f0e09" d="M 0 5 
+C 1.326016 5 2.597899 4.473168 3.535534 3.535534 
+C 4.473168 2.597899 5 1.326016 5 0 
+C 5 -1.326016 4.473168 -2.597899 3.535534 -3.535534 
+C 2.597899 -4.473168 1.326016 -5 0 -5 
+C -1.326016 -5 -2.597899 -4.473168 -3.535534 -3.535534 
+C -4.473168 -2.597899 -5 -1.326016 -5 0 
+C -5 1.326016 -4.473168 2.597899 -3.535534 3.535534 
+C -2.597899 4.473168 -1.326016 5 0 5 
+z
+" style="stroke: #000000; stroke-opacity: 0"/>
+    </defs>
+    <g>
+     <use xlink:href="#mcab93f0e09" x="613.681406" y="114.787188" style="fill: #898f95; stroke: #000000; stroke-opacity: 0"/>
+    </g>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="634.481406" y="119.337188" transform="rotate(-0 634.481406 119.337188)">Gross margin before the win-back discount</text>
+   </g>
+   <g id="line2d_22">
+    <defs>
+     <path id="mfb590b5a39" d="M 0 5 
+C 1.326016 5 2.597899 4.473168 3.535534 3.535534 
+C 4.473168 2.597899 5 1.326016 5 0 
+C 5 -1.326016 4.473168 -2.597899 3.535534 -3.535534 
+C 2.597899 -4.473168 1.326016 -5 0 -5 
+C -1.326016 -5 -2.597899 -4.473168 -3.535534 -3.535534 
+C -4.473168 -2.597899 -5 -1.326016 -5 0 
+C -5 1.326016 -4.473168 2.597899 -3.535534 3.535534 
+C -2.597899 4.473168 -1.326016 5 0 5 
+z
+" style="stroke: #000000; stroke-opacity: 0"/>
+    </defs>
+    <g>
+     <use xlink:href="#mfb590b5a39" x="918.159687" y="114.787188" style="fill: #3d4752; stroke: #000000; stroke-opacity: 0"/>
+    </g>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="938.959687" y="119.337188" transform="rotate(-0 938.959687 119.337188)">Contribution after the discount</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p5aeab76c15">
+   <rect x="204" y="148.5" width="924" height="391.5"/>
+  </clipPath>
+ </defs>
+</svg>

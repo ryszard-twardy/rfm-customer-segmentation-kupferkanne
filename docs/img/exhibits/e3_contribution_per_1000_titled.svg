@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1200pt" height="675pt" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 675 
+L 1200 675 
+L 1200 0 
+L 0 0 
+L 0 675 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 204 526.5 
+L 1128 526.5 
+L 1128 162 
+L 204 162 
+L 204 526.5 
+z
+" style="fill: none"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 204 526.5 
+L 204 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="204" y="540.192383" transform="rotate(-0 204 540.192383)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 358 526.5 
+L 358 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="358" y="540.192383" transform="rotate(-0 358 540.192383)">500</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 512 526.5 
+L 512 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="512" y="540.192383" transform="rotate(-0 512 540.192383)">1,000</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 666 526.5 
+L 666 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="666" y="540.192383" transform="rotate(-0 666 540.192383)">1,500</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 820 526.5 
+L 820 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10"/>
+     <g id="text_5">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="820" y="540.192383" transform="rotate(-0 820 540.192383)">2,000</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_11">
+      <path d="M 974 526.5 
+L 974 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12"/>
+     <g id="text_6">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="974" y="540.192383" transform="rotate(-0 974 540.192383)">2,500</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_13">
+      <path d="M 1128 526.5 
+L 1128 162 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14"/>
+     <g id="text_7">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="1128" y="540.192383" transform="rotate(-0 1128 540.192383)">3,000</text>
+     </g>
+    </g>
+    <g id="text_8">
+     <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="666" y="556.900859" transform="rotate(-0 666 556.900859)">Contribution per 1,000 EUR of discount (EUR)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_15"/>
+     <g id="text_9">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="200.5" y="273.494687" transform="rotate(-0 200.5 273.494687)">At Risk</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_16"/>
+     <g id="text_10">
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="200.5" y="425.369687" transform="rotate(-0 200.5 425.369687)">Hibernating</text>
+     </g>
+    </g>
+   </g>
+   <g id="line2d_17">
+    <path d="M 614.900536 344.25 
+L 968.743795 344.25 
+" clip-path="url(#p92ebc75716)" style="fill: none; stroke-dasharray: 2,3; stroke-dashoffset: 0; stroke: #64748b"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 204 526.5 
+L 1128 526.5 
+" style="fill: none; stroke: #ddd6cc; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 204 283.5 
+L 968.743795 283.5 
+L 968.743795 253.125 
+L 204 253.125 
+z
+" clip-path="url(#p92ebc75716)" style="fill: #a05a55"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="977.983795" y="271.935547" transform="rotate(-0 977.983795 271.935547)">2,483 EUR</text>
+   </g>
+   <g id="patch_5">
+    <path d="M 204 435.375 
+L 614.900536 435.375 
+L 614.900536 405 
+L 204 405 
+z
+" clip-path="url(#p92ebc75716)" style="fill: #a5a29a"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="624.140536" y="423.810547" transform="rotate(-0 624.140536 423.810547)">1,334 EUR</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 600; font-size: 15px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="791.822166" y="333.499512" transform="rotate(-0 791.822166 333.499512)">+1,149 EUR (1.86x)</text>
+   </g>
+  </g>
+  <g id="text_14">
+   <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 48.956084)">Each 1,000 EUR of discount returns 2,483 EUR of contribution in At Risk, against</text>
+   <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 74.642158)">1,334 EUR in Hibernating</text>
+  </g>
+  <g id="text_15">
+   <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #64748b" x="48" y="111.763125" transform="rotate(-0 48 111.763125)">Contribution on orders placed, at the playbook discount rates: a margin-efficiency figure, not an incremental return</text>
+  </g>
+  <g id="text_16">
+   <text style="font-size: 12px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #64748b" x="48" y="641.80125" transform="rotate(-0 48 641.80125)">Source: v_rfm_for_bi and sales_curated, kupferkanne-2026.sales; docs/methodology.md</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p92ebc75716">
+   <rect x="204" y="162" width="924" height="364.5"/>
+  </clipPath>
+ </defs>
+</svg>

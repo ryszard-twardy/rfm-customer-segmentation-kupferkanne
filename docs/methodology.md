@@ -145,3 +145,17 @@ The dashboard uses Import mode with the dual-grain semantic layer described in [
 7. Customer Drillthrough – individual customer inspection.
 
 All DAX measures are formatted to the SQLBI convention via [daxformatter.com](https://www.daxformatter.com/) and catalogued in [measures.md](measures.md).
+
+## Appendix: segment shares
+
+| Segment | Customers | Share of scored customers | Lifetime spend (EUR) | Share of revenue base |
+|---|---|---|---|---|
+| Champions | 3,209 | 21.44% | 6,013,207.02 | 70.48% |
+| Loyal Customers | 2,074 | 13.86% | 1,100,568.99 | 12.90% |
+| Potential Loyalists | 2,960 | 19.78% | 884,954.60 | 10.37% |
+| Recent Customers | 2,815 | 18.81% | 360,866.07 | 4.23% |
+| At Risk | 1,366 | 9.13% | 107,123.12 | 1.26% |
+| Hibernating | 2,543 | 16.99% | 64,645.72 | 0.76% |
+| Total | 14,967 | 100.00% | 8,531,365.52 | 100.00% |
+
+Figures come from v_rfm_for_bi at the segment snapshot and are the source of the segment-share exhibit; At Risk and Hibernating total 3,909 customers and 171,768.84 EUR.

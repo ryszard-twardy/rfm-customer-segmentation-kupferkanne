@@ -1677,6 +1677,7 @@ dependencies = [
     { name = "pandas-gbq" },
     { name = "plotly" },
     { name = "pyarrow" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -1697,6 +1698,7 @@ requires-dist = [
     { name = "pandas-gbq", specifier = ">=0.35.0" },
     { name = "plotly", specifier = ">=6.9.0" },
     { name = "pyarrow", specifier = ">=25.0.0" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
 ]
 
 [package.metadata.requires-dev]

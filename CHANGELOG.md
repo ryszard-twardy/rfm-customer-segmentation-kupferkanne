@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Brand file `notebooks/_brand.yml` derived from the Power BI theme: the ten data colours, the segment colours, the page and border surfaces and the Segoe UI type stack.
+- `notebooks/exhibits_win_back.qmd` with three win-back exhibits (segment shares, margin before and after the discount, contribution per 1,000 EUR of discount), each asserted against the `docs/methodology.md` literals at render time.
+- Six exhibit images under `docs/img/exhibits/`: the three exhibits in an embedded variant (no heading, responsive SVG root) and a titled variant, each saved as SVG and PNG.
+
+### Changed
+
+- `pyyaml` promoted to a direct dependency in `pyproject.toml`; the exhibits document reads the brand file with it.
+- The exhibits document added to the Quarto render list in `notebooks/_quarto.yml`; it sets its own output file, so the notebook stays the site landing page.
+
 ### Fixed
 
 - Theme name in `theme/rfm_dashboard_theme.json` stored an em-dash as a JSON escape; it now decodes to an en-dash and matches the theme registered in the report.
@@ -23,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Recorded the likely root cause of the pre-fix staging row loss – sandbox partition expiration rather than a `PARTITION BY` interaction – as a dated note in ADR 0002.
 - `README.md` and `docs/architecture.md` page count aligned to six report pages plus a customer drillthrough.
 - Known issue recorded in docs/methodology.md Limitations: 713 of 168,777 orders fall outside the 0.001 order-value tolerance; investigation scheduled for 1.3.0.
+- Appendix with the six-segment share table (customers, share of scored customers, lifetime spend, share of revenue base) added to `docs/methodology.md` as the source of the segment-share exhibit.
 
 ---
 

@@ -1,0 +1,57 @@
+# Brand definition shared by the Quarto outputs (analytical notebook, executive
+# report, deck). Derived from the Power BI theme in theme/rfm_dashboard_theme.json
+# ("RFM Customer Segmentation - Palette C Muted Earth") and docs/architecture.md:30.
+# Segment colours follow the Segment Color measure in docs/measures.md:659-665 and
+# dim_Segment[SegmentColor] in the semantic model. Schema: brand.yml as validated
+# by Quarto 1.9 (share/schema/definitions.yml, brand-single). The SVG logo is not
+# referenced: its colour (#3c2415) sits outside this palette.
+
+meta:
+  name:
+    full: Kupferkanne RFM customer segmentation
+    short: Kupferkanne RFM
+
+color:
+  palette:
+    # The ten dataColors, in theme order.
+    c1: "#4A7AA0"
+    c2: "#7BA8B8"
+    c3: "#8FA87E"
+    c4: "#D4A762"
+    c5: "#A05A55"
+    c6: "#A5A29A"
+    c7: "#6B7F94"
+    c8: "#B8916A"
+    c9: "#9DAE96"
+    c10: "#7A6E6E"
+    # Segment colours (docs/measures.md:659-664) and the fallback (:665).
+    champions: "#4A7AA0"
+    loyal_customers: "#7BA8B8"
+    potential_loyalists: "#8FA87E"
+    recent_customers: "#D4A762"
+    at_risk: "#A05A55"
+    hibernating: "#A5A29A"
+    segment_fallback: "#94A3B8"
+    # Surfaces and chrome from the theme.
+    page: "#F7F5F1"     # report page background
+    border: "#DDD6CC"   # visual border; exhibit gridlines only (context bars use a 32% foreground blend computed in the notebook)
+    label: "#64748B"    # label text class; exhibit axis titles and footers
+  foreground: "#3D4752"  # theme foreground: text on the canvas
+  background: "#FFFFFF"  # canvas
+  primary: c1            # theme tableAccent
+
+typography:
+  fonts:
+    - family: Segoe UI
+      source: system
+    - family: Lato
+      source: system
+  # Segoe UI is a system font. Pages readers without it fall back through the
+  # stack: Lato where installed, then sans-serif. No webfont is embedded: a
+  # Google-sourced font added about 10 MB of font data to each self-contained
+  # page, and SVG exhibits loaded as images cannot use page fonts anyway.
+  base:
+    family: "Segoe UI, Lato, sans-serif"
+  headings:
+    family: "Segoe UI, Lato, sans-serif"
+    weight: 600  # theme title text class: Segoe UI Semibold
