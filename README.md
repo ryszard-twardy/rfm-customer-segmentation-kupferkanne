@@ -94,7 +94,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 | [`graphics/`](graphics/) | Navigation icons (SVG): four states for each of the six navigable pages, plus a reset control and the icon-set license |
 | [`theme/`](theme/) | Power BI report theme: `rfm_dashboard_theme.json` |
 | [`docs/`](docs/) | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/` |
-| [`notebooks/`](notebooks/) | Quarto EDA notebook – analytical companion to the SQL EDA views |
+| [`notebooks/`](notebooks/) | Quarto sources: the EDA notebook (analytical companion to the SQL EDA views), the win-back exhibits page that renders `docs/img/exhibits/`, and the shared brand file `_brand.yml` |
 | [`harness/`](harness/) | KPI regression harness – baseline + verify for the canonical KPIs |
 | [`scripts/`](scripts/) | BigQuery loader (schema-enforced ingest) |
 | [`data/`](data/) | Source CSV shards (80 files, committed for reproducibility) |

@@ -34,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Euro format notation in `docs/measures.md` aligned with the model: five measures documented as `€ 0dp` carry a two-decimal format string and now read `€ 2dp`.
 - Recorded the likely root cause of the pre-fix staging row loss – sandbox partition expiration rather than a `PARTITION BY` interaction – as a dated note in ADR 0002.
 - Page count in `README.md`, `docs/architecture.md` and `docs/methodology.md` aligned to six report pages plus a customer drillthrough: the README heading, the architecture overview, both system diagrams and the lead-in to the methodology page list.
-- Known issue recorded in docs/methodology.md Limitations: 713 of 168,777 orders fall outside the 0.001 order-value tolerance; investigation scheduled for 1.3.0.
+- Known issue recorded in `docs/methodology.md` Limitations: 713 of 168,777 orders fall outside the 0.001 order-value tolerance; investigation scheduled for 1.3.0.
 - Appendix with the six-segment share table (customers, share of scored customers, lifetime spend, share of revenue base) added to `docs/methodology.md` as the source of the segment-share exhibit.
 
 ---
@@ -264,6 +264,7 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 ### [1.3.0] – planned
 
 - Publish the analytical notebook, an executive report and a companion deck to GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`; all three are rendered locally with Quarto from the committed sources.
+- Investigate the 713 orders that fall outside the 0.001 order-value reconciliation tolerance, then fix them or document the cause (known issue in `docs/methodology.md` Limitations).
 
 ### Considered, not committed
 
