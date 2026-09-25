@@ -134,7 +134,7 @@ In addition to the pre/post-clean audits, three cross-checks run during transfor
 
 ## Power BI consumption
 
-The dashboard uses Import mode with the dual-grain semantic layer described in [data_model.md](data_model.md). Seven pages cover:
+The dashboard uses Import mode with the dual-grain semantic layer described in [data_model.md](data_model.md). It has six report pages plus a customer drillthrough:
 
 1. Executive Summary – KPIs and time-series.
 2. Segment Deep Dive – segment composition and value concentration at the snapshot date.
