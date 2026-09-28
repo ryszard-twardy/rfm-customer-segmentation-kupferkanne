@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Page count in `README.md`, `docs/architecture.md` and `docs/methodology.md` aligned to six report pages plus a customer drillthrough: the README heading, the architecture overview, both system diagrams and the lead-in to the methodology page list.
 - Known issue recorded in `docs/methodology.md` Limitations: 713 of 168,777 orders fall outside the 0.001 order-value tolerance; investigation scheduled for 1.3.0.
 - Appendix with the six-segment share table (customers, share of scored customers, lifetime spend, share of revenue base) added to `docs/methodology.md` as the source of the segment-share exhibit.
+- Win-back metric wording in `docs/methodology.md` aligned with the exhibits: At Risk "retains" 1.86 times the contribution per euro of discount that Hibernating retains, instead of "returns", which read as an observed campaign return; the exhibits check that reads the ratio matches the new wording.
 
 ---
 

@@ -103,7 +103,7 @@ Pilot a shift of win-back discount budget from Hibernating to At Risk: for every
 
 The playbook grants its deepest discount to its thinnest margin. At Risk retains 37.2440 points of contribution after a 15-point concession; Hibernating retains 26.6819 points after 20. The ranking is the finding, and it is robust to the assumptions stated above. The absolute per-euro figures carry the limitations below.
 
-At Risk returns 1.86 times the contribution per euro of discount that Hibernating returns (2.4829 against 1.3341), so each 1,000 EUR of discount moved raises expected contribution by about 1,149 EUR, conditional on the orders being placed. The pool is broad and shallow: the two segments hold 3,909 of the 14,967 scored customers (26.1 percent) and EUR 171,768.84 of lifetime spend, 2.0 percent of the EUR 8,531,365.52 revenue base; this is the quantity `[Revenue at Risk]` measures.
+At Risk retains 1.86 times the contribution per euro of discount that Hibernating retains (2.4829 against 1.3341), so each 1,000 EUR of discount moved raises expected contribution by about 1,149 EUR, conditional on the orders being placed. The pool is broad and shallow: the two segments hold 3,909 of the 14,967 scored customers (26.1 percent) and EUR 171,768.84 of lifetime spend, 2.0 percent of the EUR 8,531,365.52 revenue base; this is the quantity `[Revenue at Risk]` measures.
 
 ### Pilot design
 

@@ -493,7 +493,7 @@ p_per_1000 = dict(zip(FOCUS, map(num, grab(
 p_points = dict(zip(FOCUS, map(num, grab(
     r"At Risk retains ([\d.]+) points of contribution after a \d+-point concession; "
     r"Hibernating retains ([\d.]+) points"))))
-(p_ratio,) = map(num, grab(r"At Risk returns ([\d.]+) times the contribution"))
+(p_ratio,) = map(num, grab(r"At Risk retains ([\d.]+) times the contribution"))
 (p_gap,) = map(num, grab(r"raises expected contribution by about ([\d,]+) EUR"))
 
 checks = []
