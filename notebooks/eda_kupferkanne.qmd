@@ -64,6 +64,7 @@ views is stated and quantified, not assumed.
 ```{python}
 #| label: setup
 import logging
+import re
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -102,11 +103,15 @@ LABELS = {
 }
 
 
+NUMERIC_CELL = re.compile(r"-?[\d,]*\.?\d+%?")
+
+
 def show(df, labels=LABELS, percent=(), currency_int=(), ratio=()):
     """HTML table, no index. Formats integer cols with thousands separators and
     float/Decimal cols (percent -> N.NN%, currency_int -> whole with thousands,
     ratio -> plain 2dp, else 2dp with thousands), then renames headers via
-    `labels`."""
+    `labels`. Header and cells carry their column's kind for the page styles:
+    col-num when every cell is a plain number or percentage, else col-text."""
     out = df.copy()
     for col in out.columns:
         s = out[col]
@@ -123,7 +128,16 @@ def show(df, labels=LABELS, percent=(), currency_int=(), ratio=()):
             out[col] = s.map(lambda v: f"{float(v):.2f}" if pd.notna(v) else "")
         elif is_num:
             out[col] = s.map(lambda v: f"{float(v):,.2f}" if pd.notna(v) else "")
-    return HTML(out.rename(columns=labels).to_html(index=False))
+    kinds = ["col-num" if out[col].map(lambda v: bool(NUMERIC_CELL.fullmatch(str(v)))).all()
+             else "col-text" for col in out.columns]
+    table = out.rename(columns=labels).to_html(index=False)
+
+    def mark(row):
+        assert len(re.findall(r"<t[hd][ >]", row[0])) == len(kinds), row[0]
+        cells = iter(kinds)
+        return re.sub(r"<t([hd])>", lambda m: f'<t{m[1]} class="{next(cells)}">', row[0])
+
+    return HTML(re.sub(r"<tr[^>]*>.*?</tr>", mark, table, flags=re.S))
 
 
 # Charts use the brand type stack from _brand.yml, as the win-back exhibits do.
@@ -131,6 +145,7 @@ def show(df, labels=LABELS, percent=(), currency_int=(), ratio=()):
 # not installed.
 brand = yaml.safe_load(Path("_brand.yml").read_text(encoding="utf-8"))
 FONT_STACK = [f.strip() for f in brand["typography"]["base"]["family"].split(",")]
+LABEL_TEXT = brand["color"]["palette"]["label_text"]  # muted text, 4.5:1 on the page surfaces
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
 plt.rcParams.update({
@@ -332,14 +347,52 @@ Scores.
 #| label: fig-temporal
 #| fig-cap: "Monthly revenue, January 2023 to March 2026 (39 months; final month truncated at the data cutoff)."
 #| fig-alt: "Line chart of monthly revenue over 39 months, ramping up through 2023, peaking each December with a maximum of about 789 thousand euros in December 2024, and dropping in the truncated final month."
-mon = view("eda_monthly_temporal_pattern").sort_values("year_month")
+mon = view("eda_monthly_temporal_pattern").sort_values("year_month").reset_index(drop=True)
 mon["monthly_revenue"] = mon["monthly_revenue"].astype(float)
+# Days each month covers, from the view's own population: validated orders with item lines.
+span = client.query(
+    f"""
+    SELECT MIN(o.order_date) AS first_day, MAX(o.order_date) AS last_day
+    FROM `{DATASET}.stg_orders_validated` AS o
+    WHERE EXISTS (
+        SELECT 1 FROM `{DATASET}.stg_items_validated` AS i WHERE i.order_id = o.order_id
+    )
+    """,
+    location="EU",
+).to_dataframe().iloc[0]
+first_day, last_day = pd.Timestamp(span["first_day"]), pd.Timestamp(span["last_day"])
+month_start = pd.to_datetime(mon["year_month"] + "-01")
+month_end = month_start + pd.offsets.MonthEnd(0)
+mon["days_in_month"] = month_end.dt.day
+mon["days_covered"] = (month_end.clip(upper=last_day) - month_start.clip(lower=first_day)).dt.days + 1
+assert len(mon) == (last_day.year - first_day.year) * 12 + last_day.month - first_day.month + 1
+partial = mon.index[mon["days_covered"] < mon["days_in_month"]]
+assert set(partial) <= {0, len(mon) - 1}, partial  # only the panel's edges can be cut
 
+# Full months as a solid line; a partial month is reached by a dashed segment, drawn as an
+# open marker and labelled with the days it covers and the data edge that cuts it.
 fig, ax = plt.subplots()
-ax.plot(mon["year_month"], mon["monthly_revenue"], color=ACCENT, linewidth=2)
+full = mon.drop(index=partial)
+ax.plot(full.index, full["monthly_revenue"], color=ACCENT, linewidth=2)
+for i in partial:
+    j = i + 1 if i == 0 else i - 1
+    edge = first_day if i == 0 else last_day
+    ax.plot([j, i], mon.loc[[j, i], "monthly_revenue"], color=ACCENT,
+            linewidth=2, linestyle=(0, (3, 2)))
+    ax.plot([i], mon.loc[[i], "monthly_revenue"], linestyle="none",
+            marker="o", markersize=6, markerfacecolor="white", markeredgecolor=ACCENT,
+            markeredgewidth=1.5, zorder=3)
+    ax.annotate(
+        f"Partial month: {mon.at[i, 'days_covered']} of {mon.at[i, 'days_in_month']} days, "
+        f"data {'from' if i == 0 else 'to'} {edge:%Y-%m-%d}",
+        (i, mon.at[i, "monthly_revenue"]),
+        xytext=(8 if i == 0 else -8, 0), textcoords="offset points",
+        ha="left" if i == 0 else "right", va="center", fontsize=9, color=LABEL_TEXT,
+        bbox=dict(facecolor="white", edgecolor="none", pad=1),
+    )
 ax.set_ylabel("Monthly revenue (EUR thousands)")
 ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v / 1000:,.0f}"))
-ax.set_xticks(mon["year_month"][::6])
+ax.set_xticks(mon.index[::6], mon["year_month"][::6])
 plt.show()
 ```
 
@@ -479,7 +532,7 @@ an EDA-only data-quality check.
 ## Synthesis
 
 | Observation | Design decision | ADR |
-|---|---|---|
+|:---|:---|:---|
 | Right-skewed order values (median EUR 35 vs mean EUR 51; P99 EUR 268) | Quantile-based Monetary scoring; whales retained, not trimmed | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 | Only 26% of customers are single-order | Frequency kept as a full NTILE(5) dimension, not a repeat-buyer flag | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 | Bounded panel ending March 2026 | Recency anchored on `MAX(order_date)`, not `CURRENT_DATE()` | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
@@ -489,6 +542,20 @@ an EDA-only data-quality check.
 | Flat AOV (EUR 50 +/- 2%) across nine markets | No per-country normalisation of RFM scores | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 
 : Each observation on this page and the design decision it drove. {#tbl-synthesis}
+
+```{=html}
+<style>
+/* Captioned tables sit in a centred float, so every column needs an explicit edge:
+   show() marks text columns col-text (left) and numeric columns col-num (right, tabular
+   figures). Quarto sets word-break: break-word on table links, which lets the automatic
+   layout squeeze the Synthesis ADR column until the IDs break; the column is sized to its
+   IDs and kept on one line instead. */
+table.dataframe .col-text { text-align: left; }
+table.dataframe .col-num { text-align: right; font-variant-numeric: tabular-nums; }
+#tbl-synthesis td:nth-child(3) { width: 1%; white-space: nowrap; }
+#tbl-synthesis td:nth-child(3) a { word-break: normal; }
+</style>
+```
 
 The through-line: every structural choice in the RFM pipeline – quintile
 scoring, the recency anchor, keeping the whales, treating geography as scale
