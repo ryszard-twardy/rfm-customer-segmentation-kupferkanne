@@ -13,16 +13,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Brand file `notebooks/_brand.yml` derived from the Power BI theme: the ten data colours, the segment colours, the page and border surfaces and the Segoe UI type stack, plus `hibernating_focus`, a darker shade of the Hibernating colour that the exhibits use for focus marks so they stand apart from the grey context.
 - `notebooks/exhibits_win_back.qmd` with three win-back exhibits (segment shares, margin before and after the discount, contribution per 1,000 EUR of discount), each asserted against the `docs/methodology.md` literals at render time. The page opens with a link back to the analytical notebook and a three-sentence lede whose ratio and discount literals are checked as well. Each chart comes before its table. Shares, margins and realised discounts show at two decimals in the exhibit tables and in the charts' value labels, except the combined At Risk and Hibernating shares on the segment-share chart, which show one decimal; the win-back rates show whole percents. The checks run before any exhibit is written, a failed check stops the render, and the check table closes the page in a collapsed callout. The charts sit in a wide column capped at their 1,200 px canvas (`notebooks/exhibits.css`) and open in a lightbox. Alt texts and the `<title>` and `<desc>` of the embedded SVGs describe each chart with its key values. The segment-share chart uses direct labels and a bracket instead of a legend; its label clearance, like the margin chart's legend spacing, is asserted with DejaVu Sans metrics. The page also asserts that matplotlib lays out the exhibits and rasterises the PNGs in a brand face (Segoe UI or Lato), not the DejaVu fallback.
 - Six exhibit images under `docs/img/exhibits/`: the three exhibits in an embedded variant (no heading, responsive SVG root) and a titled variant, each saved as SVG and PNG.
+- Analytical notebook (`notebooks/eda_kupferkanne.qmd`): its introduction links to the win-back exhibits page, and the page shows a last-modified date.
 
 ### Changed
 
 - `pyyaml` promoted to a direct dependency in `pyproject.toml`; the exhibits document reads the brand file with it.
 - The exhibits document added to the Quarto render list in `notebooks/_quarto.yml`; it sets its own output file, so the notebook stays the site landing page.
+- Analytical notebook tables show counts with thousands separators, and every table has a numbered, descriptive caption; the monthly revenue chart reads in EUR thousands.
 
 ### Fixed
 
 - Theme name in `theme/rfm_dashboard_theme.json` stored an em-dash as a JSON escape; it now decodes to an en-dash and matches the theme registered in the report.
 - Dash typography in the analytical notebook (`notebooks/eda_kupferkanne.qmd`): the title, the prose and the population-split table label use en-dashes where spaced hyphens stood in for them.
+- ADR links in the analytical notebook point at the repository on GitHub instead of `../docs/adr/`, a path that does not exist on the published site.
+- Recency chart in the analytical notebook: the overlapping bucket codes on the axis are replaced with day ranges taken from the recency view (`0–29` to `730+`), and the render asserts that no tick labels overlap. The recency table shows the same ranges next to the codes.
+- Analytical notebook charts use the brand type stack from `notebooks/_brand.yml` instead of matplotlib's default DejaVu Sans.
 
 ### Documentation
 
