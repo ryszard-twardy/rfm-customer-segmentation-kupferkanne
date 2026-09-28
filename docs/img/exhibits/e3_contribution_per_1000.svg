@@ -32,156 +32,172 @@ z
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 204 526.5 
-L 1128 526.5 
-L 1128 84.75 
-L 204 84.75 
-L 204 526.5 
+    <path d="M 341.5 526.5 
+L 999.5 526.5 
+L 999.5 84.75 
+L 341.5 84.75 
+L 341.5 526.5 
 z
 " style="fill: none"/>
    </g>
+   <g id="line2d_1">
+    <path d="M 341.5 526.5 
+L 341.5 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 451.166667 526.5 
+L 451.166667 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 560.833333 526.5 
+L 560.833333 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 670.5 526.5 
+L 670.5 407.225586 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 670.5 388.086914 
+L 670.5 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 780.166667 526.5 
+L 780.166667 299.421875 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 780.166667 279.344727 
+L 780.166667 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 889.833333 526.5 
+L 889.833333 223.163086 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 889.833333 204.024414 
+L 889.833333 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 999.5 526.5 
+L 999.5 84.75 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
-     <g id="line2d_1">
-      <path d="M 204 526.5 
-L 204 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_2"/>
+     <g id="line2d_11"/>
      <g id="text_1">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="204" y="540.192383" transform="rotate(-0 204 540.192383)">0</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="341.5" y="540.192383" transform="rotate(-0 341.5 540.192383)">0</text>
      </g>
     </g>
     <g id="xtick_2">
-     <g id="line2d_3">
-      <path d="M 358 526.5 
-L 358 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_4"/>
+     <g id="line2d_12"/>
      <g id="text_2">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="358" y="540.192383" transform="rotate(-0 358 540.192383)">500</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="451.166667" y="540.192383" transform="rotate(-0 451.166667 540.192383)">500</text>
      </g>
     </g>
     <g id="xtick_3">
-     <g id="line2d_5">
-      <path d="M 512 526.5 
-L 512 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_6"/>
+     <g id="line2d_13"/>
      <g id="text_3">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="512" y="540.192383" transform="rotate(-0 512 540.192383)">1,000</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="560.833333" y="540.192383" transform="rotate(-0 560.833333 540.192383)">1,000</text>
      </g>
     </g>
     <g id="xtick_4">
-     <g id="line2d_7">
-      <path d="M 666 526.5 
-L 666 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_8"/>
+     <g id="line2d_14"/>
      <g id="text_4">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="666" y="540.192383" transform="rotate(-0 666 540.192383)">1,500</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="670.5" y="540.192383" transform="rotate(-0 670.5 540.192383)">1,500</text>
      </g>
     </g>
     <g id="xtick_5">
-     <g id="line2d_9">
-      <path d="M 820 526.5 
-L 820 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_10"/>
+     <g id="line2d_15"/>
      <g id="text_5">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="820" y="540.192383" transform="rotate(-0 820 540.192383)">2,000</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="780.166667" y="540.192383" transform="rotate(-0 780.166667 540.192383)">2,000</text>
      </g>
     </g>
     <g id="xtick_6">
-     <g id="line2d_11">
-      <path d="M 974 526.5 
-L 974 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_12"/>
+     <g id="line2d_16"/>
      <g id="text_6">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="974" y="540.192383" transform="rotate(-0 974 540.192383)">2,500</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="889.833333" y="540.192383" transform="rotate(-0 889.833333 540.192383)">2,500</text>
      </g>
     </g>
     <g id="xtick_7">
-     <g id="line2d_13">
-      <path d="M 1128 526.5 
-L 1128 84.75 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke: #ddd6cc; stroke-opacity: 0.6; stroke-linecap: square"/>
-     </g>
-     <g id="line2d_14"/>
+     <g id="line2d_17"/>
      <g id="text_7">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="1128" y="540.192383" transform="rotate(-0 1128 540.192383)">3,000</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="999.5" y="540.192383" transform="rotate(-0 999.5 540.192383)">3,000</text>
      </g>
     </g>
     <g id="text_8">
-     <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="666" y="556.900859" transform="rotate(-0 666 556.900859)">Contribution per 1,000 EUR of discount (EUR)</text>
+     <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #5e6e85" x="670.5" y="556.900859" transform="rotate(-0 670.5 556.900859)">Contribution per 1,000 EUR of discount (EUR)</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">
     <g id="ytick_1">
-     <g id="line2d_15"/>
+     <g id="line2d_18"/>
      <g id="text_9">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="200.5" y="218.775937" transform="rotate(-0 200.5 218.775937)">At Risk</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="200.5" y="218.775937" transform="rotate(-0 200.5 218.775937)">At Risk</text>
      </g>
     </g>
     <g id="ytick_2">
-     <g id="line2d_16"/>
+     <g id="line2d_19"/>
      <g id="text_10">
-      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="200.5" y="402.838437" transform="rotate(-0 200.5 402.838437)">Hibernating</text>
+      <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="200.5" y="402.838437" transform="rotate(-0 200.5 402.838437)">Hibernating</text>
      </g>
     </g>
    </g>
-   <g id="line2d_17">
-    <path d="M 614.900536 305.625 
-L 968.743795 305.625 
-" clip-path="url(#pc67ebe1f7f)" style="fill: none; stroke-dasharray: 2,3; stroke-dashoffset: 0; stroke: #64748b"/>
+   <g id="line2d_20">
+    <path d="M 634.110988 305.625 
+L 886.090278 305.625 
+" clip-path="url(#p8bc6958f18)" style="fill: none; stroke-dasharray: 2,3; stroke-dashoffset: 0; stroke: #5e6e85"/>
    </g>
    <g id="patch_3">
-    <path d="M 204 526.5 
-L 1128 526.5 
+    <path d="M 341.5 526.5 
+L 999.5 526.5 
 " style="fill: none; stroke: #ddd6cc; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="patch_4">
-    <path d="M 204 232 
-L 968.743795 232 
-L 968.743795 195.1875 
-L 204 195.1875 
+    <path d="M 341.5 232 
+L 886.090278 232 
+L 886.090278 195.1875 
+L 341.5 195.1875 
 z
-" clip-path="url(#pc67ebe1f7f)" style="fill: #a05a55"/>
+" clip-path="url(#p8bc6958f18)" style="fill: #a05a55"/>
    </g>
    <g id="text_11">
-    <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="977.983795" y="217.216797" transform="rotate(-0 977.983795 217.216797)">2,483 EUR</text>
+    <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="892.670278" y="217.216797" transform="rotate(-0 892.670278 217.216797)">2,483 EUR</text>
    </g>
    <g id="patch_5">
-    <path d="M 204 416.0625 
-L 614.900536 416.0625 
-L 614.900536 379.25 
-L 204 379.25 
+    <path d="M 341.5 416.0625 
+L 634.110988 416.0625 
+L 634.110988 379.25 
+L 341.5 379.25 
 z
-" clip-path="url(#pc67ebe1f7f)" style="fill: #8a877f"/>
+" clip-path="url(#p8bc6958f18)" style="fill: #8a877f"/>
    </g>
    <g id="text_12">
-    <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="624.140536" y="401.279297" transform="rotate(-0 624.140536 401.279297)">1,334 EUR</text>
+    <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="640.690988" y="401.279297" transform="rotate(-0 640.690988 401.279297)">1,334 EUR</text>
    </g>
    <g id="text_13">
-    <text style="font-weight: 600; font-size: 15px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="791.822166" y="293.265137" transform="rotate(-0 791.822166 293.265137)">+1,149 EUR (1.86x)</text>
+    <text style="font-weight: 600; font-size: 15px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #3d4752" x="760.100633" y="293.265137" transform="rotate(-0 760.100633 293.265137)">+1,149 EUR (1.86x)</text>
    </g>
   </g>
   <g id="text_14">
-   <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #64748b" x="48" y="34.513125" transform="rotate(-0 48 34.513125)">Contribution on orders placed, at the playbook discount rates: a margin-efficiency figure, not an incremental return</text>
+   <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #5e6e85" transform="translate(200.5 35.283809)">Contribution on orders placed, at the playbook discount rates:</text>
+   <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #5e6e85" transform="translate(200.5 50.930176)">a margin-efficiency figure, not an incremental return</text>
   </g>
   <g id="text_15">
-   <text style="font-size: 12px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #64748b" x="48" y="641.80125" transform="rotate(-0 48 641.80125)">Source: v_rfm_for_bi and sales_curated, kupferkanne-2026.sales; docs/methodology.md</text>
+   <text style="font-size: 12px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #5e6e85" x="200.5" y="641.80125" transform="rotate(-0 200.5 641.80125)">Source: v_rfm_for_bi and sales_curated, kupferkanne-2026.sales; docs/methodology.md</text>
   </g>
  </g>
  <defs>
-  <clipPath id="pc67ebe1f7f">
-   <rect x="204" y="84.75" width="924" height="441.75"/>
+  <clipPath id="p8bc6958f18">
+   <rect x="341.5" y="84.75" width="658" height="441.75"/>
   </clipPath>
  </defs>
 </svg>

@@ -21,8 +21,8 @@ execute:
 import base64
 import html
 import logging
+import math
 import re
-import textwrap
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -61,7 +61,7 @@ def query(sql: str) -> pd.DataFrame:
 brand = yaml.safe_load(Path("_brand.yml").read_text(encoding="utf-8"))
 palette = brand["color"]["palette"]
 FG = brand["color"]["foreground"]
-LABEL, GRID = palette["label"], palette["border"]
+GRID = palette["border"]
 SEGMENT_COLOR = {
     "Champions": palette["champions"],
     "Loyal Customers": palette["loyal_customers"],
@@ -160,16 +160,26 @@ def clears_focus_gates(color: str) -> bool:
     return all(contrast(color, surface) >= floor for surface, floor in FOCUS_GATES)
 
 
-def focus_shade(color: str) -> str:
+def darken(color: str, passes) -> str:
+    """First OKLab lightness step (0.01) down from the colour, hue and chroma held, that passes."""
     L, a, b = oklab(color)
     for step in range(1, 101):
         shade = from_oklab((L - step / 100, a, b))
-        if clears_focus_gates(shade):
+        if passes(shade):
             return shade
     raise AssertionError(color)
 
 
+def focus_shade(color: str) -> str:
+    return darken(color, clears_focus_gates)
+
+
 assert palette["hibernating_focus"] == focus_shade(SEGMENT_COLOR["Hibernating"]), palette["hibernating_focus"]
+# Muted text (axis titles, footers, the E3 note, secondary labels) and the bracket and gap
+# rules: the theme's label colour reaches 4.1:1 on #F1EFE9, below WCAG AA for small text, so
+# the exhibits take the first darker step of the same hue that reaches 4.5:1 on every surface.
+LABEL = palette["label_text"]
+assert LABEL == darken(palette["label"], lambda c: all(contrast(c, s) >= 4.5 for s in SURFACES)), LABEL
 FOCUS_COLOR = {"At Risk": SEGMENT_COLOR["At Risk"], "Hibernating": palette["hibernating_focus"]}
 for name in FOCUS:
     assert clears_focus_gates(FOCUS_COLOR[name]), name
@@ -203,6 +213,33 @@ for name, approach, _, _ in segment_rows:
 assert set(DISCOUNT) == set(FOCUS), DISCOUNT
 
 W, H = 1200, 675  # logical px: SVG viewBox 0 0 1200 675, PNG saved at 2x
+# Shared grid. On desktop viewports the exhibit column shows the canvas at 1:1 (it is wider
+# than 1200 px from about 1270 px of viewport) on the same centre as the body text, so a
+# figure kept inside the body column's width shares its edges with the text above and below.
+# BODY_COLUMN_PX is that column: Quarto 1.9 page grid, rule body.fullcontent .page-columns,
+# track body-content = minmax(500px, calc(850px - 3em)) from 992 px of viewport, with 3em at
+# the 17 px root font size (--bs-root-font-size): 850 - 51 = 799 px.
+BODY_COLUMN_PX = 799
+# The value holds only while its inputs hold: this page has no table of contents (a TOC moves
+# the body off the fullcontent grid) and the brand sets no base font size (it would change the
+# root font size behind 3em).
+page_meta = yaml.safe_load(Path("exhibits_win_back.qmd").read_text(encoding="utf-8").split("---", 2)[1])
+project_meta = yaml.safe_load(Path("_quarto.yml").read_text(encoding="utf-8"))
+assert page_meta["format"]["html"].get("toc") is False, page_meta["format"]["html"]
+assert "toc" not in project_meta and "format" not in project_meta, project_meta
+assert "size" not in brand["typography"]["base"], brand["typography"]["base"]
+# Text column edges; figure-level text starts at TEXT_LEFT_PX. Category labels hang from the
+# same edge, so the plot area starts CATEGORY_GUTTER_PX further in: the widest segment name in
+# DejaVu Sans (the widest fallback) plus a pad, one value for all exhibits so their zero lines
+# align down the page. Every mark and text stays inside TEXT_LEFT_PX .. PLOT_RIGHT_PX.
+TEXT_LEFT_PX, PLOT_RIGHT_PX = (W - BODY_COLUMN_PX) / 2, (W + BODY_COLUMN_PX) / 2
+CATEGORY_SIZE, CATEGORY_PAD_PX = 14, 12
+CATEGORY_GUTTER_PX = math.ceil(max(
+    TextToPath().get_text_width_height_descent(
+        name, font_manager.FontProperties(family="DejaVu Sans", size=CATEGORY_SIZE), ismath=False)[0]
+    for name in SEGMENT_ORDER)) + CATEGORY_PAD_PX
+PLOT_LEFT_PX = TEXT_LEFT_PX + CATEGORY_GUTTER_PX
+LAYOUT = []  # per variant: plot-area edges and text-column anchors, checked against the grid
 mpl.rcParams.update({
     "svg.fonttype": "none",
     "svg.hashsalt": "kupferkanne-exhibits",  # fixed element ids: identical SVG bytes on every render
@@ -247,68 +284,293 @@ def px(fig, x_display: float) -> float:
     return x_display * 72 / fig.dpi
 
 
-def fallback_right(text, renderer) -> float:
-    """Right edge, in canvas px, of a left-aligned text drawn in DejaVu Sans from its anchor."""
-    prop = font_manager.FontProperties(family="DejaVu Sans", size=text.get_fontsize(),
+def text_width(text: str, prop) -> float:
+    """Widest line of a text, in canvas px, set in the given font properties."""
+    return max(TEXT_TO_PATH.get_text_width_height_descent(line, prop, ismath=False)[0]
+               for line in text.split("\n"))
+
+
+def fallback_prop(text):
+    return font_manager.FontProperties(family="DejaVu Sans", size=text.get_fontsize(),
                                        weight=text.get_fontweight())
-    width = max(TEXT_TO_PATH.get_text_width_height_descent(line, prop, ismath=False)[0]
-                for line in text.get_text().split("\n"))
-    return px(text.figure, text.get_window_extent(renderer).x0) + width
+
+
+def fallback_box(text, renderer) -> tuple:
+    """Box (x0, y0, x1, y1), in canvas px, of a text drawn in DejaVu Sans from the same anchor:
+    a left-aligned text grows right, a right-aligned one grows left, a centred one both ways."""
+    box = text.get_window_extent(renderer)
+    fig = text.figure
+    x0, x1 = px(fig, box.x0), px(fig, box.x1)
+    width = text_width(text.get_text(), fallback_prop(text))
+    align = text.get_horizontalalignment()
+    if align == "left":
+        x1 = x0 + width
+    elif align == "right":
+        x0 = x1 - width
+    else:
+        x0, x1 = (x0 + x1 - width) / 2, (x0 + x1 + width) / 2
+    return x0, px(fig, box.y0), x1, px(fig, box.y1)
+
+
+def fallback_right(text, renderer) -> float:
+    return fallback_box(text, renderer)[2]
+
+
+NBSP = "\u00a0"
+
+
+def tokens(text: str) -> list:
+    """Words of a text, with each segment name kept as one token."""
+    for name in SEGMENT_ORDER:
+        text = text.replace(name, name.replace(" ", NBSP))
+    return [token.replace(NBSP, " ") for token in text.split(" ")]
+
+
+def check_names_whole(text: str, lines: list) -> list:
+    assert " ".join(lines) == text, (lines, text)
+    for name in SEGMENT_ORDER:
+        assert sum(line.count(name) for line in lines) == text.count(name), (name, lines)
+    return lines
+
+
+def wrap_heading(title: str, fontsize: float, weight) -> list:
+    """Greedy word wrap for a figure heading drawn from the text column's left edge: each line
+    fits the body column in the brand face and stays MIN_GAP_PX inside the canvas in DejaVu
+    Sans. A segment name is one token, so a line never breaks inside it."""
+    brand_prop = font_manager.FontProperties(family=FONT_STACK, size=fontsize, weight=weight)
+    fallback = font_manager.FontProperties(family="DejaVu Sans", size=fontsize, weight=weight)
+    lines = []
+    for word in tokens(title):
+        line = f"{lines[-1]} {word}" if lines else word
+        if lines and (text_width(line, brand_prop) <= BODY_COLUMN_PX
+                      and TEXT_LEFT_PX + text_width(line, fallback) <= W - MIN_GAP_PX):
+            lines[-1] = line
+        else:
+            lines.append(word)
+    return check_names_whole(title, lines)
+
+
+def wrap_note(note: str, fontsize: float) -> list:
+    """Fewest lines, at most two, that keep a figure note inside the text column in DejaVu
+    Sans. Two lines break after a colon or semicolon where one fits, else where the longer
+    line is shortest, so they read as a pair."""
+    fallback = font_manager.FontProperties(family="DejaVu Sans", size=fontsize)
+    if text_width(note, fallback) <= BODY_COLUMN_PX:
+        return [note]
+    words = tokens(note)
+    splits = [[" ".join(words[:i]), " ".join(words[i:])] for i in range(1, len(words))]
+    fitting = [s for s in splits if max(text_width(line, fallback) for line in s) <= BODY_COLUMN_PX]
+    assert fitting, note
+    return check_names_whole(note, min(fitting, key=lambda s: (
+        not s[0].endswith((":", ";")), max(text_width(line, fallback) for line in s))))
 
 
 def fmt_int(v) -> str:
     return f"{int(v):,}"
 
 
+def fmt_num(v, decimals=2) -> str:
+    return f"{float(v):,.{decimals}f}"
+
+
 def fmt_eur(v, decimals=2) -> str:
-    return f"{float(v):,.{decimals}f} EUR"
+    return f"{fmt_num(v, decimals)} EUR"
 
 
 def fmt_pct(v, decimals=1) -> str:
     return f"{float(v):,.{decimals}f}%"
 
 
-def show(df: pd.DataFrame) -> None:
-    display(HTML(df.to_html(index=False)))
+NUMERIC_CELL = re.compile(r"-?[\d,]*\.?\d+%?")
+
+
+def show(df: pd.DataFrame, aligned: bool = False) -> None:
+    """HTML table without the index. An aligned table marks each header and cell with its
+    column's kind (every cell a plain number or percentage: col-num, else col-text) for the
+    page styles in exhibits.css; its units belong in the row or column labels, so no cell
+    may carry one."""
+    table = df.to_html(index=False, classes="exhibit-table" if aligned else None)
+    if aligned:
+        kinds = ["col-num" if df[col].map(lambda v: bool(NUMERIC_CELL.fullmatch(v))).all()
+                 else "col-text" for col in df.columns]
+        assert not df.map(lambda v: bool(re.search(r"\d\s*EUR", v))).any().any(), df.columns
+
+        def mark(row):
+            assert len(re.findall(r"<t[hd][ >]", row[0])) == len(kinds), row[0]
+            cells = iter(kinds)
+            return re.sub(r"<t([hd])>", lambda m: f'<t{m[1]} class="{next(cells)}">', row[0])
+
+        table = re.sub(r"<tr[^>]*>.*?</tr>", mark, table, flags=re.S)
+    display(HTML(table))
 
 
 LEGEND_TOP, SUBTITLE_TOP = 0.855, 0.85  # titled layout: the header block sits under the heading
 TOP_MARGIN_PX = 24  # embedded layout: the header block (legend or subtitle) starts this far down
 
 
-def canvas(title: str, footer: str, rect, subtitle: str | None = None, embedded: bool = False):
-    """One figure per variant on the same 1200 x 675 canvas. The titled variant bakes
+def canvas(title: str, footer: str, rows, subtitle: str | None = None, embedded: bool = False):
+    """One figure per variant on the same 1200 x 675 canvas. The axes span the grid's plot
+    area; `rows` gives their bottom and height as figure fractions. The heading, the
+    subtitle and the footer start at the text column's left edge. The titled variant bakes
     the heading in; the embedded variant has no heading band: the header block and the
     top of the axes move up so the content starts TOP_MARGIN_PX below the edge."""
     fig = plt.figure(figsize=(W / 72, H / 72))
-    lines = textwrap.wrap(title, width=82)
+    lines = wrap_heading(title, 22, 600)
     assert len(lines) <= 2, title
     header_top = SUBTITLE_TOP if subtitle else LEGEND_TOP
     shift = (1 - TOP_MARGIN_PX / H) - header_top if embedded else 0.0
-    x, y, w, h = rect
-    ax = fig.add_axes([x, y, w, h + shift])
+    y, h = rows
+    ax = fig.add_axes([PLOT_LEFT_PX / W, y, (PLOT_RIGHT_PX - PLOT_LEFT_PX) / W, h + shift])
+    left = TEXT_LEFT_PX / W
+    anchored, heading = [], None
     if not embedded:
-        fig.text(0.04, 0.955, "\n".join(lines), fontsize=22, fontweight=600,
-                 va="top", ha="left", linespacing=1.25)
+        heading = fig.text(left, 0.955, "\n".join(lines), fontsize=22, fontweight=600,
+                           va="top", ha="left", linespacing=1.25)
+        anchored.append(heading)
     if subtitle:
-        fig.text(0.04, header_top + shift, subtitle, fontsize=14, color=LABEL, va="top", ha="left")
-    fig.text(0.04, 0.045, footer, fontsize=12, color=LABEL, va="bottom", ha="left")
-    return SimpleNamespace(fig=fig, ax=ax, legend_top=LEGEND_TOP + shift, title_line=lines[0])
+        anchored.append(fig.text(left, header_top + shift, "\n".join(wrap_note(subtitle, 14)),
+                                 fontsize=14, color=LABEL, va="top", ha="left"))
+    anchored.append(fig.text(left, 0.045, footer, fontsize=12, color=LABEL, va="bottom", ha="left"))
+    return SimpleNamespace(fig=fig, ax=ax, legend_top=LEGEND_TOP + shift, title_line=lines[0],
+                           anchored=anchored, heading=heading, boxes=[], lines=[])
+
+
+def category_axis(ax, names) -> None:
+    """Category labels hang from the text column's left edge, left-aligned like the first
+    column of the tables: the tick pad spans the whole category gutter."""
+    ax.set_yticks(range(len(names))[::-1])
+    ax.set_yticklabels(names, fontsize=CATEGORY_SIZE, ha="left")
+    ax.tick_params(axis="y", pad=CATEGORY_GUTTER_PX)
+
+
+def finish_axes(variant) -> None:
+    """The last value-axis label ends on the plot's right edge instead of centring past it."""
+    ax = variant.ax
+    ticks, labels = ax.get_xticks(), ax.get_xticklabels()
+    assert abs(ticks[-1] - ax.get_xlim()[1]) < 1e-9, (ticks, ax.get_xlim())
+    labels[-1].set_horizontalalignment("right")
+
+
+def text_boxes(fig, renderer) -> list:
+    """(text, DejaVu Sans box) for every non-empty text on the figure: figure texts, legend
+    entries, axes annotations, tick labels and the x-axis label."""
+    texts = list(fig.texts) + [t for legend in fig.legends for t in legend.get_texts()]
+    for ax in fig.axes:
+        texts += ax.texts + ax.get_xticklabels() + ax.get_yticklabels() + [ax.xaxis.label]
+    return [(t.get_text(), fallback_box(t, renderer)) for t in texts if t.get_text()]
+
+
+def overlaps(a: tuple, b: tuple) -> bool:
+    return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+
+GRID_CLEAR_PX = 3  # a gridline stops this far short of a text box
+
+
+def draw_grid(variant) -> None:
+    """Vertical gridlines at the major x ticks, broken wherever they would run through a
+    text: the canvas is transparent, so a label background would show as a patch on the
+    darker page surfaces. The breaks use DejaVu Sans boxes, the widest fallback. Each drawn
+    segment is kept in variant.lines, with the visible spines, for the crossing gate."""
+    ax, fig = variant.ax, variant.fig
+    fig.draw_without_rendering()
+    renderer = fig.canvas.get_renderer()
+    boxes = text_boxes(fig, renderer)
+    axes_box = ax.get_window_extent(renderer)
+    bottom, top = px(fig, axes_box.y0), px(fig, axes_box.y1)
+    to_axes = ax.transAxes.inverted()
+    xmin, xmax = ax.get_xlim()
+    for tick in (t for t in ax.get_xticks() if xmin <= t <= xmax):
+        x = px(fig, ax.transData.transform((tick, 0))[0])
+        cuts = sorted((y0 - GRID_CLEAR_PX, y1 + GRID_CLEAR_PX) for _, (x0, y0, x1, y1) in boxes
+                      if x0 - GRID_CLEAR_PX < x < x1 + GRID_CLEAR_PX and y0 < top and bottom < y1)
+        start, segments = bottom, []
+        for lo, hi in cuts:
+            if lo > start:
+                segments.append((start, lo))
+            start = max(start, hi)
+        if start < top:
+            segments.append((start, top))
+        for lo, hi in segments:
+            y_lo, y_hi = (to_axes.transform((0, v * fig.dpi / 72))[1] for v in (lo, hi))
+            ax.add_artist(Line2D([tick, tick], [y_lo, y_hi], transform=ax.get_xaxis_transform(),
+                                 color=GRID, linewidth=mpl.rcParams["grid.linewidth"],
+                                 alpha=mpl.rcParams["grid.alpha"], solid_capstyle="butt", zorder=0.5))
+            variant.lines.append((f"gridline {tick:g}", (x - 0.5, lo, x + 0.5, hi)))
+    for side, spine in ax.spines.items():
+        if spine.get_visible():
+            box = spine.get_window_extent(renderer)
+            variant.lines.append((f"{side} spine", (px(fig, box.x0), px(fig, box.y0),
+                                                    px(fig, box.x1), px(fig, box.y1))))
+
+
+def mark_boxes(fig, renderer) -> list:
+    """(name, canvas-px box) of every drawn mark: bars, lines and markers (gridlines and the
+    bracket included), annotation arrows, spines and legends."""
+    marks = [("legend", legend.get_window_extent(renderer)) for legend in fig.legends]
+    for ax in fig.axes:
+        marks += [(f"patch {i}", p.get_window_extent(renderer)) for i, p in enumerate(ax.patches)]
+        marks += [(f"line {i}", l.get_window_extent(renderer)) for i, l in enumerate(ax.lines)]
+        marks += [(f"arrow {t.get_text()!r}", t.arrow_patch.get_window_extent(renderer))
+                  for t in ax.texts if getattr(t, "arrow_patch", None) is not None]
+        marks += [(f"{side} spine", s.get_window_extent(renderer))
+                  for side, s in ax.spines.items() if s.get_visible()]
+    return [(name, (px(fig, b.x0), px(fig, b.y0), px(fig, b.x1), px(fig, b.y1))) for name, b in marks]
+
+
+def check_layout(stem: str, variant) -> None:
+    """Grid and collision gates for one drawn variant. The axes span the plot area; every
+    figure-level text and every category label starts at the text column's left edge (0.5 px
+    tolerance). Every text box and every mark lies inside the text column, TEXT_LEFT_PX ..
+    PLOT_RIGHT_PX, and on the canvas; the one exception is the titled heading, which must fit
+    the column in the brand face (in DejaVu Sans it cannot fit two lines and may run into the
+    right margin, still on the canvas). No two text boxes, nor a text box and a mark listed
+    in variant.boxes, overlap; no gridline or spine in variant.lines crosses a text box. Text
+    boxes take DejaVu Sans widths, so the gates hold for a viewer without the brand fonts."""
+    fig = variant.fig
+    fig.draw_without_rendering()
+    renderer = fig.canvas.get_renderer()
+    axes_box = variant.ax.get_window_extent(renderer)
+    edges = (px(fig, axes_box.x0), px(fig, axes_box.x1))
+    anchors = [px(fig, t.get_window_extent(renderer).x0)
+               for t in variant.anchored + variant.ax.get_yticklabels()]
+    assert abs(edges[0] - PLOT_LEFT_PX) <= 0.5 and abs(edges[1] - PLOT_RIGHT_PX) <= 0.5, (stem, edges)
+    assert all(abs(a - TEXT_LEFT_PX) <= 0.5 for a in anchors), (stem, anchors)
+    LAYOUT.append({"stem": stem, "edges": edges, "anchors": anchors})
+    texts = text_boxes(fig, renderer)
+    boxes = texts + variant.boxes
+    for name, (x0, y0, x1, y1) in boxes:
+        assert 0 <= x0 and x1 <= W and 0 <= y0 and y1 <= H, (stem, name)
+    heading = variant.heading.get_text() if variant.heading else None
+    in_band = [(name, box) for name, box in boxes + mark_boxes(fig, renderer) if name != heading]
+    if variant.heading:
+        box = variant.heading.get_window_extent(renderer)
+        in_band.append(("heading, brand face", (px(fig, box.x0), 0, px(fig, box.x1), 0)))
+    for name, (x0, _, x1, _) in in_band:
+        assert TEXT_LEFT_PX - 0.5 <= x0 and x1 <= PLOT_RIGHT_PX + 0.5, (stem, name, x0, x1)
+    for i, (a, box_a) in enumerate(boxes):
+        for b, box_b in boxes[i + 1:]:
+            assert not overlaps(box_a, box_b), (stem, a, b)
+    assert any(name.startswith("gridline") for name, _ in variant.lines), stem
+    for line, line_box in variant.lines:
+        for name, box in texts:
+            assert not overlaps(line_box, box), (stem, line, name)
 
 
 def legend_band(variant, handles):
-    """One-row legend right-aligned in the header band. The column spacing leaves every
-    entry MIN_GAP_PX clear of the next one when the text falls back to DejaVu Sans."""
-    legend = variant.fig.legend(handles=handles, loc="upper right",
-                                bbox_to_anchor=(0.94, variant.legend_top), ncol=len(handles),
-                                frameon=False, fontsize=13, handlelength=1.6, columnspacing=4.0)
+    """One-row legend in the header band, starting at the text column's left edge like the
+    E3 note in the same slot. The column spacing leaves every entry MIN_GAP_PX clear of the
+    next one when the text falls back to DejaVu Sans; check_layout keeps it in the column."""
+    legend = variant.fig.legend(handles=handles, loc="upper left",
+                                bbox_to_anchor=(TEXT_LEFT_PX / W, variant.legend_top),
+                                ncol=len(handles), frameon=False, borderpad=0, borderaxespad=0,
+                                fontsize=13, handlelength=1.6, columnspacing=4.0)
     variant.fig.draw_without_rendering()
     renderer = variant.fig.canvas.get_renderer()
     texts = legend.get_texts()
     for text, next_handle in zip(texts, legend.legend_handles[1:]):
         next_left = px(variant.fig, next_handle.get_window_extent(renderer).x0)
         assert next_left - fallback_right(text, renderer) >= MIN_GAP_PX, text.get_text()
-    assert fallback_right(texts[-1], renderer) <= W - MIN_GAP_PX, texts[-1].get_text()
     return legend
 
 
@@ -334,13 +596,16 @@ def save_svg(fig, path: Path, embedded: bool, title: str, desc: str) -> str:
     return drawing
 
 
-def render(stem: str, title: str, desc: str, footer: str, rect, draw, subtitle: str | None = None):
-    """Draw the exhibit once per variant and save SVG and PNG for each. Returns what
-    `draw` returned for the titled variant; both variants plot the same values."""
+def render(stem: str, title: str, desc: str, footer: str, rows, draw, subtitle: str | None = None):
+    """Draw the exhibit once per variant, check its layout and save SVG and PNG for each.
+    Returns what `draw` returned for the titled variant; both variants plot the same values."""
     results = []
     for embedded in (False, True):
-        variant = canvas(title, footer, rect, subtitle, embedded)
+        variant = canvas(title, footer, rows, subtitle, embedded)
         results.append(draw(variant))
+        finish_axes(variant)
+        draw_grid(variant)
+        check_layout(stem if embedded else f"{stem}_titled", variant)
         path = OUT / (stem if embedded else f"{stem}_titled")
         drawing = save_svg(variant.fig, path.with_suffix(".svg"), embedded, title, desc)
         variant.fig.savefig(path.with_suffix(".png"), format="png", dpi=144, transparent=True)
@@ -615,57 +880,94 @@ title = (f"A quarter of scored customers sit in At Risk or Hibernating, "
 assert title == HEADING_E1, title
 assert abs(two_customers - 25) <= 2.5, two_customers  # "a quarter"
 total_customers_label, total_revenue_label = fmt_pct(two_customers), fmt_pct(two_revenue)
-BRACKET_X, BRACKET_TICK = 46, 0.8  # data units (% of total)
+KEY_SEGMENT = "Champions"  # top row: its direct labels carry the key for the fill and the outline
+PAIR_GAP_PX = 4  # visible surface between the filled bar and the outline stroke of a pair
+OUTLINE_PX = 2.0  # outline stroke width; half of it falls outside the bar
+INSIDE_PAD_PX = 8  # the key row's revenue label ends this far inside the outline stroke
+BRACKET_PAD_PX, BRACKET_TICK_PX, BRACKET_TEXT_PX = 12, 8, 12
 
 
 def draw_e1(variant):
-    ax = variant.ax
+    ax, fig = variant.ax, variant.fig
     n = len(e1)
     bar = 0.30
-    gap = 2 / (ax.get_position().height * H) * n  # 2px surface gap between the paired bars, in data units
+    ax.set_ylim(-0.6, n - 0.4)
+    ax.set_xlim(0, 80)
+    unit_px = px(fig, ax.transData.transform((0, 1))[1] - ax.transData.transform((0, 0))[1])
+
+    def canvas_x(data):
+        return px(fig, ax.transData.transform((data, 0))[0])
+
+    def data_x(canvas_px):
+        return ax.transData.inverted().transform((canvas_px * fig.dpi / 72, 0))[0]
+
+    # Centre-to-centre distance of a pair: one bar plus the visible gap plus the stroke's outer half.
+    pair = bar + (PAIR_GAP_PX + OUTLINE_PX / 2) / unit_px
+    segment_gap_px = (1 - pair - bar) * unit_px - OUTLINE_PX / 2
+    assert segment_gap_px >= 3 * PAIR_GAP_PX, segment_gap_px  # pairs read as pairs
     ys = list(range(n))[::-1]
-    displayed, labels = [], []
+    displayed, labels, inside = [], [], []
     for y, row in zip(ys, e1.itertuples()):
         hi = row.segment in FOCUS
         color = FOCUS_COLOR[row.segment] if hi else CONTEXT
-        y_cust, y_rev = y + bar / 2 + gap / 2, y - bar / 2 - gap / 2
+        y_cust, y_rev = y + pair / 2, y - pair / 2
         ax.barh(y_cust, row.customer_share_pct, height=bar, color=color, edgecolor="none", zorder=3)
         ax.barh(y_rev, row.revenue_share_pct, height=bar, facecolor="none", edgecolor=color,
-                linewidth=2.0, zorder=3)
-        if hi:
-            # Direct labels name the two bars, so the exhibit needs no legend.
+                linewidth=OUTLINE_PX, zorder=3)
+        if hi or row.segment == KEY_SEGMENT:
+            # Direct labels name the two bars, so the exhibit needs no legend. The key row's
+            # labels are muted so that the focus rows stay the loudest text in the plot.
             customers_label, revenue_label = fmt_pct(row.customer_share_pct, 2), fmt_pct(row.revenue_share_pct, 2)
-            labels.append(ax.text(row.customer_share_pct + 0.8, y_cust, f"{customers_label} of customers",
-                                  va="center", ha="left", fontsize=13))
-            labels.append(ax.text(row.revenue_share_pct + 0.8, y_rev, f"{revenue_label} of revenue",
-                                  va="center", ha="left", fontsize=13))
+            text_color = FG if hi else LABEL
+            pair_labels = [
+                ax.text(row.customer_share_pct + 0.8, y_cust, f"{customers_label} of customers",
+                        va="center", ha="left", fontsize=13, color=text_color),
+            ]
+            if hi:
+                pair_labels.append(ax.text(row.revenue_share_pct + 0.8, y_rev, f"{revenue_label} of revenue",
+                                           va="center", ha="left", fontsize=13, color=text_color))
+            else:
+                # The key row's outline bar is long enough to hold its label at the inside end,
+                # INSIDE_PAD_PX clear of the stroke, which keeps the label inside the plot area.
+                inner_end = canvas_x(row.revenue_share_pct) - OUTLINE_PX / 2 - INSIDE_PAD_PX
+                inside.append(ax.text(data_x(inner_end), y_rev, f"{revenue_label} of revenue",
+                                      va="center", ha="right", fontsize=13, color=text_color))
+        if hi:
+            labels += pair_labels
             displayed.append({"Segment": row.segment, "y": y, "Customers label": customers_label,
                               "Revenue label": revenue_label})
     assert sorted(d["y"] for d in displayed) == [0, 1], displayed  # the bracket spans the bottom two rows
-    ax.set_yticks(ys)
-    ax.set_yticklabels(e1["segment"], fontsize=14)
-    ax.set_xlim(0, 80)
+    category_axis(ax, list(e1["segment"]))
     ax.set_xticks(range(0, 81, 20))
     ax.set_xticklabels([fmt_pct(v, 0) for v in range(0, 81, 20)])
-    ax.grid(axis="x", zorder=0)
     ax.set_axisbelow(True)
     ax.set_xlabel("Share of total (%)", fontsize=13, color=LABEL)
-    # Bracket from the At Risk and Hibernating rows to the total it summarises.
-    top, bottom = 1 + bar + gap, -bar - gap
-    ax.plot([BRACKET_X - BRACKET_TICK, BRACKET_X, BRACKET_X, BRACKET_X - BRACKET_TICK],
-            [top, top, bottom, bottom], color=LABEL, linewidth=1.0, zorder=2)
+    # Bracket from the At Risk and Hibernating rows to the total it summarises. It stands a
+    # fixed BRACKET_PAD_PX right of the widest focus label, measured in DejaVu Sans.
+    fig.draw_without_rendering()
+    renderer = fig.canvas.get_renderer()
+    bracket_left = max(fallback_right(label, renderer) for label in labels) + BRACKET_PAD_PX
+    for label in inside:  # inside its outline bar in DejaVu Sans, and inside the plot area
+        x0, _, x1, _ = fallback_box(label, renderer)
+        assert x0 >= PLOT_LEFT_PX + OUTLINE_PX / 2 + INSIDE_PAD_PX and x1 <= PLOT_RIGHT_PX, label.get_text()
+    assert len(inside) == 1, inside
+    x_tick, x_bar = data_x(bracket_left), data_x(bracket_left + BRACKET_TICK_PX)
+    top, bottom = 1 + pair / 2 + bar / 2, -pair / 2 - bar / 2
+    ax.plot([x_tick, x_bar, x_bar, x_tick], [top, top, bottom, bottom],
+            color=LABEL, linewidth=1.0, zorder=2)
     total = ax.text(
-        BRACKET_X + 1.2, 0.5,
+        data_x(bracket_left + BRACKET_TICK_PX + BRACKET_TEXT_PX), 0.5,
         f"At Risk + Hibernating:\n{total_customers_label} of scored customers,\n"
         f"{total_revenue_label} of the revenue base",
         fontsize=13, ha="left", va="center", linespacing=1.4,
     )
-    variant.fig.draw_without_rendering()
-    renderer = variant.fig.canvas.get_renderer()
-    bracket_left = px(variant.fig, ax.transData.transform((BRACKET_X - BRACKET_TICK, 0))[0])
+    y_top, y_bottom = (px(fig, ax.transData.transform((0, v))[1]) for v in (top, bottom))
+    variant.boxes.append(("bracket", (bracket_left, y_bottom - 0.5, bracket_left + BRACKET_TICK_PX + 0.5,
+                                      y_top + 0.5)))
     for label in labels:
         assert bracket_left - fallback_right(label, renderer) >= MIN_GAP_PX, label.get_text()
-    assert fallback_right(total, renderer) <= W - MIN_GAP_PX, total.get_text()
+    fig.draw_without_rendering()
+    assert fallback_right(total, fig.canvas.get_renderer()) <= W - MIN_GAP_PX, total.get_text()
     return displayed
 
 
@@ -679,7 +981,7 @@ E1_DESC = (
     f"{fmt_pct(rows.loc['Hibernating', 'revenue_share_pct'], 2)}; together {total_customers_label} of "
     f"scored customers and {total_revenue_label} of the revenue base. The other four segments are grey context."
 )
-displayed = render("e1_segment_share", title, E1_DESC, FOOTER_E1, [0.17, 0.17, 0.77, LEGEND_TOP - 0.17], draw_e1)
+displayed = render("e1_segment_share", title, E1_DESC, FOOTER_E1, (0.17, LEGEND_TOP - 0.17), draw_e1)
 # The displayed labels, summed and rounded to 1 dp, must equal the displayed totals.
 label_sum_customers = sum(float(d["Customers label"].rstrip("%")) for d in displayed)
 label_sum_revenue = sum(float(d["Revenue label"].rstrip("%")) for d in displayed)
@@ -694,9 +996,9 @@ show(pd.DataFrame({
     "Segment": list(e1["segment"]) + ["Total"],
     "Customers": list(e1["customers"].map(fmt_int)) + [fmt_int(SCORED_CUSTOMERS)],
     "Share of scored customers": list(e1["customer_share_pct"].map(lambda v: fmt_pct(v, 2))) + [fmt_pct(100, 2)],
-    "Lifetime spend": list(e1["revenue"].map(fmt_eur)) + [fmt_eur(REVENUE_BASE)],
+    "Lifetime spend (EUR)": list(e1["revenue"].map(fmt_num)) + [fmt_num(REVENUE_BASE)],
     "Share of revenue base": list(e1["revenue_share_pct"].map(lambda v: fmt_pct(v, 2))) + [fmt_pct(100, 2)],
-}))
+}), aligned=True)
 ```
 
 ```{python}
@@ -735,13 +1037,11 @@ def draw_e2(variant):
         ax.text(after - 1.2, y, fmt_pct(after, 2), va="center", ha="right", fontsize=13)
         ax.text((before + after) / 2, y + 0.16, f"\u2212{drop:.0f} pts: win-back {drop:.0f}% discount",
                 va="bottom", ha="center", fontsize=13, color=LABEL)
-    ax.set_yticks(ys)
-    ax.set_yticklabels(focus["segment"], fontsize=14)
+    category_axis(ax, list(focus["segment"]))
     ax.set_ylim(-0.5, 1.6)
     ax.set_xlim(0, 60)
     ax.set_xticks(range(0, 61, 10))
     ax.set_xticklabels([fmt_pct(v, 0) for v in range(0, 61, 10)])
-    ax.grid(axis="x", zorder=0)
     ax.set_axisbelow(True)
     ax.set_xlabel("Margin and contribution, % of pre-offer order value", fontsize=13, color=LABEL)
     legend_band(variant, [
@@ -761,25 +1061,29 @@ E2_DESC = (
         f"{fmt_pct(margin.loc[name, 'contribution'] * 100, 2)} after a "
         f"{margin.loc[name, 'discount'] * 100:.0f}% discount" for name in FOCUS) + "."
 )
-render("e2_margin_after_discount", title, E2_DESC, FOOTER_E23, [0.17, 0.20, 0.77, 0.58], draw_e2)
+render("e2_margin_after_discount", title, E2_DESC, FOOTER_E23, (0.20, 0.58), draw_e2)
 exhibit("e2_margin_after_discount", E2_DESC)
 ```
 
 ```{python}
 #| label: e2-table
-show(pd.DataFrame({
-    "Segment": focus["segment"],
+# Transposed: the ten measures read down the rows, the two segments across the columns.
+measures = {
     "Customers": focus["customers"].map(fmt_int),
     "Orders": focus["orders"].map(fmt_int),
-    "Revenue": focus["revenue"].map(fmt_eur),
-    "Cost": focus["cost"].map(fmt_eur),
-    "Profit": focus["profit"].map(fmt_eur),
-    "AOV": focus["aov"].map(fmt_eur),
+    "Revenue (EUR)": focus["revenue"].map(fmt_num),
+    "Cost (EUR)": focus["cost"].map(fmt_num),
+    "Profit (EUR)": focus["profit"].map(fmt_num),
+    "AOV (EUR)": focus["aov"].map(fmt_num),
     "Gross margin": (focus["gross_margin"] * 100).map(lambda v: fmt_pct(v, 2)),
     "Mean realised discount": (focus["mean_order_discount_pct"] * 100).map(lambda v: fmt_pct(v, 2)),
     "Win-back discount": (focus["discount"] * 100).map(lambda v: fmt_pct(v, 0)),
     "Contribution after discount (points)": (focus["contribution"] * 100).map(lambda v: f"{v:.2f}"),
-}))
+}
+assert list(focus["segment"]) == list(FOCUS), focus["segment"]
+show(pd.DataFrame({"": list(measures),
+                   **{name: [values.iloc[i] for values in measures.values()] for i, name in enumerate(FOCUS)}}),
+     aligned=True)
 ```
 
 ```{python}
@@ -811,13 +1115,11 @@ def draw_e3(variant):
     ax.plot([values[1], values[0]], [0.5, 0.5], color=LABEL, linewidth=1, linestyle=(0, (2, 3)), zorder=2)
     ax.text((values[0] + values[1]) / 2, 0.55, f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f}x)",
             va="bottom", ha="center", fontsize=15, fontweight=600)
-    ax.set_yticks(ys)
-    ax.set_yticklabels(per_1000["segment"], fontsize=14)
+    category_axis(ax, list(per_1000["segment"]))
     ax.set_ylim(-0.7, 1.7)
     ax.set_xlim(0, 3000)
     ax.set_xticks(range(0, 3001, 500))
     ax.set_xticklabels([f"{v:,}" for v in range(0, 3001, 500)])
-    ax.grid(axis="x", zorder=0)
     ax.set_axisbelow(True)
     ax.set_xlabel("Contribution per 1,000 EUR of discount (EUR)", fontsize=13, color=LABEL)
 
@@ -829,10 +1131,16 @@ E3_DESC = (
     f"{per_1000_by_segment['At Risk'] - per_1000_by_segment['Hibernating']:,.0f} EUR ({RATIO:.2f}x). "
     "The figure measures margin efficiency, not incremental return."
 )
-render("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, [0.17, 0.22, 0.77, 0.54], draw_e3,
+render("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, (0.22, 0.54), draw_e3,
        subtitle="Contribution on orders placed, at the playbook discount rates: "
                 "a margin-efficiency figure, not an incremental return")
 exhibit("e3_contribution_per_1000", E3_DESC)
+# One grid across the page: three exhibits in two variants share the plot-area edges and the
+# text-column anchor of figure text and category labels, within 0.5 px.
+assert len(LAYOUT) == 6, [entry["stem"] for entry in LAYOUT]
+for values in ([e["edges"][0] for e in LAYOUT], [e["edges"][1] for e in LAYOUT],
+               [a for e in LAYOUT for a in e["anchors"]]):
+    assert max(values) - min(values) <= 0.5, values
 ```
 
 ```{python}
@@ -841,8 +1149,8 @@ show(pd.DataFrame({
     "Segment": per_1000["segment"],
     "Gross margin": (per_1000["gross_margin"] * 100).map(lambda v: fmt_pct(v, 2)),
     "Win-back discount": (per_1000["discount_rate"] * 100).map(lambda v: fmt_pct(v, 0)),
-    "Contribution per 1,000 EUR of discount": per_1000["contribution_per_1000"].map(lambda v: fmt_eur(v, 0)),
-}))
+    "Contribution per 1,000 EUR of discount (EUR)": per_1000["contribution_per_1000"].map(lambda v: fmt_num(v, 0)),
+}), aligned=True)
 ```
 
 The live values on this page are checked against the literals published in [`docs/methodology.md`](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/methodology.md), and the render fails on any mismatch.

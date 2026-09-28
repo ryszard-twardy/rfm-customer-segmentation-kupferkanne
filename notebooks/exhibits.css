@@ -6,3 +6,10 @@
   max-width: 1200px;
   margin-inline: auto;
 }
+
+/* Exhibit tables: text columns read from the left; numbers align on the right in tabular
+   figures and stay on one line, while headers may wrap. show(aligned=True) in
+   exhibits_win_back.qmd sets the classes. */
+table.exhibit-table .col-text { text-align: left; }
+table.exhibit-table .col-num { text-align: right; font-variant-numeric: tabular-nums; }
+table.exhibit-table td.col-num { white-space: nowrap; }

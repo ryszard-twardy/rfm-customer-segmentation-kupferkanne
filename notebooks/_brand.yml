@@ -36,10 +36,14 @@ color:
     # chroma held) to the first 0.01 step that reaches 3:1 on #FFFFFF and #F1EFE9 and 2:1 on
     # the exhibits' context grey. Derived and asserted in exhibits_win_back.qmd.
     hibernating_focus: "#8A877F"
+    # Muted text on the exhibits and the notebook charts: label darkened in OKLab lightness
+    # (hue and chroma held) to the first 0.01 step that reaches 4.5:1 on #FFFFFF, #F7F5F1 and
+    # #F1EFE9. Derived and asserted in exhibits_win_back.qmd.
+    label_text: "#5E6E85"
     # Surfaces and chrome from the theme.
     page: "#F7F5F1"     # report page background
     border: "#DDD6CC"   # visual border; exhibit gridlines only (context bars use a 32% foreground blend computed in the notebook)
-    label: "#64748B"    # label text class; exhibit axis titles and footers
+    label: "#64748B"    # theme label text class; source of label_text, the exhibits' muted text colour
   foreground: "#3D4752"  # theme foreground: text on the canvas
   background: "#FFFFFF"  # canvas
   primary: c1            # theme tableAccent
