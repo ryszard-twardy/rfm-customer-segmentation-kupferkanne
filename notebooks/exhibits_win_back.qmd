@@ -1,10 +1,13 @@
 ---
 title: "Win-back exhibits"
 author: "Ryszard Twardy"
+date: 2026-09-28
 format:
   html:
     embed-resources: true
     toc: false
+    lightbox: true
+    css: exhibits.css
 brand: _brand.yml
 output-file: exhibits_win_back.html
 engine: jupyter
@@ -15,6 +18,8 @@ execute:
 
 ```{python}
 #| label: setup
+import base64
+import html
 import logging
 import re
 import textwrap
@@ -29,7 +34,7 @@ from google.cloud import bigquery
 from IPython.display import HTML, display
 from matplotlib import font_manager
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
+from matplotlib.textpath import TextToPath
 
 PROJECT = "kupferkanne-2026"
 DATASET = f"{PROJECT}.sales"
@@ -72,7 +77,7 @@ HEADING_E1 = ("A quarter of scored customers sit in At Risk or Hibernating, "
               "and their lifetime spend is 2% of the revenue base")
 HEADING_E2 = ("The playbook gives the deeper discount to the thinner margin: after its offer "
               "At Risk keeps 37 points of order value, Hibernating 27")
-HEADING_E3 = ("Each 1,000 EUR of discount returns 2,483 EUR of contribution in At Risk, "
+HEADING_E3 = ("Each 1,000 EUR of discount retains 2,483 EUR of contribution in At Risk, "
               "against 1,334 EUR in Hibernating")
 FONT_STACK = [f.strip() for f in brand["typography"]["base"]["family"].split(",")]
 NAMED_FONTS = [f for f in FONT_STACK if f != "sans-serif"]
@@ -114,6 +119,21 @@ def oklab(hex_color: str) -> tuple:
             0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
 
 
+def from_oklab(lab: tuple) -> str:
+    """Inverse of oklab(); the colour must fall inside the sRGB gamut."""
+    L, a, b = lab
+    l, m, s = ((L + 0.3963377774 * a + 0.2158037573 * b) ** 3,
+               (L - 0.1055613458 * a - 0.0638541728 * b) ** 3,
+               (L - 0.0894841775 * a - 1.2914855480 * b) ** 3)
+    out = "#"
+    for v in (4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+              -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+              -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s):
+        assert 0 <= v <= 1, lab
+        out += f"{round((12.92 * v if v <= 0.0031308 else 1.055 * v ** (1 / 2.4) - 0.055) * 255):02X}"
+    return out
+
+
 def delta_e(a: str, b: str) -> float:
     """Euclidean distance in OKLab, times 100: the scale the palette validator reports."""
     return 100 * sum((p - q) ** 2 for p, q in zip(oklab(a), oklab(b))) ** 0.5
@@ -129,12 +149,39 @@ CONTEXT = tint(FG, CONTEXT_SHARE)
 assert 1.5 <= contrast(CONTEXT, SURFACES[-1]) <= 2.0, contrast(CONTEXT, SURFACES[-1])
 assert luminance(CONTEXT) > luminance(SEGMENT_COLOR["Hibernating"]), CONTEXT
 assert min(delta_e(CONTEXT, c) for c in SEGMENT_COLOR.values()) >= 10, CONTEXT
-# E2 "before" markers and connectors: the segment colour blended with white. A 60%
-# share leaves the Hibernating tint at delta E 4.98 from the gridline; 61% is the
-# first one-point step that clears the floor of 5.
+# Focus marks must separate from the surfaces and from the context grey. The Hibernating
+# segment colour does not (about 2.6:1 on white, 1.5:1 on the context grey), so its marks
+# take a darker shade of the same hue: OKLab lightness steps down 0.01 at a time with hue
+# and chroma held, and the first step that clears every gate is the brand key.
+FOCUS_GATES = (("#FFFFFF", 3.0), ("#F1EFE9", 3.0), (CONTEXT, 2.0))
+
+
+def clears_focus_gates(color: str) -> bool:
+    return all(contrast(color, surface) >= floor for surface, floor in FOCUS_GATES)
+
+
+def focus_shade(color: str) -> str:
+    L, a, b = oklab(color)
+    for step in range(1, 101):
+        shade = from_oklab((L - step / 100, a, b))
+        if clears_focus_gates(shade):
+            return shade
+    raise AssertionError(color)
+
+
+assert palette["hibernating_focus"] == focus_shade(SEGMENT_COLOR["Hibernating"]), palette["hibernating_focus"]
+FOCUS_COLOR = {"At Risk": SEGMENT_COLOR["At Risk"], "Hibernating": palette["hibernating_focus"]}
+for name in FOCUS:
+    assert clears_focus_gates(FOCUS_COLOR[name]), name
+    assert min(delta_e(CONTEXT, FOCUS_COLOR[name]), delta_e(FOCUS_COLOR[name], GRID)) >= 10, name
+# E2 "before" markers and connectors: the focus colour blended with white. The share was
+# derived on the segment colours: 60% leaves the Hibernating tint at delta E 4.98 from the
+# gridline; 61% is the first one-point step that clears the floor of 5. The drawn tints
+# (focus colours) must clear the same floor.
 TINT_SHARE = 0.61
 for name in FOCUS:
     assert delta_e(tint(SEGMENT_COLOR[name], TINT_SHARE), GRID) >= 5, name
+    assert delta_e(tint(FOCUS_COLOR[name], TINT_SHARE), GRID) >= 5, name
 
 
 # Playbook: segment order, segment colour and win-back discount rate come from
@@ -188,6 +235,25 @@ mpl.rcParams.update({
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 RESOLVED_FONT = font_manager.findfont(font_manager.FontProperties(family=FONT_STACK))
 assert font_manager.get_font(RESOLVED_FONT).family_name in NAMED_FONTS, RESOLVED_FONT
+# Live SVG text keeps the x position matplotlib computed with the brand face, so a viewer
+# without Segoe UI or Lato draws it wider from the same anchor. Clearances are measured with
+# DejaVu Sans, the widest common fallback, and must leave MIN_GAP_PX between neighbours.
+MIN_GAP_PX = 8
+TEXT_TO_PATH = TextToPath()
+
+
+def px(fig, x_display: float) -> float:
+    """Display x to canvas px (the SVG viewBox unit): the canvas is laid out at 72 px per inch."""
+    return x_display * 72 / fig.dpi
+
+
+def fallback_right(text, renderer) -> float:
+    """Right edge, in canvas px, of a left-aligned text drawn in DejaVu Sans from its anchor."""
+    prop = font_manager.FontProperties(family="DejaVu Sans", size=text.get_fontsize(),
+                                       weight=text.get_fontweight())
+    width = max(TEXT_TO_PATH.get_text_width_height_descent(line, prop, ismath=False)[0]
+                for line in text.get_text().split("\n"))
+    return px(text.figure, text.get_window_extent(renderer).x0) + width
 
 
 def fmt_int(v) -> str:
@@ -230,29 +296,45 @@ def canvas(title: str, footer: str, rect, subtitle: str | None = None, embedded:
     return SimpleNamespace(fig=fig, ax=ax, legend_top=LEGEND_TOP + shift, title_line=lines[0])
 
 
-def legend_band(variant, handles) -> None:
-    variant.fig.legend(handles=handles, loc="upper right", bbox_to_anchor=(0.94, variant.legend_top),
-                       ncol=len(handles), frameon=False, fontsize=13, handlelength=1.6,
-                       columnspacing=2.0)
+def legend_band(variant, handles):
+    """One-row legend right-aligned in the header band. The column spacing leaves every
+    entry MIN_GAP_PX clear of the next one when the text falls back to DejaVu Sans."""
+    legend = variant.fig.legend(handles=handles, loc="upper right",
+                                bbox_to_anchor=(0.94, variant.legend_top), ncol=len(handles),
+                                frameon=False, fontsize=13, handlelength=1.6, columnspacing=4.0)
+    variant.fig.draw_without_rendering()
+    renderer = variant.fig.canvas.get_renderer()
+    texts = legend.get_texts()
+    for text, next_handle in zip(texts, legend.legend_handles[1:]):
+        next_left = px(variant.fig, next_handle.get_window_extent(renderer).x0)
+        assert next_left - fallback_right(text, renderer) >= MIN_GAP_PX, text.get_text()
+    assert fallback_right(texts[-1], renderer) <= W - MIN_GAP_PX, texts[-1].get_text()
+    return legend
 
 
-def save_svg(fig, path: Path, embedded: bool) -> str:
+def save_svg(fig, path: Path, embedded: bool, title: str, desc: str) -> str:
     """Write the SVG with LF line endings (matplotlib writes CRLF on Windows). The
-    embedded variant keeps only the viewBox on its root, so it scales to its container."""
+    embedded variant keeps only the viewBox on its root, so it scales to its container,
+    and carries the heading and the chart description as <title> and <desc>. Returns
+    the drawing as matplotlib wrote it."""
     fig.savefig(path, format="svg", transparent=True, metadata={"Date": None})
     data = path.read_bytes().replace(b"\r\n", b"\n")
     assert b"\r" not in data, path
+    drawing = data.decode("utf-8")
     root = re.search(rb"<svg[^>]*>", data).group(0)
     assert b'viewBox="0 0 1200 675"' in root, root
     if embedded:
         new_root = re.sub(rb'\s(?:width|height)="[^"]*"', b"", root)
         assert b"width=" not in new_root and b"height=" not in new_root, new_root
-        data = data.replace(root, new_root, 1)
+        labels = (f"\n <title>{html.escape(title, quote=False)}</title>"
+                  f"\n <desc>{html.escape(desc, quote=False)}</desc>").encode("utf-8")
+        data = data.replace(root, new_root + labels, 1)
+        assert data.count(b"<title>") == 1 and data.count(b"<desc>") == 1, path
     path.write_bytes(data)
-    return data.decode("utf-8")
+    return drawing
 
 
-def render(stem: str, title: str, footer: str, rect, draw, subtitle: str | None = None):
+def render(stem: str, title: str, desc: str, footer: str, rect, draw, subtitle: str | None = None):
     """Draw the exhibit once per variant and save SVG and PNG for each. Returns what
     `draw` returned for the titled variant; both variants plot the same values."""
     results = []
@@ -260,11 +342,27 @@ def render(stem: str, title: str, footer: str, rect, draw, subtitle: str | None 
         variant = canvas(title, footer, rect, subtitle, embedded)
         results.append(draw(variant))
         path = OUT / (stem if embedded else f"{stem}_titled")
-        text = save_svg(variant.fig, path.with_suffix(".svg"), embedded)
+        drawing = save_svg(variant.fig, path.with_suffix(".svg"), embedded, title, desc)
         variant.fig.savefig(path.with_suffix(".png"), format="png", dpi=144, transparent=True)
         plt.close(variant.fig)
-        assert (variant.title_line in text) == (not embedded), path
+        assert (variant.title_line in drawing) == (not embedded), path
     return results[0]
+
+
+def exhibit(stem: str, alt: str) -> None:
+    """Print the embedded SVG in the wide exhibit column (the page CSS caps it at 1200 px).
+    The image is a data URI: the lightbox link that wraps it then needs no file outside
+    the site, where docs/img/exhibits/ does not exist. The page copy carries the canvas
+    size as its intrinsic size, so the lightbox opens it at up to 1200 x 675 px; the CSS
+    still scales it to the column, and the embedded file keeps a viewBox-only root."""
+    assert '"' not in alt, alt
+    svg = (OUT / f"{stem}.svg").read_bytes()
+    assert svg.count(b"<svg ") == 1 and b"width=" not in re.search(rb"<svg[^>]*>", svg).group(0), stem
+    svg = svg.replace(b"<svg ", f'<svg width="{W}" height="{H}" '.encode("ascii"), 1)
+    uri = "data:image/svg+xml;base64," + base64.b64encode(svg).decode("ascii")
+    print(f'::: {{.column-screen-inset .exhibit}}\n'
+          f'![]({uri}){{fig-alt="{alt}"}}\n'
+          f':::\n')
 
 
 FOOTER_E1 = "Source: v_rfm_for_bi, kupferkanne-2026.sales; docs/methodology.md"
@@ -351,10 +449,21 @@ for col in ("discount_rate", "gross_margin", "contribution_per_eur", "contributi
 RATIO = per_1000["contribution_per_eur"].iloc[0] / per_1000["contribution_per_eur"].iloc[1]
 ```
 
-::: {.callout-note collapse="true" title="Checks against docs/methodology.md: the render fails if any check fails"}
+```{python}
+#| label: lede
+LEDE = (
+    "Does the win-back playbook spend its discount where a discount euro keeps the most "
+    "contribution? It does not: each euro of discount retains "
+    f"{RATIO:.2f} times as much contribution in At Risk as in Hibernating, yet the playbook gives "
+    f"Hibernating the deeper discount ({DISCOUNT['Hibernating'] * 100:.0f}% against "
+    f"{DISCOUNT['At Risk'] * 100:.0f}%). The recommendation is a pilot against a randomised holdout "
+    "that moves budget to At Risk only if the gap holds on an incremental basis."
+)
+```
 
 ```{python}
 #| label: assertions
+# Runs before any exhibit file is written; the table is shown at the end of the page.
 doc = METHODOLOGY.read_text(encoding="utf-8")
 
 
@@ -385,6 +494,7 @@ p_points = dict(zip(FOCUS, map(num, grab(
     r"At Risk retains ([\d.]+) points of contribution after a \d+-point concession; "
     r"Hibernating retains ([\d.]+) points"))))
 (p_ratio,) = map(num, grab(r"At Risk returns ([\d.]+) times the contribution"))
+(p_gap,) = map(num, grab(r"raises expected contribution by about ([\d,]+) EUR"))
 
 checks = []
 
@@ -441,6 +551,10 @@ check("Revenue base", p_base, REVENUE_BASE, 2)
 check("At Risk + Hibernating share of revenue base %", p_revenue_share,
       two["revenue"].sum() / REVENUE_BASE * 100, 1)
 check("At Risk / Hibernating contribution ratio", p_ratio, RATIO, 2)
+# The gap the E3 label and alt text print: the live per-1,000 difference at 0 dp.
+per_1000_live = per_1000.set_index("segment")["contribution_per_1000"]
+check("At Risk - Hibernating gap per 1,000 EUR of discount", p_gap,
+      per_1000_live["At Risk"] - per_1000_live["Hibernating"], 0)
 
 # Segment-share table appended to docs/methodology.md: every row and the closing
 # sentence must equal the same strings built from the live v_rfm_for_bi result.
@@ -463,12 +577,24 @@ check_text("Segment shares closing sentence", p_share_sentence,
            f"segment-share exhibit; At Risk and Hibernating total {fmt_int(two['customers'].sum())} "
            f"customers and {two['revenue'].sum():,.2f} EUR.")
 
-show(pd.DataFrame(checks))
+# The lede's literals, read back from the printed sentence.
+lede_ratio, lede_hibernating, lede_at_risk = map(num, grab(
+    r"retains ([\d.]+) times as much contribution .* \((\d+)% against (\d+)%\)", LEDE))
+check("Lede: At Risk / Hibernating contribution ratio", p_ratio, lede_ratio, 2)
+check("Lede: Hibernating discount %", published["Hibernating"]["discount_pct"], lede_hibernating, 0)
+check("Lede: At Risk discount %", published["At Risk"]["discount_pct"], lede_at_risk, 0)
+
 failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
 assert not failed, f"live results differ from docs/methodology.md: {failed}"
 ```
 
-:::
+Back to the [exploratory data analysis](index.html).
+
+```{python}
+#| label: lede-text
+#| output: asis
+print(LEDE)
+```
 
 ```{python}
 #| label: e1-heading
@@ -476,11 +602,94 @@ assert not failed, f"live results differ from docs/methodology.md: {failed}"
 print(f"## {HEADING_E1}")
 ```
 
-Share of scored customers and share of the revenue base per segment from `v_rfm_for_bi`; At Risk and Hibernating carry their segment colours, the other four segments are context.
+Share of scored customers and share of the revenue base per segment from `v_rfm_for_bi`; At Risk carries its segment colour and Hibernating a darker shade of its own, the other four segments are context.
+
+```{python}
+#| label: e1-figure
+#| output: asis
+e1 = seg.copy()
+two_customers = e1.loc[e1["segment"].isin(FOCUS), "customer_share_pct"].sum()
+two_revenue = e1.loc[e1["segment"].isin(FOCUS), "revenue_share_pct"].sum()
+title = (f"A quarter of scored customers sit in At Risk or Hibernating, "
+         f"and their lifetime spend is {two_revenue:.0f}% of the revenue base")
+assert title == HEADING_E1, title
+assert abs(two_customers - 25) <= 2.5, two_customers  # "a quarter"
+total_customers_label, total_revenue_label = fmt_pct(two_customers), fmt_pct(two_revenue)
+BRACKET_X, BRACKET_TICK = 46, 0.8  # data units (% of total)
+
+
+def draw_e1(variant):
+    ax = variant.ax
+    n = len(e1)
+    bar = 0.30
+    gap = 2 / (ax.get_position().height * H) * n  # 2px surface gap between the paired bars, in data units
+    ys = list(range(n))[::-1]
+    displayed, labels = [], []
+    for y, row in zip(ys, e1.itertuples()):
+        hi = row.segment in FOCUS
+        color = FOCUS_COLOR[row.segment] if hi else CONTEXT
+        y_cust, y_rev = y + bar / 2 + gap / 2, y - bar / 2 - gap / 2
+        ax.barh(y_cust, row.customer_share_pct, height=bar, color=color, edgecolor="none", zorder=3)
+        ax.barh(y_rev, row.revenue_share_pct, height=bar, facecolor="none", edgecolor=color,
+                linewidth=2.0, zorder=3)
+        if hi:
+            # Direct labels name the two bars, so the exhibit needs no legend.
+            customers_label, revenue_label = fmt_pct(row.customer_share_pct, 2), fmt_pct(row.revenue_share_pct, 2)
+            labels.append(ax.text(row.customer_share_pct + 0.8, y_cust, f"{customers_label} of customers",
+                                  va="center", ha="left", fontsize=13))
+            labels.append(ax.text(row.revenue_share_pct + 0.8, y_rev, f"{revenue_label} of revenue",
+                                  va="center", ha="left", fontsize=13))
+            displayed.append({"Segment": row.segment, "y": y, "Customers label": customers_label,
+                              "Revenue label": revenue_label})
+    assert sorted(d["y"] for d in displayed) == [0, 1], displayed  # the bracket spans the bottom two rows
+    ax.set_yticks(ys)
+    ax.set_yticklabels(e1["segment"], fontsize=14)
+    ax.set_xlim(0, 80)
+    ax.set_xticks(range(0, 81, 20))
+    ax.set_xticklabels([fmt_pct(v, 0) for v in range(0, 81, 20)])
+    ax.grid(axis="x", zorder=0)
+    ax.set_axisbelow(True)
+    ax.set_xlabel("Share of total (%)", fontsize=13, color=LABEL)
+    # Bracket from the At Risk and Hibernating rows to the total it summarises.
+    top, bottom = 1 + bar + gap, -bar - gap
+    ax.plot([BRACKET_X - BRACKET_TICK, BRACKET_X, BRACKET_X, BRACKET_X - BRACKET_TICK],
+            [top, top, bottom, bottom], color=LABEL, linewidth=1.0, zorder=2)
+    total = ax.text(
+        BRACKET_X + 1.2, 0.5,
+        f"At Risk + Hibernating:\n{total_customers_label} of scored customers,\n"
+        f"{total_revenue_label} of the revenue base",
+        fontsize=13, ha="left", va="center", linespacing=1.4,
+    )
+    variant.fig.draw_without_rendering()
+    renderer = variant.fig.canvas.get_renderer()
+    bracket_left = px(variant.fig, ax.transData.transform((BRACKET_X - BRACKET_TICK, 0))[0])
+    for label in labels:
+        assert bracket_left - fallback_right(label, renderer) >= MIN_GAP_PX, label.get_text()
+    assert fallback_right(total, renderer) <= W - MIN_GAP_PX, total.get_text()
+    return displayed
+
+
+rows = e1.set_index("segment")
+E1_DESC = (
+    "Paired horizontal bar chart of the six RFM segments: a filled bar gives each segment's share "
+    "of scored customers, an outlined bar its share of the revenue base. At Risk holds "
+    f"{fmt_pct(rows.loc['At Risk', 'customer_share_pct'], 2)} of customers and "
+    f"{fmt_pct(rows.loc['At Risk', 'revenue_share_pct'], 2)} of revenue, Hibernating "
+    f"{fmt_pct(rows.loc['Hibernating', 'customer_share_pct'], 2)} and "
+    f"{fmt_pct(rows.loc['Hibernating', 'revenue_share_pct'], 2)}; together {total_customers_label} of "
+    f"scored customers and {total_revenue_label} of the revenue base. The other four segments are grey context."
+)
+displayed = render("e1_segment_share", title, E1_DESC, FOOTER_E1, [0.17, 0.17, 0.77, LEGEND_TOP - 0.17], draw_e1)
+# The displayed labels, summed and rounded to 1 dp, must equal the displayed totals.
+label_sum_customers = sum(float(d["Customers label"].rstrip("%")) for d in displayed)
+label_sum_revenue = sum(float(d["Revenue label"].rstrip("%")) for d in displayed)
+assert fmt_pct(label_sum_customers) == total_customers_label, (label_sum_customers, total_customers_label)
+assert fmt_pct(label_sum_revenue) == total_revenue_label, (label_sum_revenue, total_revenue_label)
+exhibit("e1_segment_share", E1_DESC)
+```
 
 ```{python}
 #| label: e1-table
-e1 = seg.copy()
 show(pd.DataFrame({
     "Segment": list(e1["segment"]) + ["Total"],
     "Customers": list(e1["customers"].map(fmt_int)) + [fmt_int(SCORED_CUSTOMERS)],
@@ -491,94 +700,16 @@ show(pd.DataFrame({
 ```
 
 ```{python}
-#| label: e1-figure
-two_customers = e1.loc[e1["segment"].isin(FOCUS), "customer_share_pct"].sum()
-two_revenue = e1.loc[e1["segment"].isin(FOCUS), "revenue_share_pct"].sum()
-title = (f"A quarter of scored customers sit in At Risk or Hibernating, "
-         f"and their lifetime spend is {two_revenue:.0f}% of the revenue base")
-assert title == HEADING_E1, title
-assert abs(two_customers - 25) <= 2.5, two_customers  # "a quarter"
-total_customers_label, total_revenue_label = fmt_pct(two_customers), fmt_pct(two_revenue)
-
-
-def draw_e1(variant):
-    ax = variant.ax
-    n = len(e1)
-    bar = 0.30
-    gap = 2 / (ax.get_position().height * H) * n  # 2px surface gap between the paired bars, in data units
-    ys = list(range(n))[::-1]
-    displayed = []
-    for y, row in zip(ys, e1.itertuples()):
-        hi = row.segment in FOCUS
-        color = SEGMENT_COLOR[row.segment] if hi else CONTEXT
-        y_cust, y_rev = y + bar / 2 + gap / 2, y - bar / 2 - gap / 2
-        ax.barh(y_cust, row.customer_share_pct, height=bar, color=color, edgecolor="none", zorder=3)
-        ax.barh(y_rev, row.revenue_share_pct, height=bar, facecolor="none", edgecolor=color,
-                linewidth=2.0, zorder=3)
-        if hi:
-            customers_label, revenue_label = fmt_pct(row.customer_share_pct, 2), fmt_pct(row.revenue_share_pct, 2)
-            ax.text(row.customer_share_pct + 0.8, y_cust, customers_label, va="center", ha="left", fontsize=13)
-            ax.text(row.revenue_share_pct + 0.8, y_rev, revenue_label, va="center", ha="left", fontsize=13)
-            displayed.append({"Segment": row.segment, "Customers label": customers_label,
-                              "Revenue label": revenue_label})
-    ax.set_yticks(ys)
-    ax.set_yticklabels(e1["segment"], fontsize=14)
-    ax.set_xlim(0, 80)
-    ax.set_xticks(range(0, 81, 20))
-    ax.set_xticklabels([fmt_pct(v, 0) for v in range(0, 81, 20)])
-    ax.grid(axis="x", zorder=0)
-    ax.set_axisbelow(True)
-    ax.set_xlabel("Share of total (%)", fontsize=13, color=LABEL)
-    ax.annotate(
-        f"At Risk + Hibernating:\n{total_customers_label} of scored customers,\n"
-        f"{total_revenue_label} of the revenue base",
-        xy=(0.62, 0.20), xycoords="axes fraction", fontsize=13, ha="left", va="center",
-        linespacing=1.4,
-    )
-    legend_band(variant, [
-        Patch(facecolor=FG, label="Share of scored customers (filled)"),
-        Patch(facecolor="none", edgecolor=FG, linewidth=2.0, label="Share of revenue base (outline)"),
-    ])
-    return displayed
-
-
-displayed = render("e1_segment_share", title, FOOTER_E1, [0.17, 0.17, 0.77, 0.62], draw_e1)
-# The displayed labels, summed and rounded to 1 dp, must equal the displayed totals.
-label_sum_customers = sum(float(d["Customers label"].rstrip("%")) for d in displayed)
-label_sum_revenue = sum(float(d["Revenue label"].rstrip("%")) for d in displayed)
-assert fmt_pct(label_sum_customers) == total_customers_label, (label_sum_customers, total_customers_label)
-assert fmt_pct(label_sum_revenue) == total_revenue_label, (label_sum_revenue, total_revenue_label)
-```
-
-![](../docs/img/exhibits/e1_segment_share.svg){width="100%" fig-alt="A quarter of scored customers sit in At Risk or Hibernating, and their lifetime spend is 2% of the revenue base"}
-
-```{python}
 #| label: e2-heading
 #| output: asis
 print(f"## {HEADING_E2}")
 ```
 
-Realised gross margin before the playbook's win-back discount and contribution after it, in points of order value; the discount rate is the `dim_Segment[Discount Approach]` label.
-
-```{python}
-#| label: e2-table
-show(pd.DataFrame({
-    "Segment": focus["segment"],
-    "Customers": focus["customers"].map(fmt_int),
-    "Orders": focus["orders"].map(fmt_int),
-    "Revenue": focus["revenue"].map(fmt_eur),
-    "Cost": focus["cost"].map(fmt_eur),
-    "Profit": focus["profit"].map(fmt_eur),
-    "AOV": focus["aov"].map(fmt_eur),
-    "Gross margin": (focus["gross_margin"] * 100).map(lambda v: fmt_pct(v, 4)),
-    "Mean realised discount": (focus["mean_order_discount_pct"] * 100).map(lambda v: fmt_pct(v, 2)),
-    "Win-back discount": (focus["discount"] * 100).map(lambda v: fmt_pct(v, 0)),
-    "Contribution after discount (points)": (focus["contribution"] * 100).map(lambda v: f"{v:.4f}"),
-}))
-```
+Realised gross margin before the playbook's win-back discount and contribution after it, in points of order value; the discount rate is the `dim_Segment[Discount Approach]` label. Order value is already net of each order's realised discount, which the mean realised discount averages, so the gross margin is measured after it; the win-back discount would come on top, as a further percentage off that order value.
 
 ```{python}
 #| label: e2-figure
+#| output: asis
 points = dict(zip(focus["segment"], focus["contribution"] * 100))
 title = (f"The playbook gives the deeper discount to the thinner margin: after its offer "
          f"At Risk keeps {points['At Risk']:.0f} points of order value, "
@@ -590,7 +721,7 @@ def draw_e2(variant):
     ax = variant.ax
     ys = [1, 0]
     for y, row in zip(ys, focus.itertuples()):
-        color = SEGMENT_COLOR[row.segment]
+        color = FOCUS_COLOR[row.segment]
         light = tint(color, TINT_SHARE)
         before, after, drop = row.gross_margin * 100, row.contribution * 100, row.discount * 100
         ax.annotate("", xy=(after, y), xytext=(before, y),
@@ -602,7 +733,7 @@ def draw_e2(variant):
                 markeredgecolor="none", linestyle="none", zorder=4)
         ax.text(before + 1.2, y, fmt_pct(before, 2), va="center", ha="left", fontsize=13)
         ax.text(after - 1.2, y, fmt_pct(after, 2), va="center", ha="right", fontsize=13)
-        ax.text((before + after) / 2, y + 0.16, f"-{drop:.0f} pts: win-back {drop:.0f}% discount",
+        ax.text((before + after) / 2, y + 0.16, f"\u2212{drop:.0f} pts: win-back {drop:.0f}% discount",
                 va="bottom", ha="center", fontsize=13, color=LABEL)
     ax.set_yticks(ys)
     ax.set_yticklabels(focus["segment"], fontsize=14)
@@ -621,10 +752,35 @@ def draw_e2(variant):
     ])
 
 
-render("e2_margin_after_discount", title, FOOTER_E23, [0.17, 0.20, 0.77, 0.58], draw_e2)
+margin = focus.set_index("segment")
+E2_DESC = (
+    "Dot-and-arrow chart for At Risk and Hibernating: each arrow runs from realised gross margin "
+    "before the win-back discount (light dot) to contribution after it (dark dot), in percent of "
+    "pre-offer order value. " + "; ".join(
+        f"{name} falls from {fmt_pct(margin.loc[name, 'gross_margin'] * 100, 2)} to "
+        f"{fmt_pct(margin.loc[name, 'contribution'] * 100, 2)} after a "
+        f"{margin.loc[name, 'discount'] * 100:.0f}% discount" for name in FOCUS) + "."
+)
+render("e2_margin_after_discount", title, E2_DESC, FOOTER_E23, [0.17, 0.20, 0.77, 0.58], draw_e2)
+exhibit("e2_margin_after_discount", E2_DESC)
 ```
 
-![](../docs/img/exhibits/e2_margin_after_discount.svg){width="100%" fig-alt="The playbook gives the deeper discount to the thinner margin: after its offer At Risk keeps 37 points of order value, Hibernating 27"}
+```{python}
+#| label: e2-table
+show(pd.DataFrame({
+    "Segment": focus["segment"],
+    "Customers": focus["customers"].map(fmt_int),
+    "Orders": focus["orders"].map(fmt_int),
+    "Revenue": focus["revenue"].map(fmt_eur),
+    "Cost": focus["cost"].map(fmt_eur),
+    "Profit": focus["profit"].map(fmt_eur),
+    "AOV": focus["aov"].map(fmt_eur),
+    "Gross margin": (focus["gross_margin"] * 100).map(lambda v: fmt_pct(v, 2)),
+    "Mean realised discount": (focus["mean_order_discount_pct"] * 100).map(lambda v: fmt_pct(v, 2)),
+    "Win-back discount": (focus["discount"] * 100).map(lambda v: fmt_pct(v, 0)),
+    "Contribution after discount (points)": (focus["contribution"] * 100).map(lambda v: f"{v:.2f}"),
+}))
+```
 
 ```{python}
 #| label: e3-heading
@@ -635,20 +791,10 @@ print(f"## {HEADING_E3}")
 Contribution per 1,000 EUR of discount at the playbook rates: (gross margin - discount rate) / discount rate x 1,000 EUR.
 
 ```{python}
-#| label: e3-table
-show(pd.DataFrame({
-    "Segment": per_1000["segment"],
-    "Gross margin": (per_1000["gross_margin"] * 100).map(lambda v: fmt_pct(v, 4)),
-    "Win-back discount": (per_1000["discount_rate"] * 100).map(lambda v: fmt_pct(v, 0)),
-    "Contribution per EUR of discount": per_1000["contribution_per_eur"].map(lambda v: f"{v:.4f}"),
-    "Contribution per 1,000 EUR of discount": per_1000["contribution_per_1000"].map(lambda v: fmt_eur(v, 0)),
-}))
-```
-
-```{python}
 #| label: e3-figure
+#| output: asis
 per_1000_by_segment = dict(zip(per_1000["segment"], per_1000["contribution_per_1000"]))
-title = (f"Each 1,000 EUR of discount returns {per_1000_by_segment['At Risk']:,.0f} EUR of "
+title = (f"Each 1,000 EUR of discount retains {per_1000_by_segment['At Risk']:,.0f} EUR of "
          f"contribution in At Risk, against {per_1000_by_segment['Hibernating']:,.0f} EUR in Hibernating")
 assert title == HEADING_E3, title
 
@@ -658,7 +804,7 @@ def draw_e3(variant):
     ys = [1, 0]
     values = list(per_1000["contribution_per_1000"])
     for y, row in zip(ys, per_1000.itertuples()):
-        ax.barh(y, row.contribution_per_1000, height=0.2, color=SEGMENT_COLOR[row.segment],
+        ax.barh(y, row.contribution_per_1000, height=0.2, color=FOCUS_COLOR[row.segment],
                 edgecolor="none", zorder=3)
         ax.text(row.contribution_per_1000 + 30, y, fmt_eur(row.contribution_per_1000, 0),
                 va="center", ha="left", fontsize=14)
@@ -676,9 +822,48 @@ def draw_e3(variant):
     ax.set_xlabel("Contribution per 1,000 EUR of discount (EUR)", fontsize=13, color=LABEL)
 
 
-render("e3_contribution_per_1000", title, FOOTER_E23, [0.17, 0.22, 0.77, 0.54], draw_e3,
+E3_DESC = (
+    "Horizontal bar chart of contribution per 1,000 EUR of discount at the playbook rates: "
+    f"At Risk {fmt_eur(per_1000_by_segment['At Risk'], 0)}, Hibernating "
+    f"{fmt_eur(per_1000_by_segment['Hibernating'], 0)}, a gap of "
+    f"{per_1000_by_segment['At Risk'] - per_1000_by_segment['Hibernating']:,.0f} EUR ({RATIO:.2f}x). "
+    "The figure measures margin efficiency, not incremental return."
+)
+render("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, [0.17, 0.22, 0.77, 0.54], draw_e3,
        subtitle="Contribution on orders placed, at the playbook discount rates: "
                 "a margin-efficiency figure, not an incremental return")
+exhibit("e3_contribution_per_1000", E3_DESC)
 ```
 
-![](../docs/img/exhibits/e3_contribution_per_1000.svg){width="100%" fig-alt="Each 1,000 EUR of discount returns 2,483 EUR of contribution in At Risk, against 1,334 EUR in Hibernating"}
+```{python}
+#| label: e3-table
+show(pd.DataFrame({
+    "Segment": per_1000["segment"],
+    "Gross margin": (per_1000["gross_margin"] * 100).map(lambda v: fmt_pct(v, 2)),
+    "Win-back discount": (per_1000["discount_rate"] * 100).map(lambda v: fmt_pct(v, 0)),
+    "Contribution per 1,000 EUR of discount": per_1000["contribution_per_1000"].map(lambda v: fmt_eur(v, 0)),
+}))
+```
+
+The live values on this page are checked against the literals published in [`docs/methodology.md`](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/methodology.md), and the render fails on any mismatch.
+
+::: {.callout-note collapse="true" title="Checks against docs/methodology.md: the render fails if any check fails"}
+
+Published and live values are compared at the precision of the literal in `docs/methodology.md`.
+
+```{python}
+#| label: checks-table
+show(pd.DataFrame(checks))
+```
+
+:::
+
+```{=html}
+<script>
+// The exhibit lightbox links point at data URIs, which carry no file extension for
+// GLightbox to infer an image from, and Quarto 1.9 drops an image's `type` attribute
+// instead of forwarding it. Mark the links as images; the lightbox initialises after
+// the page content.
+document.querySelectorAll(".exhibit a.lightbox").forEach((a) => { a.dataset.type = "image"; });
+</script>
+```

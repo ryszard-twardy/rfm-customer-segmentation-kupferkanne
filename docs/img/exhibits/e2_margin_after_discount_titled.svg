@@ -147,12 +147,12 @@ z
    <g id="patch_4">
     <path d="M 916.899011 446.785714 
 Q 768.901971 446.785714 623.140999 446.785714 
-" style="fill: none; stroke: #c8c6c1; stroke-width: 2; stroke-linecap: round"/>
+" style="fill: none; stroke: #b8b6b1; stroke-width: 2; stroke-linecap: round"/>
     <path d="M 629.540999 449.985714 
 L 623.140999 446.785714 
 L 629.540999 443.585714 
 z
-" style="fill: #c8c6c1; stroke: #c8c6c1; stroke-width: 2; stroke-linecap: round"/>
+" style="fill: #b8b6b1; stroke: #b8b6b1; stroke-width: 2; stroke-linecap: round"/>
    </g>
    <g id="patch_5">
     <path d="M 204 540 
@@ -184,11 +184,11 @@ z
     <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="759.077847" y="263.721401" transform="rotate(-0 759.077847 263.721401)">37.24%</text>
    </g>
    <g id="text_13">
-    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="893.057847" y="227.538571" transform="rotate(-0 893.057847 227.538571)">-15 pts: win-back 15% discount</text>
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="893.057847" y="227.538571" transform="rotate(-0 893.057847 227.538571)">−15 pts: win-back 15% discount</text>
    </g>
    <g id="line2d_18">
     <defs>
-     <path id="md7f79ba2be" d="M 0 6 
+     <path id="mc61d29127d" d="M 0 6 
 C 1.591219 6 3.117479 5.367802 4.242641 4.242641 
 C 5.367802 3.117479 6 1.591219 6 0 
 C 6 -1.591219 5.367802 -3.117479 4.242641 -4.242641 
@@ -201,7 +201,7 @@ z
 " style="stroke: #000000; stroke-opacity: 0"/>
     </defs>
     <g clip-path="url(#p5aeab76c15)">
-     <use xlink:href="#md7f79ba2be" x="922.900537" y="446.785714" style="fill: #c8c6c1; stroke: #000000; stroke-opacity: 0"/>
+     <use xlink:href="#mc61d29127d" x="922.900537" y="446.785714" style="fill: #b8b6b1; stroke: #000000; stroke-opacity: 0"/>
     </g>
    </g>
    <g id="text_14">
@@ -211,7 +211,7 @@ z
     <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: end; fill: #3d4752" x="596.420537" y="450.149972" transform="rotate(-0 596.420537 450.149972)">26.68%</text>
    </g>
    <g id="text_16">
-    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="768.900537" y="413.967143" transform="rotate(-0 768.900537 413.967143)">-20 pts: win-back 20% discount</text>
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: middle; fill: #64748b" x="768.900537" y="413.967143" transform="rotate(-0 768.900537 413.967143)">−20 pts: win-back 20% discount</text>
    </g>
    <g id="line2d_19">
     <defs>
@@ -233,7 +233,7 @@ z
    </g>
    <g id="line2d_20">
     <defs>
-     <path id="m4f78656efb" d="M 0 6 
+     <path id="m5536d54294" d="M 0 6 
 C 1.591219 6 3.117479 5.367802 4.242641 4.242641 
 C 5.367802 3.117479 6 1.591219 6 0 
 C 6 -1.591219 5.367802 -3.117479 4.242641 -4.242641 
@@ -246,7 +246,7 @@ z
 " style="stroke: #000000; stroke-opacity: 0"/>
     </defs>
     <g clip-path="url(#p5aeab76c15)">
-     <use xlink:href="#m4f78656efb" x="614.900537" y="446.785714" style="fill: #a5a29a; stroke: #000000; stroke-opacity: 0"/>
+     <use xlink:href="#m5536d54294" x="614.900537" y="446.785714" style="fill: #8a877f; stroke: #000000; stroke-opacity: 0"/>
     </g>
    </g>
   </g>
@@ -273,11 +273,11 @@ z
 " style="stroke: #000000; stroke-opacity: 0"/>
     </defs>
     <g>
-     <use xlink:href="#mcab93f0e09" x="613.681406" y="114.787188" style="fill: #898f95; stroke: #000000; stroke-opacity: 0"/>
+     <use xlink:href="#mcab93f0e09" x="587.681406" y="114.787188" style="fill: #898f95; stroke: #000000; stroke-opacity: 0"/>
     </g>
    </g>
    <g id="text_19">
-    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="634.481406" y="119.337188" transform="rotate(-0 634.481406 119.337188)">Gross margin before the win-back discount</text>
+    <text style="font-size: 13px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="608.481406" y="119.337188" transform="rotate(-0 608.481406 119.337188)">Gross margin before the win-back discount</text>
    </g>
    <g id="line2d_22">
     <defs>

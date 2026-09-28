@@ -161,7 +161,7 @@ L 614.900536 435.375
 L 614.900536 405 
 L 204 405 
 z
-" clip-path="url(#p92ebc75716)" style="fill: #a5a29a"/>
+" clip-path="url(#p92ebc75716)" style="fill: #8a877f"/>
    </g>
    <g id="text_12">
     <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="624.140536" y="423.810547" transform="rotate(-0 624.140536 423.810547)">1,334 EUR</text>
@@ -171,7 +171,7 @@ z
    </g>
   </g>
   <g id="text_14">
-   <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 48.956084)">Each 1,000 EUR of discount returns 2,483 EUR of contribution in At Risk, against</text>
+   <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 48.956084)">Each 1,000 EUR of discount retains 2,483 EUR of contribution in At Risk, against</text>
    <text style="font-weight: 600; font-size: 22px; font-family: 'Segoe UI', 'Lato', sans-serif; fill: #3d4752" transform="translate(48 74.642158)">1,334 EUR in Hibernating</text>
   </g>
   <g id="text_15">

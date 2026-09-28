@@ -32,6 +32,10 @@ color:
     at_risk: "#A05A55"
     hibernating: "#A5A29A"
     segment_fallback: "#94A3B8"
+    # Exhibit focus marks for Hibernating: hibernating darkened in OKLab lightness (hue and
+    # chroma held) to the first 0.01 step that reaches 3:1 on #FFFFFF and #F1EFE9 and 2:1 on
+    # the exhibits' context grey. Derived and asserted in exhibits_win_back.qmd.
+    hibernating_focus: "#8A877F"
     # Surfaces and chrome from the theme.
     page: "#F7F5F1"     # report page background
     border: "#DDD6CC"   # visual border; exhibit gridlines only (context bars use a 32% foreground blend computed in the notebook)

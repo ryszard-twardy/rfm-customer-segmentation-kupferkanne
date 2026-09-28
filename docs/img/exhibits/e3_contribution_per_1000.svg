@@ -2,6 +2,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>Each 1,000 EUR of discount retains 2,483 EUR of contribution in At Risk, against 1,334 EUR in Hibernating</title>
+ <desc>Horizontal bar chart of contribution per 1,000 EUR of discount at the playbook rates: At Risk 2,483 EUR, Hibernating 1,334 EUR, a gap of 1,149 EUR (1.86x). The figure measures margin efficiency, not incremental return.</desc>
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -161,7 +163,7 @@ L 614.900536 416.0625
 L 614.900536 379.25 
 L 204 379.25 
 z
-" clip-path="url(#pc67ebe1f7f)" style="fill: #a5a29a"/>
+" clip-path="url(#pc67ebe1f7f)" style="fill: #8a877f"/>
    </g>
    <g id="text_12">
     <text style="font-size: 14px; font-family: 'Segoe UI', 'Lato', sans-serif; text-anchor: start; fill: #3d4752" x="624.140536" y="401.279297" transform="rotate(-0 624.140536 401.279297)">1,334 EUR</text>
