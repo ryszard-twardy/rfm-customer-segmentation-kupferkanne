@@ -736,8 +736,8 @@ LEDE = (
     f"Hibernating), each euro of discount retains {RATIO:.2f} times as much contribution in At Risk "
     "as in Hibernating. Most of that gap comes from the deeper discount Hibernating gets: with "
     f"either rate applied to both segments, At Risk retains about {COMMON_RATIO:.1f} times as much. "
-    "A pilot against a randomised holdout, run at the playbook's rates, decides the allocation, "
-    "moving budget to At Risk only if the gap holds on an incremental basis."
+    "A pilot against randomised holdouts tests Hibernating at both rates; if the budget is short, "
+    "At Risk goes first only if At Risk retains more on an incremental basis."
 )
 assert len(re.findall(r"[.?!](?: |$)", LEDE)) == 5, LEDE
 ```

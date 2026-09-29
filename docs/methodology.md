@@ -99,11 +99,11 @@ The assumption, stated so it can be challenged: the win-back discount is a perce
 
 ### Recommendation
 
-Pilot a shift of win-back discount budget from Hibernating to At Risk: for every 1,000 EUR of discount granted, expected contribution is 2,483 EUR in At Risk against 1,334 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
+Pilot Hibernating's discount rate first, then, on the same data, the allocation as a break-even floor for each offer and, where the budget cannot cover every eligible customer, a contact priority for At Risk that lasts until its pool is exhausted. For every 1,000 EUR of discount granted, expected contribution is 2,483 EUR in At Risk against 1,334 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
 
 The playbook grants its deepest discount to its thinnest margin. At Risk retains 37.2440 points of contribution after a 15-point concession; Hibernating retains 26.6819 points after 20. The ranking is the finding: it is robust to the assumptions stated above and holds at any common discount rate, but not to the relative rates the playbook sets, as shown below. The absolute per-euro figures carry the limitations below.
 
-At Risk retains 1.86 times the contribution per euro of discount that Hibernating retains at the playbook's rates (2.4829 against 1.3341), so each 1,000 EUR of discount moved raises expected contribution by about 1,149 EUR, conditional on the orders being placed. The pool is broad and shallow: the two segments hold 3,909 of the 14,967 scored customers (26.1 percent) and EUR 171,768.84 of lifetime spend, 2.0 percent of the EUR 8,531,365.52 revenue base; this is the quantity `[Revenue at Risk]` measures.
+At Risk retains 1.86 times the contribution per euro of discount that Hibernating retains at the playbook's rates (2.4829 against 1.3341), so, while At Risk customers remain to be contacted, each 1,000 EUR of discount moved raises expected contribution by about 1,149 EUR, conditional on the orders being placed. The pool is broad and shallow: the two segments hold 3,909 of the 14,967 scored customers (26.1 percent) and EUR 171,768.84 of lifetime spend, 2.0 percent of the EUR 8,531,365.52 revenue base; this is the quantity `[Revenue at Risk]` measures.
 
 Most of that gap comes from the playbook's rates rather than from the segments. Contribution per euro of discount is (gross margin - discount rate) / discount rate; at either common rate At Risk retains about 1.2 times as much as Hibernating, and swapping the rates reverses the ranking.
 
@@ -112,19 +112,22 @@ Most of that gap comes from the playbook's rates rather than from the segments. 
 | At Risk (52.2440 percent) | 2.48 (playbook) | 1.61 |
 | Hibernating (46.6819 percent) | 2.11 | 1.33 (playbook) |
 
-The rate is a playbook lever, so the 1.86 times holds only at the playbook's rates, and the pilot's response data, not this ratio, decides the allocation.
+The rate is a playbook lever, so the 1.86 times holds only at the playbook's rates. The pilot therefore tests Hibernating at both rates, then the allocation; its response data, not this ratio, decides both.
 
 ### Pilot design
 
-The figures above measure how efficiently a euro of discount converts into margin once an order is placed. They do not measure incrementality: an At Risk customer, warmer by definition, may have ordered without the offer, which turns part of the concession into deadweight, while a Hibernating customer is less likely to. On an incremental basis the ranking can narrow or reverse, so the shift runs as a controlled pilot before it changes any budget.
+The figures above measure how efficiently a euro of discount converts into margin once an order is placed. They do not measure incrementality: an At Risk customer, whose composite RFM score is higher than Hibernating's by definition though its recency score need not be, may have ordered without the offer, which turns part of the concession into deadweight, while a Hibernating customer is less likely to. On an incremental basis the ranking can narrow or reverse, so the rate and the allocation run as a controlled pilot before either changes the playbook.
 
-- Randomise eligible customers within each segment into an offer group and a holdout group that receives no win-back discount; the holdout share is fixed before launch.
-- Primary metric: incremental contribution per euro of discount, built from per-customer means because the offer and holdout groups differ in size. Contribution is counted per assigned customer over an observation window set before launch, at zero for customers who place no order, on the definition above applied to each order: (gross margin - discount rate) x order value, with a discount rate of zero in the holdout, so the win-back discount is deducted once; recorded contact cost that the offer adds is deducted from the offer group's contribution.
-- Incremental contribution = (mean contribution per offer customer - mean contribution per holdout customer) x offer group size; incremental contribution per euro of discount = incremental contribution / discount spend in the offer group.
-- Decision rule, fixed before launch: move budget to At Risk only if the lower bound of the 95 percent interval for its incremental contribution per euro of discount is above break-even, which is zero because the discount and contact cost are already deducted, and the lower bound of the 95 percent interval for its difference from Hibernating is above zero; otherwise keep the current allocation.
-- Intervals are bias-corrected and accelerated (BCa) bootstrap intervals that resample customers within each segment and group. The first wave that sets group sizes is excluded from the decision data, and the pilot runs at the playbook's rates, so its verdict holds at those rates only.
+- Randomise eligible customers within each segment, with group shares fixed before launch: At Risk into an offer group at 15 percent (the playbook's rate) and a holdout group, with no 20 percent group since a deeper rate for At Risk is not under consideration; Hibernating into a holdout group and offer groups at 20 percent (the playbook's rate) and 15 percent. Holdout groups receive no win-back discount.
+- Primary metric, per offer group: incremental contribution per euro of discount, built from per-customer means because the offer and holdout groups differ in size. Contribution is counted per assigned customer over an observation window set before launch, at zero for customers who place no order, on the definition above applied to each order: (gross margin - discount rate) x order value, with a discount rate of zero in the holdout, so the win-back discount is deducted once; recorded contact cost that the offer adds is deducted from the offer group's contribution.
+- Incremental contribution = (mean contribution per offer customer - mean contribution per holdout customer) x offer group size, or, per assigned customer, the bracket alone; incremental contribution per euro of discount = incremental contribution / discount spend in the offer group. Each offer group is measured against its segment's holdout; the two Hibernating offer groups share one, which cancels in their per-customer difference.
+- Decision rule, fixed before launch: every decision defaults to the playbook as it is (Hibernating at 20 percent, both offers running, the current budget split), and only a 95 percent interval that clears its threshold changes it, so an unresolved interval keeps the playbook. Whether the budget covers every eligible customer is assumed before launch, since the playbook records budget shares, not an amount. Break-even is zero, because the discount and contact cost are already deducted.
+- Stage 1, rate: Hibernating moves to 15 percent only if the lower bound for the 15 percent group minus the 20 percent group is above zero, in incremental contribution per euro of discount if the budget cannot cover everyone, else per assigned customer.
+- Stage 2, floor: each offer, At Risk at 15 percent and Hibernating at the rate that stage 1 keeps, stops only if the upper bound of its incremental contribution per euro of discount is below break-even.
+- Stage 2, priority: if the budget cannot cover everyone, At Risk is contacted before Hibernating only if At Risk's lower bound is above break-even and the lower bound for At Risk minus Hibernating per euro, at the kept rate, is above zero. Priority lasts until At Risk's pool is exhausted; the remaining budget goes to Hibernating if its offer continues. If the budget covers everyone, only the floor applies.
+- Intervals are bias-corrected and accelerated (BCa) bootstrap intervals that resample customers within each segment and group. The verdict holds at the tested rates only.
 - Record contact cost per contacted customer; the break-even contact costs in the cost basis above (1.51 EUR and 0.67 EUR) show how sensitive the result is to it.
-- Group sizes and duration follow from the response observed in the first wave; the repository holds no campaign response history to set them in advance.
+- Group sizes and duration follow from the response and variance observed in the first wave, which is excluded from the decision data; the repository holds no campaign response history to set them in advance.
 
 ### Limitations
 
@@ -132,8 +135,9 @@ The figures above measure how efficiently a euro of discount converts into margi
 - These cohorts already transact at a discount: mean realised `order_discount_pct` is 0.2573 for At Risk and 0.3313 for Hibernating. A further 15 or 20 points compounds to roughly 36.9 and 46.5 percent off list, against an observed maximum of 0.55. Whether a cohort already at a third off warrants a further concession is a commercial judgement this analysis does not settle.
 - No campaign cost exists in the repository, so the recommendation prices the concession alone.
 - The dataset is synthetic and regenerable. The margin, discount and AOV gradients are properties of the generator, so the figures demonstrate pipeline integrity rather than a market observation.
-- The reallocation is bounded by the playbook itself. `dim_Segment[Budget Allocation]` reads "Low (7%)" for At Risk and "Minimal (3%)" for Hibernating (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), so the move is directionally right and small in absolute budget terms.
+- The reallocation is bounded by the playbook itself. `dim_Segment[Budget Allocation]` reads "Low (7%)" for At Risk and "Minimal (3%)" for Hibernating (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), so any move is small relative to the whole budget.
 - Order-value reconciliation: 713 of 168,777 orders fall outside the 0.001 tolerance stated above; they remain unexplained and are tracked as a known issue for the next release.
+- Stage 2 reads the data that set Hibernating's rate: a 15 percent group that wins stage 1 carries an upward-biased estimate, so stage 2 errs toward the playbook.
 
 ## Validation
 
