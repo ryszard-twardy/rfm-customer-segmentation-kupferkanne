@@ -77,8 +77,8 @@ HEADING_E1 = ("A quarter of scored customers sit in At Risk or Hibernating, "
               "and their lifetime spend is 2% of the revenue base")
 HEADING_E2 = ("The playbook gives the deeper discount to the thinner margin: after its offer "
               "At Risk keeps 37 points of order value, Hibernating 27")
-HEADING_E3 = ("Each 1,000 EUR of discount retains 2,483 EUR of contribution in At Risk, "
-              "against 1,334 EUR in Hibernating")
+HEADING_E3 = ("At the playbook's rates, each 1,000 EUR of discount retains 2,483 EUR of contribution "
+              "in At Risk, against 1,334 EUR in Hibernating")
 FONT_STACK = [f.strip() for f in brand["typography"]["base"]["family"].split(",")]
 NAMED_FONTS = [f for f in FONT_STACK if f != "sans-serif"]
 
@@ -712,18 +712,34 @@ per_1000 = per_1000.set_index("segment").loc[list(FOCUS)].reset_index()
 for col in ("discount_rate", "gross_margin", "contribution_per_eur", "contribution_per_1000"):
     per_1000[col] = per_1000[col].astype(float)
 RATIO = per_1000["contribution_per_eur"].iloc[0] / per_1000["contribution_per_eur"].iloc[1]
+# The same metric with the rate held equal: each focus segment at each playbook rate, and the
+# At Risk / Hibernating ratio with either playbook rate applied to both segments, which the
+# page prints once at 1 dp.
+MARGIN = dict(zip(per_1000["segment"], per_1000["gross_margin"]))
+AT_RATE = {(name, rate): (MARGIN[name] - rate) / rate for name in FOCUS for rate in DISCOUNT.values()}
+COMMON_RATIOS = {rate: AT_RATE[("At Risk", rate)] / AT_RATE[("Hibernating", rate)]
+                 for rate in DISCOUNT.values()}
+assert len({f"{r:.1f}" for r in COMMON_RATIOS.values()}) == 1, COMMON_RATIOS
+COMMON_RATIO = next(iter(COMMON_RATIOS.values()))
 ```
 
 ```{python}
 #| label: lede
+# "Not at its current rates": the playbook's deeper discount goes to the segment where a
+# discount euro retains less contribution at those rates.
+per_eur = dict(zip(per_1000["segment"], per_1000["contribution_per_eur"]))
+assert max(DISCOUNT, key=DISCOUNT.get) == min(per_eur, key=per_eur.get) == "Hibernating", (DISCOUNT, per_eur)
 LEDE = (
-    "Does the win-back playbook spend its discount where a discount euro keeps the most "
-    "contribution? It does not: each euro of discount retains "
-    f"{RATIO:.2f} times as much contribution in At Risk as in Hibernating, yet the playbook gives "
-    f"Hibernating the deeper discount ({DISCOUNT['Hibernating'] * 100:.0f}% against "
-    f"{DISCOUNT['At Risk'] * 100:.0f}%). The recommendation is a pilot against a randomised holdout "
-    "that moves budget to At Risk only if the gap holds on an incremental basis."
+    "Does the win-back playbook give its deeper discount where a discount euro keeps the most "
+    "contribution? Not at its current rates. At the playbook's rates "
+    f"({DISCOUNT['At Risk'] * 100:.0f}% for At Risk, {DISCOUNT['Hibernating'] * 100:.0f}% for "
+    f"Hibernating), each euro of discount retains {RATIO:.2f} times as much contribution in At Risk "
+    "as in Hibernating. Most of that gap comes from the deeper discount Hibernating gets: with "
+    f"either rate applied to both segments, At Risk retains about {COMMON_RATIO:.1f} times as much. "
+    "A pilot against a randomised holdout, run at the playbook's rates, decides the allocation, "
+    "moving budget to At Risk only if the gap holds on an incremental basis."
 )
+assert len(re.findall(r"[.?!](?: |$)", LEDE)) == 5, LEDE
 ```
 
 ```{python}
@@ -821,6 +837,39 @@ per_1000_live = per_1000.set_index("segment")["contribution_per_1000"]
 check("At Risk - Hibernating gap per 1,000 EUR of discount", p_gap,
       per_1000_live["At Risk"] - per_1000_live["Hibernating"], 0)
 
+# Segment by rate table under the ratio: every cell, each gross margin and each "(playbook)"
+# marker must match the live margins at both playbook rates, and so must the common-rate
+# ratio and the rate-scoped ratio in the sentences around it. Takes the text as an argument
+# so a positive control can run the same parser, with a fresh checks list, on an altered copy.
+RATE_HEADER = r"^\| Segment \(gross margin\) \| (\d+) percent discount \| (\d+) percent discount \|$"
+RATE_ROW = (r"^\| {segment} \(([\d.]+) percent\) \| ([\d.]+)( \(playbook\))? "
+            r"\| ([\d.]+)( \(playbook\))? \|$")
+
+
+def check_common_rates(text: str) -> float:
+    """Append the table's checks; return the published common-rate ratio."""
+    rates = [num(r) / 100 for r in grab(RATE_HEADER, text)]
+    assert sorted(rates) == sorted(DISCOUNT.values()), rates
+    for name in FOCUS:
+        p_margin, *cells = grab(RATE_ROW.format(segment=name), text)
+        check(f"{name} gross margin % (rate table)", num(p_margin), MARGIN[name] * 100, 4)
+        for rate, value, marker in zip(rates, cells[0::2], cells[1::2]):
+            label = f"{name} at {rate * 100:.0f}% (rate table)"
+            check(f"{label}: contribution per euro of discount", num(value), AT_RATE[(name, rate)], 2)
+            check_text(f"{label}: playbook marker", "playbook" if marker else "other rate",
+                       "playbook" if rate == DISCOUNT[name] else "other rate")
+    grab(r"^Most of that gap comes from the playbook's rates rather than from the segments\.", text)
+    (common,) = map(num, grab(
+        r"at either common rate At Risk retains about ([\d.]+) times as much as Hibernating", text))
+    for rate, ratio in COMMON_RATIOS.items():
+        check(f"At Risk / Hibernating ratio at a common {rate * 100:.0f}% rate", common, ratio, 1)
+    (scoped,) = map(num, grab(r"so the ([\d.]+) times holds only at the playbook's rates", text))
+    check("At Risk / Hibernating ratio, rate-scope sentence", scoped, RATIO, 2)
+    return common
+
+
+p_common = check_common_rates(doc)
+
 # Segment-share table appended to docs/methodology.md: every row and the closing
 # sentence must equal the same strings built from the live v_rfm_for_bi result.
 SHARE_HEADING = "## Appendix: segment shares"
@@ -843,11 +892,14 @@ check_text("Segment shares closing sentence", p_share_sentence,
            f"customers and {two['revenue'].sum():,.2f} EUR.")
 
 # The lede's literals, read back from the printed sentence.
-lede_ratio, lede_hibernating, lede_at_risk = map(num, grab(
-    r"retains ([\d.]+) times as much contribution .* \((\d+)% against (\d+)%\)", LEDE))
-check("Lede: At Risk / Hibernating contribution ratio", p_ratio, lede_ratio, 2)
-check("Lede: Hibernating discount %", published["Hibernating"]["discount_pct"], lede_hibernating, 0)
+lede_at_risk, lede_hibernating, lede_ratio, lede_common = map(num, grab(
+    r"At the playbook's rates \((\d+)% for At Risk, (\d+)% for Hibernating\), each euro of discount "
+    r"retains ([\d.]+) times as much contribution in At Risk as in Hibernating\. Most of that gap .*: "
+    r"with either rate applied to both segments, At Risk retains about ([\d.]+) times as much\.", LEDE))
 check("Lede: At Risk discount %", published["At Risk"]["discount_pct"], lede_at_risk, 0)
+check("Lede: Hibernating discount %", published["Hibernating"]["discount_pct"], lede_hibernating, 0)
+check("Lede: At Risk / Hibernating contribution ratio", p_ratio, lede_ratio, 2)
+check("Lede: At Risk / Hibernating ratio at a common rate", p_common, lede_common, 1)
 
 failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
 assert not failed, f"live results differ from docs/methodology.md: {failed}"
@@ -1092,14 +1144,32 @@ show(pd.DataFrame({"": list(measures),
 print(f"## {HEADING_E3}")
 ```
 
-Contribution per 1,000 EUR of discount at the playbook rates: (gross margin - discount rate) / discount rate x 1,000 EUR.
+```{python}
+#| label: e3-caption
+#| output: asis
+E3_CAPTION = (
+    "Contribution per 1,000 EUR of discount at the playbook's rates: (gross margin - discount rate) "
+    f"/ discount rate x 1,000 EUR. At these rates At Risk retains {RATIO:.2f} times as much per euro "
+    "of discount as Hibernating; with either rate applied to both segments, about "
+    f"{COMMON_RATIO:.1f} times as much."
+)
+caption_ratio, caption_common = map(num, grab(
+    r"At Risk retains ([\d.]+) times as much .*; with either rate applied to both segments, about "
+    r"([\d.]+) times as much\.", E3_CAPTION))
+check("Contribution chart caption: At Risk / Hibernating contribution ratio", p_ratio, caption_ratio, 2)
+check("Contribution chart caption: ratio at a common rate", p_common, caption_common, 1)
+failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
+assert not failed, f"live results differ from docs/methodology.md: {failed}"
+print(E3_CAPTION)
+```
 
 ```{python}
 #| label: e3-figure
 #| output: asis
 per_1000_by_segment = dict(zip(per_1000["segment"], per_1000["contribution_per_1000"]))
-title = (f"Each 1,000 EUR of discount retains {per_1000_by_segment['At Risk']:,.0f} EUR of "
-         f"contribution in At Risk, against {per_1000_by_segment['Hibernating']:,.0f} EUR in Hibernating")
+title = (f"At the playbook's rates, each 1,000 EUR of discount retains "
+         f"{per_1000_by_segment['At Risk']:,.0f} EUR of contribution in At Risk, against "
+         f"{per_1000_by_segment['Hibernating']:,.0f} EUR in Hibernating")
 assert title == HEADING_E3, title
 
 
@@ -1107,14 +1177,15 @@ def draw_e3(variant):
     ax = variant.ax
     ys = [1, 0]
     values = list(per_1000["contribution_per_1000"])
+    bars = []
     for y, row in zip(ys, per_1000.itertuples()):
-        ax.barh(y, row.contribution_per_1000, height=0.2, color=FOCUS_COLOR[row.segment],
-                edgecolor="none", zorder=3)
+        bars += ax.barh(y, row.contribution_per_1000, height=0.2, color=FOCUS_COLOR[row.segment],
+                        edgecolor="none", zorder=3)
         ax.text(row.contribution_per_1000 + 30, y, fmt_eur(row.contribution_per_1000, 0),
                 va="center", ha="left", fontsize=14)
     ax.plot([values[1], values[0]], [0.5, 0.5], color=LABEL, linewidth=1, linestyle=(0, (2, 3)), zorder=2)
-    ax.text((values[0] + values[1]) / 2, 0.55, f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f}x)",
-            va="bottom", ha="center", fontsize=15, fontweight=600)
+    gap = ax.text((values[0] + values[1]) / 2, 0.55, f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f} times)",
+                  va="bottom", ha="center", fontsize=15, fontweight=600)
     category_axis(ax, list(per_1000["segment"]))
     ax.set_ylim(-0.7, 1.7)
     ax.set_xlim(0, 3000)
@@ -1122,17 +1193,42 @@ def draw_e3(variant):
     ax.set_xticklabels([f"{v:,}" for v in range(0, 3001, 500)])
     ax.set_axisbelow(True)
     ax.set_xlabel("Contribution per 1,000 EUR of discount (EUR)", fontsize=13, color=LABEL)
+    # The gap label sits between the two bars, MIN_GAP_PX clear of each; the bars join the
+    # layout boxes, so check_layout also keeps every text off them.
+    fig = variant.fig
+    fig.draw_without_rendering()
+    renderer = fig.canvas.get_renderer()
+    for name, bar in zip(per_1000["segment"], bars):
+        b = bar.get_window_extent(renderer)
+        variant.boxes.append((f"{name} bar", (px(fig, b.x0), px(fig, b.y0), px(fig, b.x1), px(fig, b.y1))))
+    upper, lower = variant.boxes[-2][1], variant.boxes[-1][1]
+    _, label_y0, _, label_y1 = fallback_box(gap, renderer)
+    assert upper[1] - label_y1 >= MIN_GAP_PX and label_y0 - lower[3] >= MIN_GAP_PX, (upper, lower, label_y0, label_y1)
 
 
 E3_DESC = (
-    "Horizontal bar chart of contribution per 1,000 EUR of discount at the playbook rates: "
-    f"At Risk {fmt_eur(per_1000_by_segment['At Risk'], 0)}, Hibernating "
+    "Horizontal bar chart of contribution per 1,000 EUR of discount at the playbook's rates "
+    f"({DISCOUNT['At Risk'] * 100:.0f}% for At Risk, {DISCOUNT['Hibernating'] * 100:.0f}% for "
+    f"Hibernating): At Risk {fmt_eur(per_1000_by_segment['At Risk'], 0)}, Hibernating "
     f"{fmt_eur(per_1000_by_segment['Hibernating'], 0)}, a gap of "
-    f"{per_1000_by_segment['At Risk'] - per_1000_by_segment['Hibernating']:,.0f} EUR ({RATIO:.2f}x). "
+    f"{per_1000_by_segment['At Risk'] - per_1000_by_segment['Hibernating']:,.0f} EUR. At these rates "
+    f"At Risk retains {RATIO:.2f} times as much contribution per euro of discount as Hibernating; "
+    f"with either rate applied to both segments, about {COMMON_RATIO:.1f} times as much. "
     "The figure measures margin efficiency, not incremental return."
 )
+# The description's literals, read back from the printed text.
+desc_at_risk, desc_hibernating, desc_ratio, desc_common = map(num, grab(
+    r"at the playbook's rates \((\d+)% for At Risk, (\d+)% for Hibernating\):.* At Risk retains "
+    r"([\d.]+) times as much .*; with either rate applied to both segments, about ([\d.]+) times as much\.",
+    E3_DESC))
+check("Contribution chart description: At Risk discount %", published["At Risk"]["discount_pct"], desc_at_risk, 0)
+check("Contribution chart description: Hibernating discount %", published["Hibernating"]["discount_pct"], desc_hibernating, 0)
+check("Contribution chart description: At Risk / Hibernating contribution ratio", p_ratio, desc_ratio, 2)
+check("Contribution chart description: ratio at a common rate", p_common, desc_common, 1)
+failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
+assert not failed, f"live results differ from docs/methodology.md: {failed}"
 render("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, (0.22, 0.54), draw_e3,
-       subtitle="Contribution on orders placed, at the playbook discount rates: "
+       subtitle="Contribution on orders placed, at the playbook's rates: "
                 "a margin-efficiency figure, not an incremental return")
 exhibit("e3_contribution_per_1000", E3_DESC)
 # One grid across the page: three exhibits in two variants share the plot-area edges and the
