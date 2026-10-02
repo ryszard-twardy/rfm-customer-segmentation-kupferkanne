@@ -28,6 +28,7 @@ OLD = {
     "grain_parity": 0,
 }
 NEW = {**OLD, "total_revenue": 990.50, "total_profit": 590.50}
+NEWER = {**NEW, "total_revenue": 980.25}
 
 
 class FakeBigQuery:
@@ -146,6 +147,21 @@ def test_accept_writes_new_values_and_one_log_line(env):
 
     # The accepted baseline is what the comparison now sees.
     assert cli.main(["verify"]) == 0
+
+
+def test_second_accept_appends_and_keeps_the_first_line(env):
+    assert cli.main(["baseline", "--accept", "--reason", REASON]) == 0
+    first = env.log.read_bytes()
+    env.bq.values = NEWER
+    assert cli.main(["baseline", "--accept", "--reason", "Second reason."]) == 0
+
+    raw = env.log.read_bytes()
+    assert raw.startswith(first)  # the first line is left byte for byte
+    lines = raw.decode("utf-8").splitlines()
+    assert len(lines) == 2
+    second = json.loads(lines[1])
+    assert second["reason"] == "Second reason."
+    assert second["changes"]["total_revenue"] == {"old": 990.5, "new": 980.25}
 
 
 def test_accept_refreshes_a_stale_query_hash_and_logs_it(env):

@@ -189,7 +189,10 @@ def cmd_verify(_args) -> int:
     project, dataset = resolve_bq_config()
     baseline = _load_baseline()
     if baseline is None:
-        print(f"No baseline at baselines/{BASELINE_NAME}. Run `baseline --accept` first.")
+        print(
+            f"No baseline at baselines/{BASELINE_NAME}. "
+            'Run `baseline --accept --reason "<why>"` first.'
+        )
         return 2
     base_flat = {**baseline["primitives"], **baseline["derived"]}
     primitives, derived = _capture(project, dataset)

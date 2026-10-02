@@ -1,10 +1,12 @@
 # KPI parity regression harness
 
-A reusable safety net for the Kupferkanne pipeline. It snapshots the canonical
-KPIs to a versioned baseline (`baseline`) and re-verifies them later with
-zero-drift assertions (`verify`). Use it before and after any change that could
-move the numbers (for example the snake_case rename in issue #9) to prove the
-pipeline still produces identical figures.
+A reusable safety net for the Kupferkanne pipeline. `verify` re-runs the
+canonical KPI queries and asserts zero drift against the committed baseline.
+`baseline` shows how the figures moved against it, and only
+`baseline --accept --reason` writes a new baseline. Use it before and after any
+change that could move the numbers (for example the snake_case rename in
+issue #9) to prove the pipeline still produces identical figures, or to record
+why they moved.
 
 ## What it checks
 
