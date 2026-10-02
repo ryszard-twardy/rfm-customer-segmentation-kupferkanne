@@ -57,7 +57,7 @@ SET orders_contract_ok = (
         WHERE
             table_type = 'BASE TABLE'
             AND table_name LIKE 'orders20%'
-            AND REGEXP_EXTRACT(table_name, r'(\d{6})$') BETWEEN start_suffix AND end_suffix
+            AND REGEXP_EXTRACT(table_name, r'^orders20(.*)$') BETWEEN start_suffix AND end_suffix
     ),
 
     expected AS (
@@ -90,7 +90,7 @@ SET orders_contract_ok = (
         FROM `kupferkanne-2026.sales.INFORMATION_SCHEMA.COLUMNS`
         WHERE
             table_name LIKE 'orders20%'
-            AND REGEXP_EXTRACT(table_name, r'(\d{6})$') BETWEEN start_suffix AND end_suffix
+            AND REGEXP_EXTRACT(table_name, r'^orders20(.*)$') BETWEEN start_suffix AND end_suffix
             AND column_name IN (
                 'OrderID', 'CustomerID', 'OrderDate', 'OrderDiscountPct', 'BasketItemCount'
             )
@@ -110,7 +110,7 @@ SET items_contract_ok = (
         WHERE
             table_type = 'BASE TABLE'
             AND table_name LIKE 'items20%'
-            AND REGEXP_EXTRACT(table_name, r'(\d{6})$') BETWEEN start_suffix AND end_suffix
+            AND REGEXP_EXTRACT(table_name, r'^items20(.*)$') BETWEEN start_suffix AND end_suffix
     ),
 
     expected AS (
@@ -143,7 +143,7 @@ SET items_contract_ok = (
         FROM `kupferkanne-2026.sales.INFORMATION_SCHEMA.COLUMNS`
         WHERE
             table_name LIKE 'items20%'
-            AND REGEXP_EXTRACT(table_name, r'(\d{6})$') BETWEEN start_suffix AND end_suffix
+            AND REGEXP_EXTRACT(table_name, r'^items20(.*)$') BETWEEN start_suffix AND end_suffix
             AND column_name IN ('OrderID', 'ProductID', 'Quantity', 'UnitPrice', 'LineNetAmount')
         GROUP BY column_name
         HAVING COUNT(DISTINCT data_type) > 1
@@ -281,14 +281,14 @@ order_tables AS (
   FROM `kupferkanne-2026.sales.INFORMATION_SCHEMA.TABLES`
   WHERE table_type = 'BASE TABLE'
     AND table_name LIKE 'orders20%%'
-    AND REGEXP_EXTRACT(table_name, r'(\\d{6})$') BETWEEN '%s' AND '%s'
+    AND REGEXP_EXTRACT(table_name, r'^orders20(.*)$') BETWEEN '%s' AND '%s'
 ),
 item_tables AS (
   SELECT table_name
   FROM `kupferkanne-2026.sales.INFORMATION_SCHEMA.TABLES`
   WHERE table_type = 'BASE TABLE'
     AND table_name LIKE 'items20%%'
-    AND REGEXP_EXTRACT(table_name, r'(\\d{6})$') BETWEEN '%s' AND '%s'
+    AND REGEXP_EXTRACT(table_name, r'^items20(.*)$') BETWEEN '%s' AND '%s'
 ),
 expected_dim_customers AS (
   SELECT 'CustomerID' AS column_name UNION ALL
@@ -340,13 +340,13 @@ order_cols AS (
   SELECT table_name, column_name, data_type
   FROM `kupferkanne-2026.sales.INFORMATION_SCHEMA.COLUMNS`
   WHERE table_name LIKE 'orders20%%'
-    AND REGEXP_EXTRACT(table_name, r'(\\d{6})$') BETWEEN '%s' AND '%s'
+    AND REGEXP_EXTRACT(table_name, r'^orders20(.*)$') BETWEEN '%s' AND '%s'
 ),
 item_cols AS (
   SELECT table_name, column_name, data_type
   FROM `kupferkanne-2026.sales.INFORMATION_SCHEMA.COLUMNS`
   WHERE table_name LIKE 'items20%%'
-    AND REGEXP_EXTRACT(table_name, r'(\\d{6})$') BETWEEN '%s' AND '%s'
+    AND REGEXP_EXTRACT(table_name, r'^items20(.*)$') BETWEEN '%s' AND '%s'
 ),
 raw_orders AS (
   %s
