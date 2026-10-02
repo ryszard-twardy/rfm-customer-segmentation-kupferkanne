@@ -1,17 +1,17 @@
 {
   "bq_dataset_env": "KK_BQ_DATASET",
   "bq_project_env": "KK_BQ_PROJECT",
-  "captured_at_utc": "2026-06-09T14:48:13Z",
+  "captured_at_utc": "2026-10-02T10:08:41Z",
   "derived": {
-    "aov": 50.55,
-    "margin_pct": 59.78
+    "aov": 50.22,
+    "margin_pct": 59.52
   },
   "primitives": {
     "distinct_customers": 14967,
     "distinct_orders": 168777,
     "grain_parity": 0,
-    "total_profit": 5100089.72,
-    "total_revenue": 8531365.52
+    "total_profit": 5044924.94,
+    "total_revenue": 8476200.74
   },
   "queries": {
     "distinct_customers": {
