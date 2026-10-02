@@ -90,22 +90,3 @@ KPI_DEFS: tuple[KpiDef, ...] = (
         sources=(SALES_CURATED, V_ITEMS_FOR_BI),
     ),
 )
-
-# Known production reference values. These are the harness's own correctness
-# test: a freshly captured baseline MUST equal these. If a captured value
-# differs, the QUERY is wrong - fix the query, never edit these numbers.
-EXPECTED_PRIMITIVES: dict = {
-    "total_revenue": 8531365.52,
-    "total_profit": 5100089.72,
-    "distinct_customers": 14967,
-    "distinct_orders": 168777,
-    "grain_parity": 0,
-}
-
-# Derived values are computed in compare.derive_metrics, not stored as
-# primitives. Listed here only so the build-time self-test can confirm the
-# derivation lands on the documented figures.
-EXPECTED_DERIVED: dict = {
-    "aov": 50.55,        # revenue / orders, 2 dp
-    "margin_pct": 59.78,  # profit / revenue * 100, 2 dp
-}

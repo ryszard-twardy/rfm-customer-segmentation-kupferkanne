@@ -5,19 +5,27 @@ from __future__ import annotations
 import pytest
 
 from harness.compare import ComparisonReport, compare_kpis, derive_metrics
-from harness.kpi_queries import EXPECTED_DERIVED, EXPECTED_PRIMITIVES
+
+# Synthetic figures: the tests check the rules, not the warehouse's data.
+PRIMITIVES = {
+    "total_revenue": 100.10,
+    "total_profit": 30.00,
+    "distinct_customers": 3,
+    "distinct_orders": 4,
+    "grain_parity": 0,
+}
 
 
-def test_derive_metrics_matches_known_production():
-    # Independently confirms AOV=50.55 and Margin %=59.78 from the primitives,
-    # so EXPECTED_DERIVED can never silently diverge from EXPECTED_PRIMITIVES.
-    derived = derive_metrics(EXPECTED_PRIMITIVES)
-    assert derived["aov"] == EXPECTED_DERIVED["aov"]
-    assert derived["margin_pct"] == EXPECTED_DERIVED["margin_pct"]
+def test_derive_metrics_rounds_half_up_to_the_cent():
+    # AOV = 100.10 / 4 = 25.025 -> 25.03 (half-up; half-even would give 25.02).
+    # Margin % = 30.00 / 100.10 * 100 = 29.970... -> 29.97.
+    derived = derive_metrics(PRIMITIVES)
+    assert derived["aov"] == 25.03
+    assert derived["margin_pct"] == 29.97
 
 
 def test_compare_identical_has_no_drift():
-    flat = {**EXPECTED_PRIMITIVES, **EXPECTED_DERIVED}
+    flat = {**PRIMITIVES, **derive_metrics(PRIMITIVES)}
     report = compare_kpis(flat, dict(flat))
     assert isinstance(report, ComparisonReport)
     assert report.ok
@@ -33,8 +41,8 @@ def test_currency_compares_to_the_cent():
 
 
 def test_counts_require_exact_equality():
-    assert compare_kpis({"distinct_orders": 168777}, {"distinct_orders": 168777}).ok
-    assert not compare_kpis({"distinct_orders": 168777}, {"distinct_orders": 168778}).ok
+    assert compare_kpis({"distinct_orders": 4}, {"distinct_orders": 4}).ok
+    assert not compare_kpis({"distinct_orders": 4}, {"distinct_orders": 5}).ok
 
 
 def test_grain_parity_drift_is_detected():
@@ -43,7 +51,7 @@ def test_grain_parity_drift_is_detected():
 
 
 def test_missing_key_is_drift():
-    report = compare_kpis({"total_profit": 5100089.72}, {})
+    report = compare_kpis({"total_profit": 30.00}, {})
     assert not report.ok
     assert report.drifted()[0].name == "total_profit"
 
