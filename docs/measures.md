@@ -169,9 +169,9 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 **Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 
-**Equal-weight benchmark:** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.94% vs `Profit Margin %` 59.78% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
+**Equal-weight benchmark:** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.63% vs `Profit Margin %` 59.52% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
 
-**Margin Baseline:** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.78%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
+**Margin Baseline:** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.52%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
 
 **Fact-grain principle (dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
 

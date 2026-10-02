@@ -28,4 +28,4 @@ FROM `kupferkanne-2026.sales.sales_curated` AS s
 INNER JOIN first_purchase AS f USING (customer_id)
 GROUP BY revenue_month, customer_type;
 
--- Validation: SUM(revenue) over all rows = [Total Revenue] baseline 8,531,365.52.
+-- Validation: SUM(revenue) over all rows = [Total Revenue] baseline 8,476,200.74.

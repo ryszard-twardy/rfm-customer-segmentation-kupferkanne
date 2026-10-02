@@ -31,7 +31,7 @@ INNER JOIN `kupferkanne-2026.sales.sales_curated` AS sc
 INNER JOIN `kupferkanne-2026.sales.v_dim_products_std` AS p
     ON i.product_id = p.product_id;
 
--- Validation: row count ~275K, SUM(line_net_amount) ≈ €8.53M (header parity)
+-- Validation: row count ~275K, SUM(line_net_amount) ≈ €8.48M (header parity)
 SELECT
     COUNT(*) AS line_rows,
     ROUND(SUM(line_net_amount), 2) AS total_revenue,

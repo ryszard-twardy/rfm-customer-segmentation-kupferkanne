@@ -36,7 +36,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 +------------------+     +----------------------+     +------------------------+
 |  synth-datagen   |---->|       BigQuery       |---->|        Power BI        |
 |  (Python CLI)    |     |    data warehouse    |     |      Import mode       |
-|                  |     |      9-step SQL      |     |      PBIP / TMDL       |
+|                  |     |     10-step SQL      |     |      PBIP / TMDL       |
 +------------------+     +----------------------+     +------------------------+
   80 CSV shards            audit -> clean ->            6 pages + drillthrough
   ~460K raw records        EDA -> RFM -> marts          109 DAX measures
@@ -45,8 +45,8 @@ Each question maps to specific report pages, and every figure on those pages is 
 
 | Scale | Value |
 |---|---|
-| Revenue | EUR 8,531,365.52 |
-| Profit | EUR 5,100,089.72 (weighted margin 59.78%) |
+| Revenue | EUR 8,476,200.74 |
+| Profit | EUR 5,044,924.94 (weighted margin 59.52%) |
 | Customers | 14,967 scored |
 | Orders | 168,777 order-grain rows; ~275K line-grain rows |
 | Catalogue | 60 products, 5 brands, 6 categories |
@@ -57,7 +57,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 
 **RFM segmentation.** Every customer is scored 1–5 on Recency, Frequency and Monetary value using `NTILE(5)` quintiles with deterministic tiebreakers, summed into a composite score (3–15) and banded into six segments – Champions, Loyal Customers, Potential Loyalists, Recent Customers, At Risk, Hibernating – each mapped to a recommended marketing action. Recency is anchored to `MAX(OrderDate)` rather than `CURRENT_DATE()`, so results are reproducible on a frozen dataset; quintile scoring is distribution-adaptive, so thresholds move with the data instead of hard-coding euro cutoffs. ([ADR 0006](docs/adr/0006-rfm-segmentation-with-ntile.md))
 
-**Two-tier margin.** Profitability is reported two ways on purpose: weighted (`SUM profit / SUM revenue` = 59.78%) and equal-weight across brands (59.94%). Today the two sit within 0.16 pp of each other – the dual view is the guard that keeps a future mix shift from hiding behind a single number. Both figures are labelled wherever they appear. ([ADR 0007](docs/adr/0007-two-tier-margin-calculation.md))
+**Two-tier margin.** Profitability is reported two ways on purpose: weighted (`SUM profit / SUM revenue` = 59.52%) and equal-weight across brands (59.63%). Today the two sit within 0.11 pp of each other – the dual view is the guard that keeps a future mix shift from hiding behind a single number. Both figures are labelled wherever they appear. ([ADR 0007](docs/adr/0007-two-tier-margin-calculation.md))
 
 **Dual-grain model.** A Kimball star schema with conformed dimensions and two fact grains: order-grain `sales_curated` (168,777 rows) for revenue and segmentation, line-grain `v_items_for_bi` (~275K rows) for product detail. Measure names carry the grain (`[Total *]` vs `[Line *]`), and a reconciliation measure asserts the two grains agree (invariant = 0). ([ADR 0005](docs/adr/0005-dual-grain-fact-model.md))
 
@@ -76,8 +76,8 @@ Each question maps to specific report pages, and every figure on those pages is 
 ## Built like production
 
 - **Model as code.** The Power BI model ships in PBIP/TMDL format: 109 measures, 12 tables and 7 single-direction relationships live as plain text, diffable and reviewable like any other source. [`docs/measures.md`](docs/measures.md) is the synced catalogue, kept honest by a standing rule: any model change triggers a Best Practice Analyzer run and a docs sync in the same session.
-- **SQL that expects to be re-run.** Nine idempotent GoogleSQL scripts (audit → standardise → clean → validate → EDA → RFM transform → line-grain BI fact → BI customer dimension → analytics marts), SQLFluff lint-clean under a documented exception policy. Exploration runs *before* transformation, so segmentation thresholds come from observed distributions, not assumptions. ([ADR 0003](docs/adr/0003-pipeline-order-eda-before-transform.md))
-- **Regression invariants.** Canonical KPIs (Revenue 8,531,365.52 / Customers 14,967) are baselined and re-asserted after pipeline changes – a refactor cannot silently bend a number.
+- **SQL that expects to be re-run.** Nine idempotent GoogleSQL build scripts (audit → standardise → clean → validate → EDA → RFM transform → line-grain BI fact → BI customer dimension → analytics marts) and a tenth, an assertion that builds nothing, all SQLFluff lint-clean under a documented exception policy. Exploration runs *before* transformation, so segmentation thresholds come from observed distributions, not assumptions. ([ADR 0003](docs/adr/0003-pipeline-order-eda-before-transform.md))
+- **Regression invariants.** Canonical KPIs (Revenue 8,476,200.74 / Customers 14,967) are baselined and re-asserted after pipeline changes – a refactor cannot silently bend a number.
 - **Decisions on the record.** Fifteen architecture decision records, including two that were later superseded and deliberately kept in place – the model's history is part of the artifact. ([`docs/adr/`](docs/adr/))
 - **Dirty data on purpose.** The source is generated by [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) with seeded real-world defects – duplicate orders, cents-format inconsistency, orphan keys, type drift, header-row contamination – so the cleaning layer solves problems that actually occur in production. ([ADR 0008](docs/adr/0008-synthetic-data-with-realistic-quality-issues.md))
 
@@ -89,7 +89,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 
 | Path | Contents |
 |---|---|
-| [`sql/`](sql/) | Nine-step BigQuery pipeline, numbered in execution order (`00_0` audit → `05` marts) + 2 standalone analytical views |
+| [`sql/`](sql/) | Ten-step BigQuery pipeline, numbered in execution order (`00_0` audit → `05` marts → `06` coverage assertion) + 2 standalone analytical views |
 | [`pbip/`](pbip/) | Power BI project: report definition (PBIR) + semantic model (TMDL) |
 | [`graphics/`](graphics/) | Navigation icons (SVG): four states for each of the six navigable pages, plus a reset control and the icon-set license |
 | [`theme/`](theme/) | Power BI report theme: `rfm_dashboard_theme.json` |

@@ -92,6 +92,9 @@ Never edit a baseline file by hand. A baseline changes only through
   time, the git HEAD and whether tracked files had uncommitted changes, the
   reason, each changed KPI's old and new value, and the old and new SHA-256 of
   each query whose hash changed.
+- It replaces the baseline first and appends the log line after it, so a run
+  that stops between the two leaves the new baseline without its log line;
+  check that both files changed before committing.
 - An empty or whitespace-only reason, `--accept` without `--reason`, or
   `--reason` without `--accept` exits 2 and writes nothing.
 - If no KPI value and no query hash changed, it says so, writes nothing and
@@ -108,5 +111,5 @@ uv run pytest
 ```
 
 The tests cover the comparison and derivation logic and both `baseline` modes,
-using synthetic figures and a fake query layer - they do not touch BigQuery and
+using synthetic figures and a fake query layer – they do not touch BigQuery and
 need no credentials.

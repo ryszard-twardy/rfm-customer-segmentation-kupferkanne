@@ -10,7 +10,7 @@ Kupferkanne is a retail analytics platform: a complete data warehouse and the BI
 +------------------+     +----------------------+     +------------------------+
 |  synth-datagen   |---->|       BigQuery       |---->|        Power BI        |
 |  (Python CLI)    |     |    data warehouse    |     |      Import mode       |
-|                  |     |      9-step SQL      |     |      PBIP / TMDL       |
+|                  |     |     10-step SQL      |     |      PBIP / TMDL       |
 +------------------+     +----------------------+     +------------------------+
   80 CSV shards            33 pipeline objects          6 pages + drillthrough
   ~460K raw records        11 tables + 22 views         109 DAX measures
@@ -24,7 +24,7 @@ _The counts above cover the objects the SQL pipeline creates; the 80 CSV shards 
 |---|---|---|
 | Data generation | [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) | Python CLI producing realistic data with intentional quality issues |
 | Data warehouse | Google BigQuery | Serverless cloud DW, GoogleSQL dialect |
-| Transformation | 9-step SQL pipeline | Idempotent (`CREATE OR REPLACE`), lint-clean |
+| Transformation | 10-step SQL pipeline | Idempotent build steps (`CREATE OR REPLACE`), lint-clean |
 | Linting | SQLFluff | Custom rule policy |
 | BI | Power BI (PBIP / TMDL) | Import mode, dual-grain semantic layer, model as code |
 | Theme | Custom JSON | Segoe UI, muted-blue primary (#4A7AA0) on white, with a #F7F5F1 page background |
@@ -32,7 +32,7 @@ _The counts above cover the objects the SQL pipeline creates; the 80 CSV shards 
 
 ## Pipeline flow
 
-The SQL layer follows the standard data engineering progression – **audit → clean → explore → transform → mart** – implemented across nine idempotent scripts. Exploratory analysis runs **before** RFM transformation, so that segmentation thresholds are informed by observed distribution shape rather than guessed assumptions. See [ADR 0003](adr/0003-pipeline-order-eda-before-transform.md) for the rationale.
+The SQL layer follows the standard data engineering progression – **audit → clean → explore → transform → mart** – implemented across ten numbered scripts: nine idempotent build steps and a final assertion that builds nothing. Exploratory analysis runs **before** RFM transformation, so that segmentation thresholds are informed by observed distribution shape rather than guessed assumptions. See [ADR 0003](adr/0003-pipeline-order-eda-before-transform.md) for the rationale.
 
 The data model uses a Kimball-style star schema with two conformed dimensions and a **dual-grain** fact layer: order-grain `sales_curated` for revenue and segmentation, line-grain `v_items_for_bi` for product-level detail. This separation prevents aggregation errors that arise from joining mixed grains. See [ADR 0005](adr/0005-dual-grain-fact-model.md).
 

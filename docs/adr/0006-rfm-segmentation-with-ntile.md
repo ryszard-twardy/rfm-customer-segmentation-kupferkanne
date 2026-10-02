@@ -51,3 +51,5 @@ Segments are derived from `r_score + f_score + m_score`:
 - **k-means clustering** – rejected: clusters are not interpretable without inspection of centroids; thresholds aren't human-readable; results depend on initialisation seed.
 - **Single composite formula** (e.g., `0.5*R + 0.3*F + 0.2*M`) – rejected: arbitrary weights, loses per-dimension information, harder to justify analytically.
 - **`CURRENT_DATE()` as recency anchor** – rejected: distorts recency when the dataset is bounded in the past.
+
+Note (2026-10-02): `sql/03_rfm_pipeline_kupferkanne_2026.sql` still anchors recency on `MAX(order_date)`, 2026-03-15; the fixed as-of date added in commit 18d6330 sets only its snapshot date. Its `NTILE` calls break ties on `customer_id`, so scores are deterministic, but customers with equal values can receive different scores: at the current snapshot 6,000 of 14,967 customers share a recency, frequency or monetary value with a customer scored differently on it, 5,842 of them on frequency. Tie handling may change in a later release.

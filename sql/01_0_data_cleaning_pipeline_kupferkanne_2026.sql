@@ -17,7 +17,7 @@
 --      between 1 and 500, or when it is at least 10 times its list line
 --      value (quantity * unit_price). Line amounts are net of the order
 --      discount (at most 0.55 in the source), so a euro line sits at or
---      below 1.0x its list line value and a cents line at about 45x
+--      below 1.0 times its list line value and a cents line at least 45 times
 --      (100 x (1 - 0.55)); the 10x threshold sits between the two. On the
 --      current source, after the first test no line sits between 1.0x and
 --      54.4x, and the second test catches 69 lines in 67 orders whose cents

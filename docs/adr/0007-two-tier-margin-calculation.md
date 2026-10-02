@@ -41,3 +41,5 @@ Note (2026-06-09): report page numbering changed after this ADR – Customer Lif
 ## Addendum (2026-07-23) – shipped measure names
 
 The decision stands: headline margins are revenue-weighted everywhere. The measure names and the comparison grain evolved during implementation: the weighted tier ships as `[Profit Margin %]` (59.78%) and the equal-weight tier ships at brand grain as `[Avg Brand Margin %]` (`AVERAGEX` over brands, 59.94%), replacing the order-grain tooltip measure sketched above. Qualifying labels remain mandatory wherever either figure appears. Current catalogue: `docs/measures.md`.
+
+Note (2026-10-02): after the data-quality fixes in commit 18d6330, the revenue-weighted `[Profit Margin %]` reads 59.52% and the equal-weight `[Avg Brand Margin %]` reads 59.63%. The addendum above keeps the figures as first shipped; current values are in `docs/measures.md`.

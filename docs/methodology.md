@@ -6,7 +6,7 @@ This project applies RFM (Recency, Frequency, Monetary) segmentation to a 39-mon
 
 The end-to-end workflow follows the standard data engineering progression: audit raw data → clean and validate → explore distributions → transform into analytical structures → build presentation marts → expose through Power BI.
 
-Each step is implemented as an idempotent SQL script (`CREATE OR REPLACE`) so that the pipeline can be re-run from any point without side effects. The nine numbered pipeline scripts in `sql/` execute in numerical order, with two standalone view scripts alongside; see [architecture.md](architecture.md) for the high-level flow and [ADR 0003](adr/0003-pipeline-order-eda-before-transform.md) for the ordering rationale.
+Each build step is implemented as an idempotent SQL script (`CREATE OR REPLACE`) so that the pipeline can be re-run from any point without side effects. The ten numbered pipeline scripts in `sql/` execute in numerical order, the last of them an assertion that builds nothing, with two standalone view scripts alongside; see [architecture.md](architecture.md) for the high-level flow and [ADR 0003](adr/0003-pipeline-order-eda-before-transform.md) for the ordering rationale.
 
 ## Data origin
 
@@ -26,7 +26,7 @@ Two consequences follow. First, the heatmap is retained on the dashboard but fra
 
 ## Quality audit (steps 00_0 and 01_1)
 
-Two audits bookend the cleaning step. The pre-clean audit (00_0) runs 29 checks against raw shards for schema compliance, type drift, header-row contamination, referential integrity, and value-level issues. The post-clean audit (01_1) re-runs the same 29 checks against validated staging tables, allowing direct before/after comparison. Both audits write findings to dedicated audit tables for inspection in BigQuery. The pipeline does not abort on issues – it documents them. Cleaning rules are explicit and version-controlled.
+Two audits bookend the cleaning step. The pre-clean audit (00_0) runs 29 checks against raw shards for schema compliance, type drift, header-row contamination, referential integrity, and value-level issues. The post-clean audit (01_1) re-runs the same 29 checks against validated staging tables, allowing direct before/after comparison. Both audits write findings to dedicated audit tables for inspection in BigQuery. The pipeline does not abort on audit findings – it documents them. Cleaning rules are explicit and version-controlled.
 
 ## Exploratory analysis (step 02)
 
@@ -82,11 +82,11 @@ The Churn page (PBI Page 4) carries a What-If parameter that simulates reactivat
 
 ### Revenue base
 
-`sales_curated[Order Value]` is net of `order_discount_pct`. Across 274,734 line rows `unit_price` equals the `dim_Product` retail price without exception, and order value over summed line gross tracks `1 - order_discount_pct` within 0.001 for 168,064 of 168,777 orders. The margins below are realised margins, not list margins.
+`sales_curated[Order Value]` is net of `order_discount_pct`. Across 274,734 line rows `unit_price` equals the `dim_Product` retail price without exception, and order value over summed line gross tracks `1 - order_discount_pct` within 0.001 for 168,131 of 168,777 orders. The margins below are realised margins, not list margins.
 
 ### Cost basis
 
-The model prices no campaign action. `dim_Segment[Discount Approach]` records a playbook label per segment (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), and those labels are the only action cost the repository carries: 15 percent for At Risk, 20 percent for Hibernating. The figures below therefore price the discount itself, a revenue concession, and not contact, send or fulfilment cost, none of which exist in the model, the SQL layer or this documentation. On the What-If parameter's default rate of 10 percent, which is a planning assumption rather than a measured reactivation rate, and on one recovered order per reactivated customer, ten contacts stand behind each recovered order and contribution is exhausted at a contact cost of 1.51 EUR in At Risk and 0.67 EUR in Hibernating. The playbook assigns both segments an email cadence (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`).
+The model prices no campaign action. `dim_Segment[Discount Approach]` records a playbook label per segment (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), and those labels are the only action cost the repository carries: 15 percent for At Risk, 20 percent for Hibernating. The figures below therefore price the discount itself, a revenue concession, and not contact, send or fulfilment cost, none of which exist in the model, the SQL layer or this documentation. On the What-If parameter's default rate of 10 percent, which is a planning assumption rather than a measured reactivation rate, and on one recovered order per reactivated customer, ten contacts stand behind each recovered order and contribution is exhausted at a contact cost of 1.49 EUR in At Risk and 0.67 EUR in Hibernating. The playbook assigns both segments an email cadence (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`).
 
 The assumption, stated so it can be challenged: the win-back discount is a percentage off order value and per-unit COGS is unchanged by it. Contribution then equals (gross margin - discount rate) x order value, an identity rather than an approximation, because both rates share the same denominator. `unit_cost` is a fixed attribute of `dim_Product`, so per-unit COGS is invariant to price. Basket mix is not, and a discount-motivated basket need not resemble the segment's historical one.
 
@@ -94,25 +94,25 @@ The assumption, stated so it can be challenged: the win-back discount is a perce
 
 | Segment | Customers | Orders | Revenue | Cost | Profit | AOV | Gross margin | Discount | Contribution per order | Contribution per euro of discount |
 |---|---|---|---|---|---|---|---|---|---|---|
-| At Risk | 1,366 | 2,635 | 107,123.12 | 51,157.70 | 55,965.42 | 40.65 | 52.2440% | 15% | 15.14 | 2.4829 |
-| Hibernating | 2,543 | 2,587 | 64,645.72 | 34,467.90 | 30,177.82 | 24.99 | 46.6819% | 20% | 6.67 | 1.3341 |
+| At Risk | 1,365 | 2,634 | 106,109.36 | 50,963.20 | 55,146.16 | 40.28 | 51.9711% | 15% | 14.89 | 2.4647 |
+| Hibernating | 2,544 | 2,588 | 64,699.38 | 34,490.90 | 30,208.48 | 25.00 | 46.6905% | 20% | 6.67 | 1.3345 |
 
 ### Recommendation
 
-Pilot Hibernating's discount rate first, then, on the same data, the allocation as a break-even floor for each offer and, where the budget cannot cover every eligible customer, a contact priority for At Risk that lasts until its pool is exhausted. For every 1,000 EUR of discount granted, expected contribution is 2,483 EUR in At Risk against 1,334 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
+Pilot Hibernating's discount rate first, then, on the same data, the allocation as a break-even floor for each offer and, where the budget cannot cover every eligible customer, a contact priority for At Risk that lasts until its pool is exhausted. For every 1,000 EUR of discount granted, expected contribution is 2,465 EUR in At Risk against 1,335 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
 
-The playbook grants its deepest discount to its thinnest margin. At Risk retains 37.2440 points of contribution after a 15-point concession; Hibernating retains 26.6819 points after 20. The ranking is the finding: it is robust to the assumptions stated above and holds at any common discount rate, but not to the relative rates the playbook sets, as shown below. The absolute per-euro figures carry the limitations below.
+The playbook grants its deepest discount to its thinnest margin. At Risk retains 36.9711 points of contribution after a 15-point concession; Hibernating retains 26.6905 points after 20. The ranking is the finding: it is robust to the assumptions stated above and holds at any common discount rate, but not to the relative rates the playbook sets, as shown below. The absolute per-euro figures carry the limitations below.
 
-At Risk retains 1.86 times the contribution per euro of discount that Hibernating retains at the playbook's rates (2.4829 against 1.3341), so, while At Risk customers remain to be contacted, each 1,000 EUR of discount moved raises expected contribution by about 1,149 EUR, conditional on the orders being placed. The pool is broad and shallow: the two segments hold 3,909 of the 14,967 scored customers (26.1 percent) and EUR 171,768.84 of lifetime spend, 2.0 percent of the EUR 8,531,365.52 revenue base; this is the quantity `[Revenue at Risk]` measures.
+At Risk retains 1.85 times the contribution per euro of discount that Hibernating retains at the playbook's rates (2.4647 against 1.3345), so, while At Risk customers remain to be contacted, each 1,000 EUR of discount moved raises expected contribution by about 1,130 EUR, conditional on the orders being placed. The pool is broad and shallow: the two segments hold 3,909 of the 14,967 scored customers (26.1 percent) and EUR 170,808.74 of lifetime spend, 2.0 percent of the EUR 8,476,200.74 revenue base; this is the quantity `[Revenue at Risk]` measures.
 
 Most of that gap comes from the playbook's rates rather than from the segments. Contribution per euro of discount is (gross margin - discount rate) / discount rate; at either common rate At Risk retains about 1.2 times as much as Hibernating, and swapping the rates reverses the ranking.
 
 | Segment (gross margin) | 15 percent discount | 20 percent discount |
 |---|---|---|
-| At Risk (52.2440 percent) | 2.48 (playbook) | 1.61 |
-| Hibernating (46.6819 percent) | 2.11 | 1.33 (playbook) |
+| At Risk (51.9711 percent) | 2.46 (playbook) | 1.60 |
+| Hibernating (46.6905 percent) | 2.11 | 1.33 (playbook) |
 
-The rate is a playbook lever, so the 1.86 times holds only at the playbook's rates. The pilot therefore tests Hibernating at both rates, then the allocation; its response data, not this ratio, decides both.
+The rate is a playbook lever, so the 1.85 times holds only at the playbook's rates. The pilot therefore tests Hibernating at both rates, then the allocation; its response data, not this ratio, decides both.
 
 ### Pilot design
 
@@ -126,26 +126,26 @@ The figures above measure how efficiently a euro of discount converts into margi
 - Stage 2, floor: each offer, At Risk at 15 percent and Hibernating at the rate that stage 1 keeps, stops only if the upper bound of its incremental contribution per euro of discount is below break-even.
 - Stage 2, priority: if the budget cannot cover everyone, At Risk is contacted before Hibernating only if At Risk's lower bound is above break-even and the lower bound for At Risk minus Hibernating per euro, at the kept rate, is above zero. Priority lasts until At Risk's pool is exhausted; the remaining budget goes to Hibernating if its offer continues. If the budget covers everyone, only the floor applies.
 - Intervals are bias-corrected and accelerated (BCa) bootstrap intervals that resample customers within each segment and group. The verdict holds at the tested rates only.
-- Record contact cost per contacted customer; the break-even contact costs in the cost basis above (1.51 EUR and 0.67 EUR) show how sensitive the result is to it.
+- Record contact cost per contacted customer; the break-even contact costs in the cost basis above (1.49 EUR and 0.67 EUR) show how sensitive the result is to it.
 - Group sizes and duration follow from the response and variance observed in the first wave, which is excluded from the decision data; the repository holds no campaign response history to set them in advance.
 
 ### Limitations
 
 - Segment membership is a single snapshot. Every figure describes customers who sit in a segment as of the analysis date, not revenue earned while in it. Segment migration is not computable from this data.
-- These cohorts already transact at a discount: mean realised `order_discount_pct` is 0.2573 for At Risk and 0.3313 for Hibernating. A further 15 or 20 points compounds to roughly 36.9 and 46.5 percent off list, against an observed maximum of 0.55. Whether a cohort already at a third off warrants a further concession is a commercial judgement this analysis does not settle.
+- These cohorts already transact at a discount: mean realised `order_discount_pct` is 0.2570 for At Risk and 0.3312 for Hibernating. A further 15 or 20 points compounds to roughly 36.8 and 46.5 percent off list, against an observed maximum of 0.55. Whether a cohort already at a third off warrants a further concession is a commercial judgement this analysis does not settle.
 - No campaign cost exists in the repository, so the recommendation prices the concession alone.
 - The dataset is synthetic and regenerable. The margin, discount and AOV gradients are properties of the generator, so the figures demonstrate pipeline integrity rather than a market observation.
 - The reallocation is bounded by the playbook itself. `dim_Segment[Budget Allocation]` reads "Low (7%)" for At Risk and "Minimal (3%)" for Hibernating (`pbip/kupferkanne-rfm-customer-segmentation.SemanticModel/definition/tables/dim_Segment.tmdl:77-82`), so any move is small relative to the whole budget.
-- Order-value reconciliation: 713 of 168,777 orders fall outside the 0.001 tolerance stated above; they remain unexplained and are tracked as a known issue for the next release.
+- Order-value reconciliation: 646 of 168,777 orders fall outside the 0.001 tolerance stated above. They are not rounding: every gap exceeds what rounding each line to the cent could produce, the smallest by a factor of two; the largest is 17.46 EUR, and 315 orders sit above the expected ratio, 331 below it. They remain unexplained and are tracked as a known issue.
 - Stage 2 reads the data that set Hibernating's rate: a 15 percent group that wins stage 1 carries an upward-biased estimate, so stage 2 errs toward the playbook.
 
 ## Validation
 
-In addition to the pre/post-clean audits, three cross-checks run during transformation:
+Besides the pre- and post-clean audits, three checks cover the semantic model, the segmentation and the pipeline output:
 
-1. **Grain parity** – order-grain revenue equals line-grain revenue aggregated to orders, asserted in the semantic model via the `[Grain Reconciliation]` measure (expected 0) – confirms the dual-grain join is consistent.
-2. **Segment monotonicity** – the average Monetary score increases monotonically from Hibernating to Champions, confirming the composite score is well-behaved.
-3. **Country coverage** – every country in `dim_customers` appears in the segmented output.
+1. **Grain parity** – the `[Grain Reconciliation]` measure compares order-grain revenue with line-grain revenue aggregated to orders and returns 0, which confirms the dual-grain join. The check lives in the semantic model.
+2. **Segment monotonicity** – an observation at the current snapshot, not an enforced rule: the average Monetary score rises with every score band, from Hibernating (1.15) to Champions (4.82).
+3. **Country coverage** – enforced: the last pipeline script, `sql/06_country_coverage_assert_kupferkanne_2026.sql`, stops a run unless every country on a curated order appears in the segmented output and every segmented country appears in the customer dimension. Today 9 countries sit on each side.
 
 ## Power BI consumption
 
@@ -165,12 +165,12 @@ All DAX measures are formatted to the SQLBI convention via [daxformatter.com](ht
 
 | Segment | Customers | Share of scored customers | Lifetime spend (EUR) | Share of revenue base |
 |---|---|---|---|---|
-| Champions | 3,209 | 21.44% | 6,013,207.02 | 70.48% |
-| Loyal Customers | 2,074 | 13.86% | 1,100,568.99 | 12.90% |
-| Potential Loyalists | 2,960 | 19.78% | 884,954.60 | 10.37% |
-| Recent Customers | 2,815 | 18.81% | 360,866.07 | 4.23% |
-| At Risk | 1,366 | 9.13% | 107,123.12 | 1.26% |
-| Hibernating | 2,543 | 16.99% | 64,645.72 | 0.76% |
-| Total | 14,967 | 100.00% | 8,531,365.52 | 100.00% |
+| Champions | 3,209 | 21.44% | 5,973,272.78 | 70.47% |
+| Loyal Customers | 2,077 | 13.88% | 1,096,121.16 | 12.93% |
+| Potential Loyalists | 2,955 | 19.74% | 874,921.68 | 10.32% |
+| Recent Customers | 2,817 | 18.82% | 361,076.38 | 4.26% |
+| At Risk | 1,365 | 9.12% | 106,109.36 | 1.25% |
+| Hibernating | 2,544 | 17.00% | 64,699.38 | 0.76% |
+| Total | 14,967 | 100.00% | 8,476,200.74 | 100.00% |
 
-Figures come from v_rfm_for_bi at the segment snapshot and are the source of the segment-share exhibit; At Risk and Hibernating total 3,909 customers and 171,768.84 EUR.
+Figures come from v_rfm_for_bi at the segment snapshot and are the source of the segment-share exhibit; At Risk and Hibernating total 3,909 customers and 170,808.74 EUR.
