@@ -9,6 +9,33 @@
 --      are safe. Step 00 audits this contract explicitly.
 --   2. Lookup-table standardisation is handled in Step 00.1.
 --
+-- Cleaning rules:
+--   1. Discount bound: order_discount_pct is a fraction, so out of range
+--      means < 0 or > 1.
+--   2. Cents lines (ADR 0008, cents-format inconsistency): a line is read
+--      as cents and divided by 100 when it exceeds 1000 with a result
+--      between 1 and 500, or when it is at least 10 times its list line
+--      value (quantity * unit_price). Line amounts are net of the order
+--      discount (at most 0.55 in the source), so a euro line sits at or
+--      below 1.0x its list line value and a cents line at about 45x
+--      (100 x (1 - 0.55)); the 10x threshold sits between the two. On the
+--      current source, after the first test no line sits between 1.0x and
+--      54.4x, and the second test catches 69 lines in 67 orders whose cents
+--      amounts (429 to 993) stay under the 1000 guard.
+--   3. As-of date: one constant, as_of_date, fixes both the shard window
+--      (the last closed month before it) and the future-date cut-off, so a
+--      later re-run reads the same shard window and applies the same cut-off. The
+--      source holds 89 orders dated 2027-01-01 that a current-date cut-off
+--      would admit on that day, moving the recency anchor (ADR 0006). Raise
+--      as_of_date deliberately when loading data past it, together with the
+--      same constant in Step 00 and Step 03.
+--   4. Dedup tie-break: row_id is a content key of the raw row (an MD5 of
+--      its source month and source columns). Rows sharing a row_id are
+--      byte-identical raw rows, so either pick yields the same output; rows
+--      that differ get a fixed order, so the pick no longer varies between
+--      runs. row_id is therefore a content key, not unique across
+--      byte-identical duplicates.
+--
 -- Outputs:
 --   stg_orders_intake, stg_orders_cleaned, stg_orders_validated
 --   stg_items_intake,  stg_items_cleaned,  stg_items_validated
@@ -17,21 +44,27 @@
 
 DECLARE start_year INT64 DEFAULT 2023;
 DECLARE include_open_current_month BOOL DEFAULT FALSE;
-DECLARE tz STRING DEFAULT 'Europe/Berlin';
-DECLARE run_date DATE DEFAULT CURRENT_DATE(tz);
+DECLARE as_of_date DATE DEFAULT DATE '2026-09-30';
 DECLARE start_suffix STRING DEFAULT FORMAT_DATE('%y%m', DATE(start_year, 1, 1));
 DECLARE end_suffix STRING DEFAULT FORMAT_DATE(
     '%y%m',
     IF(
-        include_open_current_month, run_date,
-        DATE_SUB(DATE_TRUNC(run_date, MONTH), INTERVAL 1 MONTH)
+        include_open_current_month, as_of_date,
+        DATE_SUB(DATE_TRUNC(as_of_date, MONTH), INTERVAL 1 MONTH)
     )
 );
 
 -- ORDERS INTAKE ----------------------------------------------------------------
 CREATE OR REPLACE TABLE `kupferkanne-2026.sales.stg_orders_intake` AS
 SELECT
-    GENERATE_UUID() AS row_id,
+    TO_HEX(MD5(TO_JSON_STRING(STRUCT(
+        _TABLE_SUFFIX AS source_month,
+        OrderID,
+        CustomerID,
+        OrderDate,
+        OrderDiscountPct,
+        BasketItemCount
+    )))) AS row_id,
     CAST(OrderID AS STRING) AS raw_order_id,
     CAST(CustomerID AS STRING) AS raw_customer_id,
     CAST(OrderDate AS STRING) AS raw_order_date,
@@ -50,7 +83,15 @@ WHERE _TABLE_SUFFIX BETWEEN start_suffix AND end_suffix;
 -- ITEMS INTAKE -----------------------------------------------------------------
 CREATE OR REPLACE TABLE `kupferkanne-2026.sales.stg_items_intake` AS
 SELECT
-    GENERATE_UUID() AS row_id,
+    TO_HEX(MD5(TO_JSON_STRING(STRUCT(
+        _TABLE_SUFFIX AS source_month,
+        OrderID,
+        LineNumber,
+        ProductID,
+        Quantity,
+        UnitPrice,
+        LineNetAmount
+    )))) AS row_id,
     CAST(OrderID AS STRING) AS raw_order_id,
     CAST(ProductID AS STRING) AS raw_product_id,
     CAST(Quantity AS STRING) AS raw_quantity,
@@ -79,13 +120,13 @@ SELECT
     customer_id,
     CASE
         WHEN order_date IS NULL THEN NULL
-        WHEN order_date > CURRENT_DATE() THEN NULL
+        WHEN order_date > as_of_date THEN NULL
         WHEN order_date < DATE(2020, 1, 1) THEN NULL
         ELSE order_date
     END AS order_date,
     CASE
         WHEN order_discount_pct_raw IS NULL THEN NULL
-        WHEN order_discount_pct_raw < 0 OR order_discount_pct_raw > 100 THEN NULL
+        WHEN order_discount_pct_raw < 0 OR order_discount_pct_raw > 1 THEN NULL
         ELSE order_discount_pct_raw
     END AS order_discount_pct,
     CASE
@@ -110,7 +151,7 @@ SELECT
             ['UNPARSEABLE_DATE'],
             []
         ),
-        IF(order_date > CURRENT_DATE(), ['FUTURE_DATE'], []),
+        IF(order_date > as_of_date, ['FUTURE_DATE'], []),
         IF(order_date < DATE(2020, 1, 1), ['TOO_EARLY_DATE'], []),
         IF(
             raw_order_discount_pct IS NOT NULL AND TRIM(raw_order_discount_pct) = '',
@@ -125,7 +166,7 @@ SELECT
             []
         ),
         IF(
-            order_discount_pct_raw < 0 OR order_discount_pct_raw > 100,
+            order_discount_pct_raw < 0 OR order_discount_pct_raw > 1,
             ['DISCOUNT_PCT_OUT_OF_RANGE'],
             []
         ),
@@ -172,7 +213,12 @@ SELECT
         WHEN line_net_amount_raw < 0 THEN NULL
         WHEN line_net_amount_raw = 0 THEN NULL
         WHEN
-            line_net_amount_raw > 1000 AND line_net_amount_raw / 100 BETWEEN 1 AND 500
+            (line_net_amount_raw > 1000 AND line_net_amount_raw / 100 BETWEEN 1 AND 500)
+            OR (
+                quantity_raw > 0
+                AND unit_price_raw > 0
+                AND line_net_amount_raw >= 10 * quantity_raw * unit_price_raw
+            )
             THEN ROUND(line_net_amount_raw / 100, 2)
         ELSE ROUND(line_net_amount_raw, 2)
     END AS line_net_amount,
@@ -214,7 +260,12 @@ SELECT
         IF(line_net_amount_raw < 0, ['NEGATIVE_AMOUNT'], []),
         IF(line_net_amount_raw = 0, ['ZERO_AMOUNT'], []),
         IF(
-            line_net_amount_raw > 1000 AND line_net_amount_raw / 100 BETWEEN 1 AND 500,
+            (line_net_amount_raw > 1000 AND line_net_amount_raw / 100 BETWEEN 1 AND 500)
+            OR (
+                quantity_raw > 0
+                AND unit_price_raw > 0
+                AND line_net_amount_raw >= 10 * quantity_raw * unit_price_raw
+            ),
             ['CENTS_CONVERTED'],
             []
         )

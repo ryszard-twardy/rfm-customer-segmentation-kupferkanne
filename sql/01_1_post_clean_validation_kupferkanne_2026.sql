@@ -101,6 +101,7 @@ c05 AS (
         5,
         'Future order_date',
         'stg_orders_validated.order_date',
+        -- Deliberately reads the wall clock, independent of the cleaning rule's as_of_date.
         COUNTIF(order_date > CURRENT_DATE()),
         (SELECT n FROM ob),
         'HIGH',
@@ -151,7 +152,7 @@ c09 AS (
         'Discount pct out of range',
         'stg_orders_validated.order_discount_pct',
         COUNTIF(
-            order_discount_pct IS NOT NULL AND (order_discount_pct < 0 OR order_discount_pct > 100)
+            order_discount_pct IS NOT NULL AND (order_discount_pct < 0 OR order_discount_pct > 1)
         ),
         (SELECT n FROM ob),
         'MEDIUM',

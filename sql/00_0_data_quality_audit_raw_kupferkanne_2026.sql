@@ -14,6 +14,8 @@
 --      on the broken source.
 --   3. Lookup-table key checks are also guarded, so the script remains usable
 --      even if a raw dimension header is wrong.
+--   4. as_of_date must equal the value declared in Step 01.0. Here it sets
+--      the shard window and the future-date cut-off of check c18.
 --
 -- Output:
 --   kupferkanne-2026.sales.data_quality_audit_raw
@@ -21,14 +23,13 @@
 
 DECLARE start_year INT64 DEFAULT 2023;
 DECLARE include_open_current_month BOOL DEFAULT FALSE;
-DECLARE tz STRING DEFAULT 'Europe/Berlin';
-DECLARE run_date DATE DEFAULT CURRENT_DATE(tz);
+DECLARE as_of_date DATE DEFAULT DATE '2026-09-30';
 DECLARE start_suffix STRING DEFAULT FORMAT_DATE('%y%m', DATE(start_year, 1, 1));
 DECLARE end_suffix STRING DEFAULT FORMAT_DATE(
     '%y%m',
     IF(
-        include_open_current_month, run_date,
-        DATE_SUB(DATE_TRUNC(run_date, MONTH), INTERVAL 1 MONTH)
+        include_open_current_month, as_of_date,
+        DATE_SUB(DATE_TRUNC(as_of_date, MONTH), INTERVAL 1 MONTH)
     )
 );
 
@@ -47,6 +48,7 @@ DECLARE orders_contract_ok_sql STRING;
 DECLARE items_contract_ok_sql STRING;
 DECLARE dim_customers_key_ok_sql STRING;
 DECLARE dim_products_key_ok_sql STRING;
+DECLARE as_of_date_sql STRING;
 
 SET orders_contract_ok = (
     WITH order_tables AS (
@@ -199,6 +201,8 @@ SET items_source_sql = IF(
     CAST(ProductID AS STRING) AS raw_product_id,
     CAST(LineNetAmount AS STRING) AS raw_amount,
     SAFE_CAST(NULLIF(TRIM(CAST(LineNetAmount AS STRING)), '') AS NUMERIC) AS parsed_amount,
+    SAFE_CAST(NULLIF(TRIM(CAST(Quantity AS STRING)), '') AS INT64) AS parsed_quantity,
+    SAFE_CAST(NULLIF(TRIM(CAST(UnitPrice AS STRING)), '') AS NUMERIC) AS parsed_unit_price,
     _TABLE_SUFFIX AS src
   FROM `kupferkanne-2026.sales.items20*`
   WHERE _TABLE_SUFFIX BETWEEN '""" || start_suffix || """' AND '""" || end_suffix || ''''
@@ -209,6 +213,8 @@ SET items_source_sql = IF(
     CAST(NULL AS STRING) AS raw_product_id,
     CAST(NULL AS STRING) AS raw_amount,
     CAST(NULL AS NUMERIC) AS parsed_amount,
+    CAST(NULL AS INT64) AS parsed_quantity,
+    CAST(NULL AS NUMERIC) AS parsed_unit_price,
     CAST(NULL AS STRING) AS src
   WHERE FALSE
   '''
@@ -264,6 +270,7 @@ SET orders_contract_ok_sql = IF(orders_contract_ok, 'TRUE', 'FALSE');
 SET items_contract_ok_sql = IF(items_contract_ok, 'TRUE', 'FALSE');
 SET dim_customers_key_ok_sql = IF(dim_customers_key_ok, 'TRUE', 'FALSE');
 SET dim_products_key_ok_sql = IF(dim_products_key_ok, 'TRUE', 'FALSE');
+SET as_of_date_sql = FORMAT("DATE '%t'", as_of_date);
 
 EXECUTE IMMEDIATE FORMAT(
     '''
@@ -538,7 +545,7 @@ c17 AS (
 ),
 c18 AS (
   SELECT 18 AS seq, 'Future OrderDate' AS chk, 'orders.OrderDate' AS col,
-         CASE WHEN %s THEN COUNTIF(parsed_date > CURRENT_DATE()) ELSE NULL END AS cnt,
+         CASE WHEN %s THEN COUNTIF(parsed_date > %s) ELSE NULL END AS cnt,
          (SELECT n FROM ob) AS tot,
          'MEDIUM' AS sev,
          CASE WHEN %s THEN 'Set to NULL during cleaning and exclude from validated orders' ELSE 'Skipped because orders wildcard contract is broken' END AS fix
@@ -586,7 +593,11 @@ c23 AS (
 ),
 c24 AS (
   SELECT 24 AS seq, 'Cents format suspicion' AS chk, 'items.LineNetAmount' AS col,
-         CASE WHEN %s THEN COUNTIF(parsed_amount > 1000 AND parsed_amount / 100 BETWEEN 1 AND 500) ELSE NULL END AS cnt,
+         CASE WHEN %s THEN COUNTIF(
+           (parsed_amount > 1000 AND parsed_amount / 100 BETWEEN 1 AND 500)
+           OR (parsed_quantity > 0 AND parsed_unit_price > 0
+               AND parsed_amount >= 10 * parsed_quantity * parsed_unit_price)
+         ) ELSE NULL END AS cnt,
          (SELECT n FROM ib) AS tot,
          'HIGH' AS sev,
          CASE WHEN %s THEN 'Normalise by dividing by 100 during cleaning when this pattern is detected' ELSE 'Skipped because items wildcard contract is broken' END AS fix
@@ -680,7 +691,7 @@ ORDER BY seq
     dim_customers_key_ok_sql,
     orders_contract_ok_sql, orders_contract_ok_sql,
     orders_contract_ok_sql, orders_contract_ok_sql,
-    orders_contract_ok_sql, orders_contract_ok_sql,
+    orders_contract_ok_sql, as_of_date_sql, orders_contract_ok_sql,
     orders_contract_ok_sql, orders_contract_ok_sql,
     items_contract_ok_sql, items_contract_ok_sql,
     items_contract_ok_sql, items_contract_ok_sql,

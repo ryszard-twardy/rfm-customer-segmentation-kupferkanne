@@ -19,9 +19,11 @@
 --            in step 03, so EDA and curated numbers reconcile exactly. Orders
 --            without item lines are excluded from value-based views (they
 --            remain visible in the frequency, recency, and basket views).
---            order_discount_pct is not applied, consistent with the curated
---            layer. Country is a customer attribute (v_dim_customers_std,
---            LEFT JOIN on customer_id); NULL country stays NULL.
+--            order_discount_pct is not applied again because line_net_amount
+--            is already net of it, so order value is the net order value,
+--            consistent with the curated layer. Country is a customer
+--            attribute (v_dim_customers_std, LEFT JOIN on customer_id); NULL
+--            country stays NULL.
 --            Rewritten against the post-migration snake_case staging schema.
 --
 -- See ADR-0003 (pipeline order: EDA before transform).
@@ -34,6 +36,8 @@
 --            of transaction sizes. Informs Monetary dimension binning in RFM.
 -- Reading:   P10/P25/P50/P75/P90/P99 give the shape of the distribution. A
 --            large gap between P90 and P99 indicates a long tail (whales).
+-- Method:    Percentiles are exact (PERCENTILE_CONT), rounded to the cent, so
+--            re-runs are deterministic.
 -- -----------------------------------------------------------------------------
 
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_order_value_distribution`
@@ -47,20 +51,41 @@ WITH order_values AS (
     INNER JOIN `kupferkanne-2026.sales.stg_items_validated` AS i
         ON o.order_id = i.order_id
     GROUP BY o.order_id
+),
+
+percentiles AS (
+    SELECT DISTINCT
+        ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.10') OVER (), 2) AS p10,
+        ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.25') OVER (), 2) AS p25,
+        ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.50') OVER (), 2) AS median,
+        ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.75') OVER (), 2) AS p75,
+        ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.90') OVER (), 2) AS p90,
+        ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.99') OVER (), 2) AS p99
+    FROM order_values
+),
+
+summary AS (
+    SELECT
+        MIN(order_value) AS min_value,
+        MAX(order_value) AS max_value,
+        ROUND(AVG(order_value), 2) AS mean_value,
+        COUNT(*) AS order_count
+    FROM order_values
 )
 
 SELECT
-    APPROX_QUANTILES(order_value, 100)[OFFSET(10)] AS p10,
-    APPROX_QUANTILES(order_value, 100)[OFFSET(25)] AS p25,
-    APPROX_QUANTILES(order_value, 100)[OFFSET(50)] AS median,
-    APPROX_QUANTILES(order_value, 100)[OFFSET(75)] AS p75,
-    APPROX_QUANTILES(order_value, 100)[OFFSET(90)] AS p90,
-    APPROX_QUANTILES(order_value, 100)[OFFSET(99)] AS p99,
-    MIN(order_value) AS min_value,
-    MAX(order_value) AS max_value,
-    ROUND(AVG(order_value), 2) AS mean_value,
-    COUNT(*) AS order_count
-FROM order_values;
+    p.p10,
+    p.p25,
+    p.median,
+    p.p75,
+    p.p90,
+    p.p99,
+    s.min_value,
+    s.max_value,
+    s.mean_value,
+    s.order_count
+FROM summary AS s
+LEFT JOIN percentiles AS p ON TRUE;
 
 -- -----------------------------------------------------------------------------
 -- 2. eda_order_value_outliers
@@ -70,6 +95,9 @@ FROM order_values;
 --            transactions.
 -- Reading:   Review outliers for plausibility. If artifacts, address in the
 --            cleaning layer. If legitimate, ensure RFM Monetary captures them.
+-- Method:    The threshold uses the same P99 expression as view 1: exact
+--            (PERCENTILE_CONT), rounded to the cent, so p99_threshold equals
+--            its p99 and re-runs are deterministic.
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_order_value_outliers`
 OPTIONS (description = 'Exploratory list of orders above the 99th-percentile value threshold, showing each order value as a multiple of P99, for outlier review.')  -- noqa: LT05
@@ -87,7 +115,7 @@ WITH order_values AS (
 ),
 
 p99_threshold AS (
-    SELECT APPROX_QUANTILES(order_value, 100)[OFFSET(99)] AS p99
+    SELECT DISTINCT ROUND(PERCENTILE_CONT(order_value, NUMERIC '0.99') OVER (), 2) AS p99
     FROM order_values
 )
 

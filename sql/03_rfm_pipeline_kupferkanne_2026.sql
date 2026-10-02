@@ -5,6 +5,8 @@
 --   1. Run Step 00.0 and 00.1 so audit and standardised lookup views exist.
 --   2. Run Step 01.0 and 01.1 so validated staging tables are ready.
 --   3. Run Step 02 (eda_*) so exploratory views inform design choices below.
+--   4. as_of_date must equal the value declared in Step 01.0; here it sets
+--      snapshot_date.
 --
 -- Purpose:
 --   Join the validated fact layer with standardised lookups, build an
@@ -20,8 +22,7 @@
 --     (see eda_pareto_concentration for 80/20 spend skew).
 -- ============================================================================
 
-DECLARE tz STRING DEFAULT 'Europe/Berlin';
-DECLARE run_date DATE DEFAULT CURRENT_DATE(tz);
+DECLARE as_of_date DATE DEFAULT DATE '2026-09-30';
 
 -- STEP 1: ORDER-LEVEL CURATED FACT --------------------------------------------
 DROP TABLE IF EXISTS `kupferkanne-2026.sales.sales_curated`;
@@ -109,7 +110,7 @@ scored AS (
 
 SELECT
     customer_id,
-    run_date AS snapshot_date,
+    as_of_date AS snapshot_date,
     (SELECT data_as_of_date FROM data_cutoff) AS data_as_of_date,
     last_order_date,
     recency_days,
