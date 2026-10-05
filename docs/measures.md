@@ -137,7 +137,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 5, 6, 7 |
 | Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2, 4, 5, 6 |
 | Customers at Risk | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), dim_Customer[Segment] IN {"At Risk", "Hibernating"}, NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 4 |
-| Total Orders | `SUM(dim_Customer[Order Count])` | # 0dp | 7 |
+| Total Orders | `[Distinct Orders]` | # 0dp | 7 |
 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 7 |
 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | – |
 | Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
@@ -166,6 +166,8 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 **Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand/category measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
 
 **`[Distinct Orders]` (Pages = 4):** order-grain distinct order count from `sales_curated[Order ID]`. Not slice-able by `dim_Product` – `sales_curated` has no relationship path to `dim_Product` in the single-direction star, so a product slice returns the unfiltered grand total. Bound on the Page 4 scatter; do not place on a product axis.
+
+**`[Total Orders]` (Pages = 7):** an alias of `[Distinct Orders]`, kept so the Page 7 cards and `[Avg Order Value]` keep their references. It counts orders at order grain in the current filter context, so `[Avg Order Value]` divides the revenue in that context by the orders in it; on Page 7 a month or order selection narrows both. Like `[Total Revenue]`, it ignores a `dim_Product` filter (the `[Distinct Orders]` caveat).
 
 **Weighted margin principle:** `Profit Margin %` uses `SUM(profit) / SUM(revenue)`, never `AVERAGE(margin_pct)`. Arithmetic mean of percentages misrepresents aggregate when orders have different sizes.
 

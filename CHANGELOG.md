@@ -36,6 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A fixed as-of date replaces the current date in the raw audit, cleaning and RFM scripts, so re-runs read the same shards and apply the same cut-off.
 - Discount bounds test fractions (above 1, not above 100); percentiles are exact (P99 263.70); duplicate rows resolve on an MD5 of the raw row instead of a random UUID.
 - The raw audit's shard checks select shards by the suffix the wildcard reads; before, they examined no shard and always passed.
+- `[Total Orders]` counts distinct orders in the current filter context instead of summing lifetime order counts from `dim_Customer`, so `[Avg Order Value]` divides period revenue by period orders; on the Customer Drillthrough cards both now follow a month or order selection. Unfiltered totals are unchanged (168,777 orders).
 
 ### Documentation
 

@@ -22,10 +22,10 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: f5bf0588-f124-4262-8ba2-497f9c4f00d1
 
-	/// Total order count, summed from dim_Customer[Order Count].
+	/// Orders in the current filter context, counted at order grain from sales_curated (the same count as [Distinct Orders]).
 	measure 'Total Orders' =
 			
-			SUM ( dim_Customer[Order Count] )
+			[Distinct Orders]
 		formatString: #,##0
 		displayFolder: 01 - Core KPIs
 		lineageTag: c588885a-88aa-4b8e-a349-0984f195d34b
