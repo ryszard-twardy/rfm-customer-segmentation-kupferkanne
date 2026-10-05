@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Discount bounds test fractions (above 1, not above 100); percentiles are exact (P99 263.70); duplicate rows resolve on an MD5 of the raw row instead of a random UUID.
 - The raw audit's shard checks select shards by the suffix the wildcard reads; before, they examined no shard and always passed.
 - `[Total Orders]` counts distinct orders in the current filter context instead of summing lifetime order counts from `dim_Customer`, so `[Avg Order Value]` divides period revenue by period orders; on the Customer Drillthrough cards both now follow a month or order selection. Unfiltered totals are unchanged (168,777 orders).
+- Revenue by Segment on the Executive Summary labels values in millions at two decimals, so At Risk and Hibernating no longer both read "€0.1M"; they read €0.11M and €0.06M.
 
 ### Documentation
 
