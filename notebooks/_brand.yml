@@ -1,6 +1,7 @@
 # Brand definition shared by the Quarto outputs (analytical notebook, executive
 # report, deck). Derived from the Power BI theme in theme/rfm_dashboard_theme.json
-# ("RFM Customer Segmentation - Palette C Muted Earth") and docs/architecture.md:30.
+# ("RFM Customer Segmentation - Palette C Muted Earth") and docs/architecture.md:30,
+# except the fonts.
 # Segment colours follow the Segment Color measure in docs/measures.md:659-665 and
 # dim_Segment[SegmentColor] in the semantic model. Schema: brand.yml as validated
 # by Quarto 1.9 (share/schema/definitions.yml, brand-single). The SVG logo is not
@@ -50,16 +51,15 @@ color:
 
 typography:
   fonts:
-    - family: Segoe UI
-      source: system
     - family: Lato
-      source: system
-  # Segoe UI is a system font. Pages readers without it fall back through the
-  # stack: Lato where installed, then sans-serif. No webfont is embedded: a
-  # Google-sourced font added about 10 MB of font data to each self-contained
-  # page, and SVG exhibits loaded as images cannot use page fonts anyway.
+      source: google
+      weight: [400, 700]
+      style: [normal, italic]
+  # Lato for body text and headings. The render embeds four Lato faces (400 and
+  # 700, normal and italic) in each self-contained page; headings use the
+  # 700 face. SVG exhibits loaded as images cannot use page fonts.
   base:
-    family: "Segoe UI, Lato, sans-serif"
+    family: "Lato, sans-serif"
   headings:
-    family: "Segoe UI, Lato, sans-serif"
-    weight: 600  # theme title text class: Segoe UI Semibold
+    family: "Lato, sans-serif"
+    weight: 700  # Lato Bold, as in the exhibit headings

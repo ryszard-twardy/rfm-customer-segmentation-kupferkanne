@@ -44,13 +44,13 @@ insight about any real business.
 - **The top 20% of customers generate 71% of revenue** (the top decile alone
   carries 53%) – value-based segmentation is justified before a single
   segment is built.
-- **Order values are hard right-skewed** (median EUR 35 vs mean EUR 51;
-  1,679 orders sit beyond the P99 of EUR 268, the largest at 6.3x) –
+- **Order values are hard right-skewed** (median EUR 35 vs mean EUR 50;
+  1,688 orders sit beyond the P99 of EUR 264, the largest at 3.8 times it) –
   Monetary scoring must be quantile-based, not mean-based.
 - **Only 26% of customers are single-order** – the Frequency dimension has
   enough spread for NTILE(5) quintiles to separate cleanly.
 - **Germany carries 57% of revenue while average order value is flat
-  (EUR 50 +/- 2%) across all nine markets** – market size, not basket
+  (EUR 50 +/- 3%) across all nine markets** – market size, not basket
   economics, differentiates countries.
 :::
 
@@ -141,7 +141,7 @@ def show(df, labels=LABELS, percent=(), currency_int=(), ratio=()):
 
 
 # Charts use the brand type stack from _brand.yml, as the win-back exhibits do.
-# Lato is listed after Segoe UI; mute matplotlib's per-text warning when it is
+# Lato heads the stack; mute matplotlib's per-text warning when it is
 # not installed.
 brand = yaml.safe_load(Path("_brand.yml").read_text(encoding="utf-8"))
 FONT_STACK = [f.strip() for f in brand["typography"]["base"]["family"].split(",")]
@@ -163,7 +163,7 @@ plt.rcParams.update({
 ```{python}
 #| label: tbl-reconciliation
 #| tbl-cap: "Headline totals derived read-only from sales_curated against the KPI baseline."
-BASELINE = {"Revenue": 8_531_365.52, "Orders": 168_777, "Customers": 14_967}
+BASELINE = {"Revenue": 8_476_200.74, "Orders": 168_777, "Customers": 14_967}
 
 cur = client.query(
     f"""
@@ -305,7 +305,7 @@ Scores.
 ```{python}
 #| label: fig-monetary
 #| fig-cap: "Order-value percentiles (EUR). The gap between P90 and P99 is the long tail."
-#| fig-alt: "Bar chart of order value at percentiles 10, 25, 50, 75, 90 and 99, rising steeply from about 11 euros at P10 to 268 euros at P99."
+#| fig-alt: "Bar chart of order value at percentiles 10, 25, 50, 75, 90 and 99, rising steeply from about 11 euros at P10 to 264 euros at P99."
 dist = view("eda_order_value_distribution").iloc[0]
 pct_labels = ["p10", "p25", "median", "p75", "p90", "p99"]
 pct_values = [float(dist[c]) for c in pct_labels]
@@ -324,9 +324,9 @@ out = out.sort_values("order_value", ascending=False).head(5)
 show(out[["order_id", "country", "order_value", "p99_threshold", "multiple_of_p99"]], ratio=["multiple_of_p99"])
 ```
 
-The shape is hard right-skew: median EUR 35.03 against a mean of EUR 50.55,
-P90 at EUR 105 and P99 at EUR 267.54, with a maximum of EUR 1,694 – 6.3x the
-P99 threshold. 1,679 orders (just under 1%) sit beyond P99. Inspected, the
+The shape is hard right-skew: median EUR 35.01 against a mean of EUR 50.22,
+P90 at EUR 105 and P99 at EUR 263.70, with a maximum of EUR 997.23 – 3.8 times the
+P99 threshold. 1,688 orders (about 1%) sit beyond P99. Inspected, the
 tail reads as legitimate high-value or B2B-style baskets rather than
 artifacts: values are plausible multiples, spread across markets, and the
 cents-format errors that would fake such a tail were already normalised in
@@ -438,8 +438,8 @@ show(geo[["country", "order_count", "customer_count", "avg_order_value",
 
 Germany dominates with 56.8% of revenue; the top three markets (DE, AT, PL)
 carry 77%. The more interesting observation is what does *not* vary: average
-order value sits in a band from EUR 49.72 (UK) to EUR 51.43 (SE) – under
-3.5% spread across nine markets. Market differences are volume differences,
+order value sits in a band from EUR 49.57 (UK) to EUR 51.43 (SE) – under
+4% spread across nine markets. Market differences are volume differences,
 not basket-economics differences, which means country is a scale attribute
 for segmentation, not a behavioural one – RFM scores need no per-country
 normalisation. One semantic note inherited from the curated layer: country
@@ -471,13 +471,13 @@ ax.set_ylim(0, 105)
 plt.show()
 ```
 
-The top decile of customers generates 53.4% of revenue; the top two deciles
-together, 71.1%. The canonical 80/20 rule does not quite hold – the top 20%
+The top decile of customers generates 53.3% of revenue; the top two deciles
+together, 71.0%. The canonical 80/20 rule does not quite hold – the top 20%
 carry 71%, and reaching 80% takes the top three deciles – but the strategic
 conclusion survives the nuance: revenue concentration is steep enough that
 value-tiered treatment (retention spend on Champions, win-back on
 high-value At Risk) is justified, while the curve is shallow enough that the
-bottom half is not economically irrelevant (it still carries ~10%). This
+bottom half is not economically irrelevant (it still carries about 7%). This
 view validated the segmentation *ex ante*, before any segment existed; the
 dashboard's revenue-concentration chart on Page 5 monitors the same curve
 *ex post*, per segment, as the data evolves. The two are complements, not
@@ -533,13 +533,13 @@ an EDA-only data-quality check.
 
 | Observation | Design decision | ADR |
 |:---|:---|:---|
-| Right-skewed order values (median EUR 35 vs mean EUR 51; P99 EUR 268) | Quantile-based Monetary scoring; whales retained, not trimmed | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
+| Right-skewed order values (median EUR 35 vs mean EUR 50; P99 EUR 264) | Quantile-based Monetary scoring; whales retained, not trimmed | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 | Only 26% of customers are single-order | Frequency kept as a full NTILE(5) dimension, not a repeat-buyer flag | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 | Bounded panel ending March 2026 | Recency anchored on `MAX(order_date)`, not `CURRENT_DATE()` | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 | Top 20% of customers carry 71% of revenue | Value-tiered segment actions ex ante; Page 5 Pareto monitors ex post | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 | Findings needed *before* transform design | Pipeline order: audit, clean, validate, **EDA**, transform | [0003](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0003-pipeline-order-eda-before-transform.md) |
 | 0.65% declared-vs-actual mismatch; 404 itemless orders | Seeded DQ issues give cleaning real work; residue quantified, not hidden | [0008](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0008-synthetic-data-with-realistic-quality-issues.md) |
-| Flat AOV (EUR 50 +/- 2%) across nine markets | No per-country normalisation of RFM scores | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
+| Flat AOV (EUR 50 +/- 3%) across nine markets | No per-country normalisation of RFM scores | [0006](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/adr/0006-rfm-segmentation-with-ntile.md) |
 
 : Each observation on this page and the design decision it drove. {#tbl-synthesis}
 
@@ -575,8 +575,9 @@ the rendered report needs no credentials. To re-render:
 2. **Python environment** (covered by the manifest): `uv sync` at the repo
    root reproduces the full environment (`pyproject.toml` + `uv.lock`).
 3. **Render** (PowerShell, from the repo root). The third command renders the
-   win-back exhibits page and rewrites `docs/img/exhibits/`; it needs Segoe UI
-   or Lato installed, or its font check stops the render:
+   win-back exhibits page and rewrites `docs/img/exhibits/`; it needs Lato
+   installed, or its font check stops the render. Both renders fetch Lato from
+   Google Fonts to embed it:
 
 ```powershell
 $env:QUARTO_PYTHON = ".venv\Scripts\python.exe"

@@ -20,7 +20,6 @@ execute:
 #| label: setup
 import base64
 import html
-import logging
 import math
 import re
 from pathlib import Path
@@ -77,8 +76,8 @@ HEADING_E1 = ("A quarter of scored customers sit in At Risk or Hibernating, "
               "and their lifetime spend is 2% of the revenue base")
 HEADING_E2 = ("The playbook gives the deeper discount to the thinner margin: after its offer "
               "At Risk keeps 37 points of order value, Hibernating 27")
-HEADING_E3 = ("At the playbook's rates, each 1,000 EUR of discount retains 2,483 EUR of contribution "
-              "in At Risk, against 1,334 EUR in Hibernating")
+HEADING_E3 = ("At the playbook's rates, each 1,000 EUR of discount retains 2,465 EUR of contribution "
+              "in At Risk, against 1,335 EUR in Hibernating")
 FONT_STACK = [f.strip() for f in brand["typography"]["base"]["family"].split(",")]
 NAMED_FONTS = [f for f in FONT_STACK if f != "sans-serif"]
 
@@ -241,7 +240,7 @@ CATEGORY_GUTTER_PX = math.ceil(max(
 PLOT_LEFT_PX = TEXT_LEFT_PX + CATEGORY_GUTTER_PX
 LAYOUT = []  # per variant: plot-area edges and text-column anchors, checked against the grid
 mpl.rcParams.update({
-    "svg.fonttype": "none",
+    "svg.fonttype": "path",  # text as Lato glyph outlines: viewers need no installed font
     "svg.hashsalt": "kupferkanne-exhibits",  # fixed element ids: identical SVG bytes on every render
     "font.family": FONT_STACK,
     "font.sans-serif": NAMED_FONTS,
@@ -265,16 +264,20 @@ mpl.rcParams.update({
     "savefig.facecolor": "none",
     "savefig.transparent": True,
 })
-# The stack lists Lato after Segoe UI, so matplotlib logs a findfont warning per text layout
-# whenever Lato is not installed. Mute that log and assert the resolved family instead:
-# matplotlib must lay out the exhibits and rasterise the PNGs in a brand face, not the DejaVu
-# fallback. The SVGs keep live text, so on the page the viewer's installed fonts decide.
-logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
-RESOLVED_FONT = font_manager.findfont(font_manager.FontProperties(family=FONT_STACK))
-assert font_manager.get_font(RESOLVED_FONT).family_name in NAMED_FONTS, RESOLVED_FONT
-# Live SVG text keeps the x position matplotlib computed with the brand face, so a viewer
-# without Segoe UI or Lato draws it wider from the same anchor. Clearances are measured with
-# DejaVu Sans, the widest common fallback, and must leave MIN_GAP_PX between neighbours.
+# The exhibits draw text at 400 and headings and the E3 gap label at 700. matplotlib must lay
+# them out and rasterise the PNGs in a brand face, not the DejaVu fallback. The SVGs carry text
+# as glyph paths, so viewers see Lato whatever fonts they have.
+# Guard: each weight must resolve to the Lato face of that weight. findfont substitutes the
+# nearest weight without error, so the check reads the resolved file's own OS/2 weight class.
+# Without Lato, findfont raises and the render stops.
+for weight in (400, 700):
+    RESOLVED_FONT = font_manager.findfont(font_manager.FontProperties(family=NAMED_FONTS, weight=weight),
+                                          fallback_to_default=False)
+    resolved_face = font_manager.get_font(RESOLVED_FONT)
+    assert resolved_face.family_name in NAMED_FONTS, (weight, RESOLVED_FONT)
+    assert resolved_face.get_sfnt_table("OS/2")["usWeightClass"] == weight, (weight, RESOLVED_FONT)
+# Clearances are measured with DejaVu Sans, the widest common fallback, and must leave
+# MIN_GAP_PX between neighbours.
 MIN_GAP_PX = 8
 TEXT_TO_PATH = TextToPath()
 
@@ -295,13 +298,13 @@ def fallback_prop(text):
                                        weight=text.get_fontweight())
 
 
-def fallback_box(text, renderer) -> tuple:
-    """Box (x0, y0, x1, y1), in canvas px, of a text drawn in DejaVu Sans from the same anchor:
+def anchored_box(text, renderer, prop) -> tuple:
+    """Box (x0, y0, x1, y1), in canvas px, of a text set in `prop` from the same anchor:
     a left-aligned text grows right, a right-aligned one grows left, a centred one both ways."""
     box = text.get_window_extent(renderer)
     fig = text.figure
     x0, x1 = px(fig, box.x0), px(fig, box.x1)
-    width = text_width(text.get_text(), fallback_prop(text))
+    width = text_width(text.get_text(), prop)
     align = text.get_horizontalalignment()
     if align == "left":
         x1 = x0 + width
@@ -310,6 +313,17 @@ def fallback_box(text, renderer) -> tuple:
     else:
         x0, x1 = (x0 + x1 - width) / 2, (x0 + x1 + width) / 2
     return x0, px(fig, box.y0), x1, px(fig, box.y1)
+
+
+def fallback_box(text, renderer) -> tuple:
+    """The text's box in DejaVu Sans, the widest fallback, from the same anchor."""
+    return anchored_box(text, renderer, fallback_prop(text))
+
+
+def drawn_box(text, renderer) -> tuple:
+    """The text's box as the SVG draws it: path-mode text is laid out with unhinted glyph
+    widths in its own font, which can run a few px wider than the on-screen layout box."""
+    return anchored_box(text, renderer, text.get_fontproperties())
 
 
 def fallback_right(text, renderer) -> float:
@@ -415,7 +429,7 @@ def canvas(title: str, footer: str, rows, subtitle: str | None = None, embedded:
     the heading in; the embedded variant has no heading band: the header block and the
     top of the axes move up so the content starts TOP_MARGIN_PX below the edge."""
     fig = plt.figure(figsize=(W / 72, H / 72))
-    lines = wrap_heading(title, 22, 600)
+    lines = wrap_heading(title, 22, 700)
     assert len(lines) <= 2, title
     header_top = SUBTITLE_TOP if subtitle else LEGEND_TOP
     shift = (1 - TOP_MARGIN_PX / H) - header_top if embedded else 0.0
@@ -424,7 +438,7 @@ def canvas(title: str, footer: str, rows, subtitle: str | None = None, embedded:
     left = TEXT_LEFT_PX / W
     anchored, heading = [], None
     if not embedded:
-        heading = fig.text(left, 0.955, "\n".join(lines), fontsize=22, fontweight=600,
+        heading = fig.text(left, 0.955, "\n".join(lines), fontsize=22, fontweight=700,
                            va="top", ha="left", linespacing=1.25)
         anchored.append(heading)
     if subtitle:
@@ -451,12 +465,16 @@ def finish_axes(variant) -> None:
     labels[-1].set_horizontalalignment("right")
 
 
-def text_boxes(fig, renderer) -> list:
+def text_boxes(fig, renderer, drawn: bool = False) -> list:
     """(text, DejaVu Sans box) for every non-empty text on the figure: figure texts, legend
-    entries, axes annotations, tick labels and the x-axis label."""
+    entries, axes annotations, tick labels and the x-axis label. With drawn=True, the box as
+    drawn in the brand face, which every viewer sees: the SVGs carry Lato glyph paths and the
+    PNGs are rasterised in Lato."""
     texts = list(fig.texts) + [t for legend in fig.legends for t in legend.get_texts()]
     for ax in fig.axes:
         texts += ax.texts + ax.get_xticklabels() + ax.get_yticklabels() + [ax.xaxis.label]
+    if drawn:
+        return [(t.get_text(), drawn_box(t, renderer)) for t in texts if t.get_text()]
     return [(t.get_text(), fallback_box(t, renderer)) for t in texts if t.get_text()]
 
 
@@ -470,12 +488,12 @@ GRID_CLEAR_PX = 3  # a gridline stops this far short of a text box
 def draw_grid(variant) -> None:
     """Vertical gridlines at the major x ticks, broken wherever they would run through a
     text: the canvas is transparent, so a label background would show as a patch on the
-    darker page surfaces. The breaks use DejaVu Sans boxes, the widest fallback. Each drawn
+    darker page surfaces. The breaks use the boxes as drawn, so each sits beside its text. Each drawn
     segment is kept in variant.lines, with the visible spines, for the crossing gate."""
     ax, fig = variant.ax, variant.fig
     fig.draw_without_rendering()
     renderer = fig.canvas.get_renderer()
-    boxes = text_boxes(fig, renderer)
+    boxes = text_boxes(fig, renderer, drawn=True)
     axes_box = ax.get_window_extent(renderer)
     bottom, top = px(fig, axes_box.y0), px(fig, axes_box.y1)
     to_axes = ax.transAxes.inverted()
@@ -526,7 +544,8 @@ def check_layout(stem: str, variant) -> None:
     the column in the brand face (in DejaVu Sans it cannot fit two lines and may run into the
     right margin, still on the canvas). No two text boxes, nor a text box and a mark listed
     in variant.boxes, overlap; no gridline or spine in variant.lines crosses a text box. Text
-    boxes take DejaVu Sans widths, so the gates hold for a viewer without the brand fonts."""
+    boxes take DejaVu Sans widths, wider than the Lato the exhibits draw; gridlines are held to
+    the boxes as drawn, which their breaks follow."""
     fig = variant.fig
     fig.draw_without_rendering()
     renderer = fig.canvas.get_renderer()
@@ -552,8 +571,9 @@ def check_layout(stem: str, variant) -> None:
         for b, box_b in boxes[i + 1:]:
             assert not overlaps(box_a, box_b), (stem, a, b)
     assert any(name.startswith("gridline") for name, _ in variant.lines), stem
+    drawn = text_boxes(fig, renderer, drawn=True)
     for line, line_box in variant.lines:
-        for name, box in texts:
+        for name, box in (drawn if line.startswith("gridline") else texts):
             assert not overlaps(line_box, box), (stem, line, name)
 
 
@@ -564,7 +584,7 @@ def legend_band(variant, handles):
     legend = variant.fig.legend(handles=handles, loc="upper left",
                                 bbox_to_anchor=(TEXT_LEFT_PX / W, variant.legend_top),
                                 ncol=len(handles), frameon=False, borderpad=0, borderaxespad=0,
-                                fontsize=13, handlelength=1.6, columnspacing=4.0)
+                                fontsize=13, handlelength=1.6, columnspacing=4.5)
     variant.fig.draw_without_rendering()
     renderer = variant.fig.canvas.get_renderer()
     texts = legend.get_texts()
@@ -596,6 +616,17 @@ def save_svg(fig, path: Path, embedded: bool, title: str, desc: str) -> str:
     return drawing
 
 
+def drawn_lines(drawing: str) -> list:
+    """Text lines matplotlib drew into an SVG in path mode: the bodies of the XML comments it
+    writes beside each line's glyphs, with its escaping reversed (`- -` read as `--`, then `&lt;`,
+    `&gt;` and `&amp;`). A drawn `- -` would also read as `--`; no heading contains one."""
+    lines = []
+    for body in re.findall(r"<!-- (.*?) -->", drawing, flags=re.S):
+        body = re.sub(r"- (?=-)", "-", body)
+        lines.append(body.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&"))
+    return lines
+
+
 def render(stem: str, title: str, desc: str, footer: str, rows, draw, subtitle: str | None = None):
     """Draw the exhibit once per variant, check its layout and save SVG and PNG for each.
     Returns what `draw` returned for the titled variant; both variants plot the same values."""
@@ -610,7 +641,8 @@ def render(stem: str, title: str, desc: str, footer: str, rows, draw, subtitle: 
         drawing = save_svg(variant.fig, path.with_suffix(".svg"), embedded, title, desc)
         variant.fig.savefig(path.with_suffix(".png"), format="png", dpi=144, transparent=True)
         plt.close(variant.fig)
-        assert (variant.title_line in drawing) == (not embedded), path
+        # In path mode each drawn line is an XML comment by its glyphs: no heading, or no comments, fails the titled half.
+        assert (variant.title_line in drawn_lines(drawing)) == (not embedded), path
     return results[0]
 
 
@@ -1184,8 +1216,9 @@ def draw_e3(variant):
         ax.text(row.contribution_per_1000 + 30, y, fmt_eur(row.contribution_per_1000, 0),
                 va="center", ha="left", fontsize=14)
     ax.plot([values[1], values[0]], [0.5, 0.5], color=LABEL, linewidth=1, linestyle=(0, (2, 3)), zorder=2)
-    gap = ax.text((values[0] + values[1]) / 2, 0.55, f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f} times)",
-                  va="bottom", ha="center", fontsize=15, fontweight=600)
+    gap = ax.text((values[0] + values[1]) / 2, 0.55,
+                  f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f} times as much) at the playbook's rates",
+                  va="bottom", ha="center", fontsize=15, fontweight=700)
     category_axis(ax, list(per_1000["segment"]))
     ax.set_ylim(-0.7, 1.7)
     ax.set_xlim(0, 3000)
@@ -1204,6 +1237,12 @@ def draw_e3(variant):
     upper, lower = variant.boxes[-2][1], variant.boxes[-1][1]
     _, label_y0, _, label_y1 = fallback_box(gap, renderer)
     assert upper[1] - label_y1 >= MIN_GAP_PX and label_y0 - lower[3] >= MIN_GAP_PX, (upper, lower, label_y0, label_y1)
+    # Guard: the gap label as drawn (its Lato extent) stays inside its band: MIN_GAP_PX clear of
+    # both bars (the assert above, on the same vertical extent) and within the plot area (below).
+    # check_layout also holds its wider DejaVu Sans box to the text column.
+    drawn = gap.get_window_extent(renderer)
+    x0, x1 = px(fig, drawn.x0), px(fig, drawn.x1)
+    assert PLOT_LEFT_PX <= x0 and x1 <= PLOT_RIGHT_PX, ("E3 gap label outside the plot area", x0, x1)
 
 
 E3_DESC = (
