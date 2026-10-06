@@ -25,6 +25,7 @@
 DECLARE as_of_date DATE DEFAULT DATE '2026-09-30';
 
 -- STEP 1: ORDER-LEVEL CURATED FACT --------------------------------------------
+-- DROP lets a later PARTITION BY through: CREATE OR REPLACE rejects a different partitioning spec.
 DROP TABLE IF EXISTS `kupferkanne-2026.sales.sales_curated`;
 CREATE OR REPLACE TABLE `kupferkanne-2026.sales.sales_curated`
 CLUSTER BY customer_id, order_id AS
@@ -70,6 +71,7 @@ GROUP BY
     o.source_month;
 
 -- STEP 2: CUSTOMER-LEVEL RFM SNAPSHOT -----------------------------------------
+-- DROP lets a later PARTITION BY through: CREATE OR REPLACE rejects a different partitioning spec.
 DROP TABLE IF EXISTS `kupferkanne-2026.sales.rfm_customer_segments`;
 CREATE OR REPLACE TABLE `kupferkanne-2026.sales.rfm_customer_segments`
 CLUSTER BY rfm_segment, customer_id AS
@@ -86,6 +88,7 @@ customer_rfm AS (
         COUNT(DISTINCT order_id) AS frequency_orders,
         ROUND(SUM(order_value), 2) AS monetary_value,
         ROUND(SUM(order_profit), 2) AS total_profit,
+        -- revenue-weighted despite the avg_ prefix: SUM(order_profit) / SUM(order_value)
         ROUND(SAFE_DIVIDE(SUM(order_profit), SUM(order_value)), 4) AS avg_margin_pct,
         ROUND(AVG(order_value), 2) AS avg_order_value,
         SUM(total_units) AS total_units,

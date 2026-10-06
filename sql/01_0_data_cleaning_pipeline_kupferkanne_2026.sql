@@ -18,10 +18,11 @@
 --      value (quantity * unit_price). Line amounts are net of the order
 --      discount (at most 0.55 in the source), so a euro line sits at or
 --      below 1.0 times its list line value and a cents line at least 45 times
---      (100 x (1 - 0.55)); the 10x threshold sits between the two. On the
---      current source, after the first test no line sits between 1.0x and
---      54.4x, and the second test catches 69 lines in 67 orders whose cents
---      amounts (429 to 993) stay under the 1000 guard.
+--      (100 x (1 - 0.55)); a threshold of 10 times sits between the two. On
+--      the current source, after the first test no line sits between 1.0
+--      and 54.4 times its list line value, and the second test catches 69
+--      lines in 67 orders whose cents amounts (429 to 993) stay under the
+--      1000 guard.
 --   3. As-of date: one constant, as_of_date, fixes both the shard window
 --      (the last closed month before it) and the future-date cut-off, so a
 --      later re-run reads the same shard window and applies the same cut-off. The

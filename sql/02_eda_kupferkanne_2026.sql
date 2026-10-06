@@ -215,7 +215,10 @@ ORDER BY year_month;
 -- Purpose:   Distribution of order counts per customer. Validates whether the
 --            RFM Frequency dimension has enough spread for NTILE(5).
 -- Reading:   If 80%+ of customers have exactly 1 order, Frequency loses
---            signal. If spread is healthy, NTILE quintiles separate cleanly.
+--            signal. NTILE(5) cuts by row position, not value, so equal order
+--            counts can fall in different quintiles (the customer_id tie-break
+--            in Step 03 only fixes which customers): one-order customers fill
+--            quintile 1 and spill into quintile 2.
 -- -----------------------------------------------------------------------------
 CREATE OR REPLACE VIEW `kupferkanne-2026.sales.eda_customer_frequency_distribution`
 OPTIONS (description = 'Exploratory distribution of order counts per customer, used to validate spread for the RFM Frequency quintiles.')  -- noqa: LT05
