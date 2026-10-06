@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The raw audit's shard checks select shards by the suffix the wildcard reads; before, they examined no shard and always passed.
 - `[Total Orders]` counts distinct orders in the current filter context instead of summing lifetime order counts from `dim_Customer`, so `[Avg Order Value]` divides period revenue by period orders; on the Customer Drillthrough cards both now follow a month or order selection. Unfiltered totals are unchanged (168,777 orders).
 - Revenue by Segment on the Executive Summary labels values in millions at two decimals, so At Risk and Hibernating no longer both read "€0.1M"; they read €0.11M and €0.06M.
+- The `Revenue Month` key of `v_revenue_new_returning` is now hidden, in line with the documented key policy; no visual binds it.
 
 ### Documentation
 

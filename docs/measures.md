@@ -94,22 +94,22 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema UX (Russo + Ferrari, *Definitive Guide to DAX*; Kimball, *Data Warehouse Toolkit*), keys that exist only to wire relationships are hidden; keys that double as user-facing attributes stay visible on their dimension.
 
 **Why (three rationales):**
-1. **Remove plumbing from the Fields pane** – `Customer ID` and `Product ID` are surrogate keys users never filter on directly (they filter by `Full Name`, `Country`, `Brand`, `Product Category`). Both are hidden on every table that carries them, fact and dimension alike. Keys that are themselves attributes – `Order Date` → `dim_Date[Date]`, `Segment` → `dim_Segment[Segment]` – stay visible so users can use them.
+1. **Remove plumbing from the Fields pane** – `Customer ID` and `Product ID` are surrogate keys users do not filter on directly (they filter by `Full Name`, `Country`, `Brand`, `Product Category`); the Page 7 drillthrough is the exception. Both are hidden on every fact table that carries them, and `Product ID` also on `dim_Product`; `dim_Customer[Customer ID]` stays visible as the key the drillthrough filters on. Keys that are themselves attributes – `Order Date` → `dim_Date[Date]`, `Segment` → `dim_Segment[Segment]` – stay visible so users can use them.
 2. **Enforce correct filter propagation** – in a single-direction star, filters flow from dimensions to facts. Dragging an FK from a fact creates a one-table-only filter context. Hiding the fact-side FK forces use of the dimension column, so a `dim_Customer` filter propagates to both `sales_curated` and `v_items_for_bi`.
 3. **Block implicit COUNT measures** – FK columns are Int/Text/DateTime. Hiding them pairs with the `SummarizeBy = None` policy and the force-explicit-measure pattern to fully block implicit aggregations.
 
-**Hidden – relationship & degenerate keys (retopologised in the single-direction refactor):**
+**Hidden – relationship & degenerate keys:**
 
 | Table | Hidden key column(s) | Class |
 |---|---|---|
-| `dim_Customer` | `Customer ID` | PK / target of two fact FKs |
 | `dim_Product` | `Product ID` | PK / target of `v_items_for_bi` FK |
 | `sales_curated` | `Customer ID`, `Order Date` | FK → `dim_Customer`, `dim_Date` |
 | `sales_curated` | `Order ID` | degenerate dimension (no relationship) |
 | `v_items_for_bi` | `Customer ID`, `Product ID`, `Order Date` | FK → `dim_Customer`, `dim_Product`, `dim_Date` |
 | `v_items_for_bi` | `Order ID` | degenerate dimension (inactive relationship removed) |
+| `v_revenue_new_returning` | `Revenue Month` | FK → `dim_Date` |
 
-Visible keys: `dim_Date[Date]` and `dim_Segment[Segment]` – user-facing attributes, not pure plumbing.
+Visible keys: `dim_Date[Date]`, `dim_Segment[Segment]` and `dim_Customer[Segment]` – user-facing attributes, not pure plumbing – and `dim_Customer[Customer ID]`, the drillthrough key.
 
 **RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `M Score`, `Health Score`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve source columns regardless of visibility); `R Score` and `F Score` are now visible (draggable score axes for the Page 5 RFM heatmap). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do `Recency Days` and the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
 
@@ -126,7 +126,7 @@ Four fact-source value columns are hidden so users reach them only through the c
 
 These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]`, `[Line Profit]`, which reference the columns explicitly in DAX.
 
-**Total hidden: 21 columns model-wide** – 18 deliberately managed (9 relationship/degenerate keys, 4 fact-source value columns, 3 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`)), plus 3 Power BI auto-generated system columns (the `_Measures` container column and the two `RFM Score Selector` field-parameter columns).
+**Total hidden: 21 columns model-wide** – 18 deliberately managed (9 relationship/degenerate keys, 4 fact-source value columns, 3 RFM payload columns on `dim_Customer`, 1 sort helper (`dim_Segment[SortOrder]`), 1 closed-month flag (`dim_Date[Is Closed Month]`)), plus 3 helper columns (the `_Measures` placeholder column and the two `RFM Score Selector` field-parameter columns).
 
 ---
 
