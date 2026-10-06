@@ -1,8 +1,8 @@
 # Brand definition shared by the Quarto outputs (analytical notebook, executive
 # report, deck). Derived from the Power BI theme in theme/rfm_dashboard_theme.json
-# ("RFM Customer Segmentation - Palette C Muted Earth") and docs/architecture.md:30,
-# except the fonts.
-# Segment colours follow the Segment Color measure in docs/measures.md:659-665 and
+# ("RFM Customer Segmentation – Palette C Muted Earth") and the Theme row in
+# docs/architecture.md, except the fonts.
+# Segment colours follow the Segment Color measure in docs/measures.md and
 # dim_Segment[SegmentColor] in the semantic model. Schema: brand.yml as validated
 # by Quarto 1.9 (share/schema/definitions.yml, brand-single). The SVG logo is not
 # referenced: its colour (#3c2415) sits outside this palette.
@@ -25,7 +25,7 @@ color:
     c8: "#B8916A"
     c9: "#9DAE96"
     c10: "#7A6E6E"
-    # Segment colours (docs/measures.md:659-664) and the fallback (:665).
+    # Segment colours and the fallback follow the Segment Color measure in docs/measures.md.
     champions: "#4A7AA0"
     loyal_customers: "#7BA8B8"
     potential_loyalists: "#8FA87E"

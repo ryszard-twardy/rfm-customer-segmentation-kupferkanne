@@ -4,9 +4,8 @@ A reusable safety net for the Kupferkanne pipeline. `verify` re-runs the
 canonical KPI queries and asserts zero drift against the committed baseline.
 `baseline` shows how the figures moved against it, and only
 `baseline --accept --reason` writes a new baseline. Use it before and after any
-change that could move the numbers (for example the snake_case rename in
-issue #9) to prove the pipeline still produces identical figures, or to record
-why they moved.
+change that could move the numbers (for example a column rename) to prove the
+pipeline still produces identical figures, or to record why they moved.
 
 ## What it checks
 

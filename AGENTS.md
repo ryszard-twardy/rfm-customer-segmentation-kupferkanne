@@ -40,6 +40,6 @@ Recorded as ADRs in `docs/adr/`.
 - **Typography**: en-dash `–` (never em-dash `U+2014`), ASCII quotes only, backticks for code/paths/identifiers.
 - **Commit messages**: no tool or session attribution trailers (co-author lines, generated-with lines, session or conversation URLs), though issue trailers such as `Closes #N` are unaffected; the subject line is scanned for em-dash separately, since file-level typography scans do not read commit messages.
 - **Filesystem**: dot-prefix everywhere; underscore-prefixed directory names are legacy and must not appear.
-- **Report/model edits**: visual and report JSON edits are scripted; see `scripts/`.
+- **Report/model edits**: visual and report JSON edits are scripted, not made by hand; no report-edit script is tracked in this repository, and the Tabular Editor batch scripts for the model live in `tools/`.
 - **Backups**: `$env:PROJECTS_ROOT\.backups\rfm-customer-segmentation-kupferkanne\` (outside repo, per-machine).
 - **Cross-machine**: this repo syncs via git.

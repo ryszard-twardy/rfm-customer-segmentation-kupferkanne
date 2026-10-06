@@ -45,7 +45,7 @@ System.Func<string, bool> IsPercent = (n) =>
     n.Contains("Share");
 
 // Text-returning measure indicators
-// Examples: "Top Brand Name", "Top Category Name", "Health Indicator",
+// Examples: "Top Brand Name", "Customer RFM Label", "Health Indicator",
 //           "R/F/M Labels", "Subtitle Page *", "Revenue Trend Chart Title",
 //           "Dynamic KPI Label", "Segment Color"
 System.Func<string, bool> IsTextName = (n) =>

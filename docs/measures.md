@@ -2,7 +2,7 @@
 ## Kupferkanne – 107 DAX Measures (106 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 
-> Source of truth for all DAX measures. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
+> Reference catalogue for the DAX measures; the TMDL files under `pbip/` are the source of truth, and this page is synced to them by hand. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
 
 ---
 
@@ -11,7 +11,7 @@
 | Power BI Table | BigQuery Object | Granularity | Key Columns |
 |---|---|---|---|
 | **sales_curated** | `sales_curated` (TABLE) | **1 row per order (~169K)** | Order ID, Customer ID, Order Date, Order Value, Order Cost, Order Profit, Order Margin %, Dominant Category, Dominant Brand |
-| **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~275K)** | Order ID, Product ID, Customer ID, Order Date, Quantity, Line Net Amount, Line Profit, Line Margin % |
+| **v_items_for_bi** | `v_items_for_bi` (VIEW) | **1 row per order line (~273K)** | Order ID, Product ID, Customer ID, Order Date, Quantity, Line Net Amount, Line Profit, Line Margin % |
 | dim_Customer | `v_dim_customers_for_bi` (VIEW) | 1 row per customer | Customer ID, Full Name, Email, Country, Segment, Recency Days, Order Count, Total Spend, R Score, F Score, M Score, Health Score, Action |
 | dim_Product | `v_dim_products_std` (VIEW) | 1 row per product | Product ID, Product Name, Brand, Margin % |
 | dim_Date | Power Query (M) calendar | 1 row per day | Date, Year, Month, Year-Month, Start of Week/Month/Quarter/Year |
@@ -64,7 +64,7 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 
 **Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The BPA "Provide format string for measures" rule currently reports 53 flags, all intentional – see the coverage note above.
 
-**BPA accepted exception – percentage decimals.** The BPA rule "Format string for percentages should show one decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
+**BPA accepted exception – percentage decimals.** The BPA rule "Percentages should be formatted with thousands separators and 1 decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
 
 ### Column Behavior: SummarizeBy = None
 
@@ -72,7 +72,7 @@ Per BPA rule **"Do not summarize numeric columns"** and the force-explicit-measu
 
 **Why:** implicit aggregations have no `FormatString`, no documentation, no name. They drift silently as schemas evolve. Forcing explicit measures keeps the semantic layer honest and visible in the Fields pane.
 
-**Scope – 38 columns (applied via `tools/format_summarize_by_batch.csx`):**
+**Scope – 38 columns (32 via `tools/format_summarize_by_batch.csx`; the 6 on `v_cohort_retention` and `v_revenue_new_returning` set when those views were imported):**
 
 | Table | Cols | Columns |
 |---|---|---|
@@ -111,7 +111,7 @@ Per BPA rule **"Hide foreign keys"** and Kimball / SQLBI defensive star-schema U
 
 Visible keys: `dim_Date[Date]`, `dim_Segment[Segment]` and `dim_Customer[Segment]` – user-facing attributes, not pure plumbing – and `dim_Customer[Customer ID]`, the drillthrough key.
 
-**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `M Score`, `Health Score`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve source columns regardless of visibility); `R Score` and `F Score` are now visible (draggable score axes for the Page 5 RFM heatmap). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do `Recency Days` and the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`, #18) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
+**RFM analytic payload on `dim_Customer`:** the single-direction refactor folded the former `v_rfm_for_bi` satellite into `dim_Customer`. Its scoring columns – `M Score`, `Health Score`, `Order Count` – are hidden and surfaced through measures (`[Avg R Score]`, `[Avg Health Score]`, …) and referenced by name in the Page-2 Field Parameter (field parameters resolve source columns regardless of visibility); `R Score` and `F Score` are now visible (draggable score axes for the Page 5 RFM heatmap). Before the merge these stayed visible under the earlier dual-grain satellite exception; after the merge that exception no longer applies. Descriptive attributes (`Full Name`, `Country`, `Last Order Date`, `RFM Cell`, `Action`) remain visible, as do `Recency Days` and the monetary analytics `Total Spend` and `Total Profit`. `Total Spend` is intentionally visible (paired with `Total Profit`) despite the BPA "Hide fact table columns" rule; the flag is accepted, not actioned.
 
 **What does NOT change after hiding the keys:**
 - Relationships remain functional – the engine resolves keys even when hidden
@@ -130,6 +130,8 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 ---
 
+**Pages column:** the report pages on which a visual binds the measure, as a field or through a conditional-formatting (fx) expression such as a title, subtitle or colour. A measure that reaches a page only through another measure shows –.
+
 ## Folder: 01 – Core KPIs
 
 | Measure | Formula | Format | Pages |
@@ -140,7 +142,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Total Orders | `[Distinct Orders]` | # 0dp | 7 |
 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 7 |
 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | – |
-| Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1, 2 |
+| Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1 |
 | Median Recency Days | `MEDIAN(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 4 |
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
 | Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
@@ -148,20 +150,20 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 4 |
 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1 |
 | Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
-| Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | – |
+| Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | 3, 7 |
 | Line Profit | `SUM(v_items_for_bi[Line Profit])` | € Currency, 2dp | – |
-| Line Margin % | `DIVIDE([Line Profit], [Line Revenue], 0)` | % 2dp | – |
+| Line Margin % | `DIVIDE([Line Profit], [Line Revenue], 0)` | % 2dp | 3 |
 | Line Quantity | `SUM(v_items_for_bi[Quantity])` | # 0dp | 3 |
 | Grain Reconciliation | `[Total Revenue] - [Line Revenue]` | € Currency, 2dp | – |
 | Total Products | `DISTINCTCOUNT(dim_Product[Product ID])` | # 0dp | 3 |
 | Total Brands | `DISTINCTCOUNT(dim_Product[Brand])` | # 0dp | 3 |
 | Top Brand Revenue | `MAXX(VALUES(dim_Product[Brand]), [Line Revenue])` | € Currency, display Millions | 3 |
-| Top Brand Name | VAR pattern – see formula block below | Text | 3 |
+| Top Brand Name | VAR pattern – see formula block below | Text | – |
 | Avg Brand Margin % | `AVERAGEX(VALUES(dim_Product[Brand]), [Line Margin %])` | % 2dp | – |
 | Margin Baseline | `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` | % 2dp | 3 |
 | Lifecycle Revenue | `SUM(v_revenue_new_returning[Revenue])` | € Currency, 2dp | 5 |
 
-**Dependency / diagnostic measures (Pages = –):** `Line Revenue`, `Line Profit`, `Line Margin %` are line-grain building blocks consumed by the brand measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`) is a QA invariant (expected 0). None are bound to a visual directly.
+**Dependency / diagnostic measures:** `Line Revenue`, `Line Profit` and `Line Margin %` are line-grain building blocks consumed by the brand measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Line Revenue` is also bound on Pages 3 and 7 and `Line Margin %` on Page 3. `Line Profit` and `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`, a QA invariant, expected 0) are bound to no visual. `[Top Brand Name]` is bound to no visual either; it feeds `[Combo Chart Title]`, the Page 3 combo chart title.
 
 **`[Distinct Orders]` (Pages = 4):** order-grain distinct order count from `sales_curated[Order ID]`. Not slice-able by `dim_Product` – `sales_curated` has no relationship path to `dim_Product` in the single-direction star, so a product slice returns the unfiltered grand total. Bound on the Page 4 scatter; do not place on a product axis.
 
@@ -204,7 +206,7 @@ RETURN
     )
 ```
 
-**Edge case:** ties in revenue resolve alphabetically first (TOPN ASC tiebreak on the name column). Acceptable for KPI cards – display only.
+**Edge case:** ties in revenue resolve alphabetically first (TOPN ASC tiebreak on the name column); a tie changes only the Page 3 combo chart title.
 
 ### Lifecycle Revenue – full formula
 
@@ -227,7 +229,7 @@ SUM ( v_revenue_new_returning[Revenue] )
 | Customer Health Score | `SELECTEDVALUE(dim_Customer[Health Score])` | `0 "/ 15"` | 7 |
 | Customer RFM Label | VAR pattern – see formula block below | Text | 7 |
 
-The `Customer *` measures are single-customer drillthrough readouts for Page 7 (Customer Drillthrough) – a page hidden by design, reached from any customer context rather than shown as its own tab; each is `BLANK` unless exactly one `dim_Customer` row is in context.
+The `Customer *` measures are single-customer drillthrough readouts for Page 7 (Customer Drillthrough) – a page hidden by design, reached by drillthrough from the Page 4 customer scatter rather than shown as its own tab; each is `BLANK` unless exactly one `dim_Customer` row is in context.
 
 ```dax
 Customer RFM Label =
@@ -252,7 +254,7 @@ RETURN
 
 | Measure | Format | Pages |
 |---|---|---|
-| Segment % of Total | % 2dp | 1, 2 |
+| Segment % of Total | % 2dp | 2 |
 | Revenue % of Total | % 2dp | 2 |
 | Revenue at Risk | € 2dp | 1, 4 |
 | % Revenue at Risk | % 2dp | 4 |
@@ -570,7 +572,7 @@ RETURN
 | Market Ranking Title | Page 6 combo title: reach-not-basket claim by default, neutral under filters | Text | 6 |
 | Market Ranking Subtitle | Dynamic Page 6 combo subtitle: clustering claim gated on 2+ visible markets | Text | 6 |
 | Region Filter Active | Drill signal (ALLSELECTED-guarded): 1 only when a direct State/Region filter is active | Whole # | 6 |
-| Country Filter Active | Country selection signal (subset-aware, ALLSELECTED-guarded): 1 only on a proper-subset Country selection | Whole # | 6 |
+| Country Filter Active | Country selection signal (subset-aware, ALLSELECTED-guarded): 1 only on a proper-subset Country selection; consumed by `[Map Title]`, `[Map Subtitle]`, `[Market Ranking Title]` and `[Market Ranking Subtitle]` | Whole # | – |
 | Country Total Revenue | Country-grain revenue immune to the Region slicer (choropleth fill driver) | € 2dp | 6 |
 | Subtitle Segment Strategy | Static subtitle for the Recommended Strategy by Segment table | Text | 2 |
 | Subtitle Segment Scatter | Static subtitle for the Frequency x Monetary by Segment scatter chart | Text | 2 |
@@ -993,6 +995,8 @@ After load: Sort by Column: Segment → SortOrder. Relationship: dim_Customer[Se
 
 **Note:** `dim_Segment` is a static DAX DATATABLE (no Power Query) that merges the former `dim_SegmentOrder` (sort order + color) and `dim_SegmentActions` (CRM attributes: email cadence, loyalty tier, discount approach, budget allocation) into one 7-column dimension, per the single-direction refactor. `SortOrder` is hidden; `Segment` is the displayed key, sorted by `SortOrder`.
 
+**Note:** segment names are defined in `sql/03_rfm_pipeline_kupferkanne_2026.sql`, repeated in this table and written as string literals in DAX measures and in report visuals and a bookmark; renaming a segment means changing all of them.
+
 **Note:** the recommended-action column is not held here – it lives on `dim_Customer` (SQL: `recommended_action AS action`), the customer-grain dimension. No duplication.
 
 ### dim_KPI_Selector – DAX DATATABLE
@@ -1038,7 +1042,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 107 measures – 106 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. No redundant calculations.
+## Total: 107 measures – 106 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. `[Total Orders]` is a deliberate alias of `[Distinct Orders]`, and `[Revenue % of Total]` and `[Country Revenue Share]` compute the same ratio for Pages 2 and 6.
 
 ---
 
@@ -1057,7 +1061,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 **Usage:**
 - Page 2 Column chart X-axis: `RFM Score Selector` (parameter column)
-- Y-axis: `[Total Customers]`
+- Y-axis: `[Total Revenue]`
 - Slicer toggles between R / F / M distributions without DAX
 
 **Decision rationale:** Field Parameters chosen over custom DAX SWITCH measure + helper dim table because:

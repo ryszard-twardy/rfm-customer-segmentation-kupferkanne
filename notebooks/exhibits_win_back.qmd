@@ -211,7 +211,7 @@ for name, approach, _, _ in segment_rows:
         DISCOUNT[name] = int(match.group(1)) / 100
 assert set(DISCOUNT) == set(FOCUS), DISCOUNT
 
-W, H = 1200, 675  # logical px: SVG viewBox 0 0 1200 675, PNG saved at 2x
+W, H = 1200, 675  # logical px: SVG viewBox 0 0 1200 675, PNG saved at twice that size
 # Shared grid. On desktop viewports the exhibit column shows the canvas at 1:1 (it is wider
 # than 1200 px from about 1270 px of viewport) on the same centre as the body text, so a
 # figure kept inside the body column's width shares its edges with the text above and below.

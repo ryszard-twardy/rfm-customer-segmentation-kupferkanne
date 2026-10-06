@@ -4,6 +4,8 @@ A Kimball-style dimensional model with two conformed dimensions and two fact tab
 
 ## Star schema
 
+The diagram shows the raw tables as loaded, with their intended keys: the loader keeps every fact column as STRING to preserve the dirty values for the audit and cleaning scripts, and BigQuery autodetects the dimension types. The raw data breaks some of these keys: blank customer keys, and customer, product and order keys padded with whitespace, which match only after trimming.
+
 ```mermaid
 erDiagram
     dim_customers ||--o{ orders : "places"
@@ -11,34 +13,41 @@ erDiagram
     orders ||--|{ items : "contains"
 
     dim_customers {
-        int64 CustomerID PK
+        string CustomerID PK
+        date SignupDate
+        string CustomerArchetype
         string FirstName
         string LastName
+        string Email
+        string Phone
         string Country
+        string State
         string City
-        date SignupDate
+        string Address
     }
     dim_products {
         string ProductID PK
         string ProductName
-        string Brand
         string ProductCategory
-        float UnitCost
+        string Brand
+        float64 RetailPrice
+        float64 UnitCost
+        float64 MarginPct
     }
     orders {
-        int64 OrderID PK
-        int64 CustomerID FK
-        date OrderDate
-        float OrderValue
-        float OrderProfit
-        string Country
+        string OrderID PK
+        string CustomerID FK
+        string OrderDate
+        string OrderDiscountPct
+        string BasketItemCount
     }
     items {
-        int64 OrderID FK
+        string OrderID FK
+        string LineNumber
         string ProductID FK
-        int Quantity
-        float UnitPrice
-        float LineNetAmount
+        string Quantity
+        string UnitPrice
+        string LineNetAmount
     }
 ```
 
@@ -55,10 +64,10 @@ erDiagram
 
 | Pattern | Total rows | Grain | Purpose |
 |---|---|---|---|
-| `orders20YYMM` | ~170,000 across 39 shards | Order | Header-level transactions |
-| `items20YYMM` | ~275,000 across 39 shards | Line item | Product-level detail |
+| `orders20YYMM` | ~171K across 39 shards | Order | Header-level transactions |
+| `items20YYMM` | ~276K across 39 shards | Line item | Product-level detail |
 
-Sharding by month allows BigQuery to prune scans when querying date ranges. Single-month queries hit one shard; cross-period queries use wildcard tables (`orders20*`).
+Each month is its own table (sharding): a single-month query reads one shard, and cross-period queries use wildcard tables (`orders20*`). BigQuery recommends partitioned tables over date-sharded ones; the shards here mirror the generator's monthly files.
 
 ## BI semantic layer
 
@@ -66,8 +75,8 @@ Two curated fact objects feed Power BI, each at a different grain:
 
 | Object | Grain | Rows | Used by PBI pages |
 |---|---|---|---|
-| `sales_curated` | Order | ~169K | 1 Executive Summary, 2 Segment Deep Dive, 4 Churn Risk & What-If, 5 Customer Lifecycle Intelligence, 6 Regional Analysis, 7 Customer Drillthrough |
-| `v_items_for_bi` | Line item | ~275K | 3 Product & Brand |
+| `sales_curated` | Order | ~169K | 1 Executive Summary, 2 Segment Deep Dive, 3 Product & Brand, 4 Churn Risk & What-If, 5 Customer Lifecycle Intelligence, 6 Regional Analysis, 7 Customer Drillthrough |
+| `v_items_for_bi` | Line item | ~273K | 3 Product & Brand, 7 Customer Drillthrough |
 
 The dual-grain approach prevents aggregation errors that would arise from joining order-level and line-level metrics in a single fact table. Power BI measures follow a naming convention: `[Total *]` for order-grain measures and `[Line *]` for line-grain, enforcing clarity at consumption time. See [measures.md](measures.md) for the full catalogue.
 
@@ -121,7 +130,7 @@ erDiagram
 | 6 | `dim_Customer[Segment] -> dim_Segment[Segment]` | M:1 | Single | Segment attribution onto the merged segment dimension |
 | 7 | `v_revenue_new_returning[Revenue Month] -> dim_Date[Date]` | M:1 | Single | Monthly calendar slice for the Page 5 New vs Returning area chart |
 
-Five model tables carry no relationship: `dim_KPI_Selector` (disconnected KPI slicer), `RFM Score Selector` (field parameter over `dim_Customer[R/F/M Score]`), `Reactivation Rate` (What-If parameter), `_Measures` (hidden measures host), and `v_cohort_retention` (standalone analytical view backing the Page 5 cohort retention heatmap). Seven related plus five unrelated is twelve model tables.
+Five model tables carry no relationship: `dim_KPI_Selector` (disconnected KPI slicer), `RFM Score Selector` (field parameter over `dim_Customer[R/F/M Score]`), `Reactivation Rate` (What-If parameter), `_Measures` (measures host; only its placeholder column is hidden), and `v_cohort_retention` (standalone analytical view backing the Page 5 cohort retention heatmap). Seven related plus five unrelated is twelve model tables.
 
 ## Naming conventions
 

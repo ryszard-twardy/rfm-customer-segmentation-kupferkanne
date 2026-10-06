@@ -22,7 +22,7 @@ Fifteen thousand customers, one retention budget. This project is what the analy
 
 ## The problem
 
-A retailer with a fixed marketing budget cannot spend uniformly across 15,000 customers – some are worth protecting, some are worth winning back, and some are not worth the spend. Kupferkanne turns that intuition into three answerable questions:
+A retailer with a fixed marketing budget cannot spend uniformly across 14,967 customers – some are worth protecting, some are worth winning back, and some are not worth the spend. Kupferkanne turns that intuition into three answerable questions:
 
 1. **Investment** – which customers deserve disproportionate retention spend, and why?
 2. **Profitability** – which products and brands actually drive margin, under which definition of margin?
@@ -39,7 +39,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 |                  |     |     10-step SQL      |     |      PBIP / TMDL       |
 +------------------+     +----------------------+     +------------------------+
   80 CSV shards            audit -> clean ->            6 pages + drillthrough
-  ~460K raw records        EDA -> RFM -> marts          107 DAX measures
+  ~462K raw records        EDA -> RFM -> marts          107 DAX measures
   seeded defects           Kimball star schema          model as code
 ```
 
@@ -48,10 +48,10 @@ Each question maps to specific report pages, and every figure on those pages is 
 | Revenue | EUR 8,476,200.74 |
 | Profit | EUR 5,044,924.94 (weighted margin 59.52%) |
 | Customers | 14,967 scored |
-| Orders | 168,777 order-grain rows; ~275K line-grain rows |
+| Orders | 168,777 order-grain rows; ~273K line-grain rows in the BI view |
 | Catalogue | 60 products, 5 brands, 6 categories |
 | Window | 2023-01 to 2026-03 (39 months), 9 European markets |
-| Semantic model | 107 DAX measures, 12 tables, 7 relationships (all single-direction) |
+| Semantic model | 107 DAX measures (55 return numbers, 52 return text), 12 tables, 7 relationships (all single-direction) |
 
 ## The method
 
@@ -59,7 +59,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 
 **Two-tier margin.** Profitability is reported two ways on purpose: weighted (`SUM profit / SUM revenue` = 59.52%) and equal-weight across brands (59.63%). Today the two sit within 0.11 pp of each other – the dual view is the guard that keeps a future mix shift from hiding behind a single number. Both figures are labelled wherever they appear. ([ADR 0007](docs/adr/0007-two-tier-margin-calculation.md))
 
-**Dual-grain model.** A Kimball star schema with conformed dimensions and two fact grains: order-grain `sales_curated` (168,777 rows) for revenue and segmentation, line-grain `v_items_for_bi` (~275K rows) for product detail. Measure names carry the grain (`[Total *]` vs `[Line *]`), and a reconciliation measure asserts the two grains agree (invariant = 0). ([ADR 0005](docs/adr/0005-dual-grain-fact-model.md))
+**Dual-grain model.** A Kimball star schema with conformed dimensions and two fact grains: order-grain `sales_curated` (168,777 rows) for revenue and segmentation, line-grain `v_items_for_bi` (~273K rows) for product detail. Measure names carry the grain (`[Total *]` vs `[Line *]`), and a reconciliation measure asserts the two grains agree (invariant = 0). ([ADR 0005](docs/adr/0005-dual-grain-fact-model.md))
 
 ## The report (six report pages plus a customer drillthrough)
 
@@ -71,7 +71,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 | 4 | Churn Risk & What-If | How much revenue is at risk, and what is the upside of acting? A live reactivation parameter prices the scenario on the page. |
 | 5 | Customer Lifecycle Intelligence | How does value concentrate and retain over time? Pareto by customer decile, cohort retention, RFM distribution map. |
 | 6 | Regional Analysis | How do the nine markets compare? Includes a Deneb / Vega-Lite choropleth. |
-| 7 | Customer Drillthrough (hidden) | What does one specific customer look like? Reached by drillthrough from any customer context. |
+| 7 | Customer Drillthrough (hidden) | What does one specific customer look like? Reached by drillthrough from the customer scatter on page 4. |
 
 ## Built like production
 
@@ -79,7 +79,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 - **SQL that expects to be re-run.** Nine idempotent GoogleSQL build scripts (audit → standardise → clean → validate → EDA → RFM transform → line-grain BI fact → BI customer dimension → analytics marts) and a tenth, an assertion that builds nothing, all SQLFluff lint-clean under a documented exception policy. Exploration runs *before* transformation, so segmentation thresholds come from observed distributions, not assumptions. ([ADR 0003](docs/adr/0003-pipeline-order-eda-before-transform.md))
 - **Regression invariants.** Canonical KPIs (Revenue 8,476,200.74 / Customers 14,967) are baselined and re-asserted after pipeline changes – a refactor cannot silently bend a number.
 - **Decisions on the record.** Fifteen architecture decision records, including two that were later superseded and deliberately kept in place – the model's history is part of the artifact. ([`docs/adr/`](docs/adr/))
-- **Dirty data on purpose.** The source is generated by [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) with seeded real-world defects – duplicate orders, cents-format inconsistency, orphan keys, type drift, header-row contamination – so the cleaning layer solves problems that actually occur in production. ([ADR 0008](docs/adr/0008-synthetic-data-with-realistic-quality-issues.md))
+- **Dirty data on purpose.** The source is generated by [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) with seeded real-world defects – duplicate line items, cents-format inconsistency, orphan keys, type drift, header-row contamination – so the cleaning layer solves problems that actually occur in production. ([ADR 0008](docs/adr/0008-synthetic-data-with-realistic-quality-issues.md))
 
 ## Engineering workflow
 
@@ -93,8 +93,8 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 | [`pbip/`](pbip/) | Power BI project: report definition (PBIR) + semantic model (TMDL) |
 | [`graphics/`](graphics/) | Navigation icons (SVG): four states for each of the six navigable pages, plus a reset control and the icon-set license |
 | [`theme/`](theme/) | Power BI report theme: `rfm_dashboard_theme.json` |
-| [`docs/`](docs/) | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/` |
-| [`notebooks/`](notebooks/) | Quarto sources: the EDA notebook (analytical companion to the SQL EDA views), the win-back exhibits page that renders `docs/img/exhibits/`, and the shared brand file `_brand.yml` |
+| [`docs/`](docs/) | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/`, `img/` (README screenshot and exhibit images) |
+| [`notebooks/`](notebooks/) | Quarto sources: the EDA notebook (analytical companion to the SQL EDA views), the win-back exhibits page that renders `docs/img/exhibits/`, the shared brand file `_brand.yml`, the exhibits stylesheet `exhibits.css` and the Quarto project file `_quarto.yml` |
 | [`harness/`](harness/) | KPI regression harness – baseline + verify for the canonical KPIs |
 | [`scripts/`](scripts/) | BigQuery loader (schema-enforced ingest) |
 | [`data/`](data/) | Source CSV shards (80 files, committed for reproducibility) |
@@ -102,10 +102,11 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 
 ## Reproduce it
 
-1. **Generate the data.** [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) produces the 80 CSV shards deterministically from a seed (~460K records, ~22 MB).
+1. **Generate the data.** [synth-datagen](https://github.com/ryszard-twardy/synth-datagen) produces the 80 CSV shards deterministically from a seed (~462K records, ~22 MB).
 2. **Load to BigQuery.** One dataset (`kupferkanne-2026.sales`) with monthly-sharded fact tables (`orders20YYMM`, `items20YYMM`) plus two dimension tables. Load them with `scripts/upload_to_bigquery_schema_enforced.py`, passing `--data-dir data --project kupferkanne-2026 --dataset sales --location EU`. The project runs with billing enabled and the dataset carries no default table or partition expiration, so warehouse tables persist between pipeline runs ([ADR 0015](docs/adr/0015-warehouse-table-retention.md)).
-3. **Run the pipeline.** Execute the `sql/` scripts in numeric order. Every script is idempotent (`CREATE OR REPLACE` for views, `DROP TABLE IF EXISTS` + `CREATE TABLE` for partitioned tables), so re-runs are safe.
+3. **Run the pipeline.** Execute the numbered `sql/` scripts in order, then the two view scripts (`sql/v_cohort_retention.sql`, `sql/v_revenue_new_returning.sql`), which read `sales_curated`. Every script is idempotent (`CREATE OR REPLACE` for views and most tables; three tables are dropped first with `DROP TABLE IF EXISTS`), so re-runs are safe. The scripts, the Power Query sources and the notebooks name the BigQuery project `kupferkanne-2026`; running elsewhere means replacing that ID.
 4. **Open the report.** Open the `.pbip` in Power BI Desktop, authenticate the BigQuery connector (OAuth), and refresh.
+5. **Render the notebooks.** With Quarto 1.9+, Application Default Credentials with read access to `kupferkanne-2026.sales` and Lato installed, run `uv sync`, then `quarto render notebooks/eda_kupferkanne.qmd` and `quarto render notebooks/exhibits_win_back.qmd` from the repo root (on Windows, set `QUARTO_PYTHON` to `.venv\Scripts\python.exe` first). The notebook's appendix gives the full steps.
 
 ## Scope, honestly
 
@@ -113,6 +114,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 - The pipeline runs manually per session. Orchestration (Dataform, dbt) was considered and consciously deferred – see the [CHANGELOG roadmap](CHANGELOG.md).
 - The What-If reactivation scenario is first-order and gross (no discount netting); it is labelled as a scenario, not a forecast, wherever it appears.
 - Import mode and a single-developer workflow: simplicity was chosen over enterprise plumbing wherever the plumbing adds no analytical signal.
+- Headline figures in the docs and notebooks are copied by hand. The KPI harness checks the canonical totals, and the exhibits page checks its figures against `docs/methodology.md` at render time.
 
 ## Documentation
 
@@ -120,7 +122,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | System overview, tech stack, pipeline flow |
 | [`docs/data_model.md`](docs/data_model.md) | Star schema, ERD, table specifications |
-| [`docs/methodology.md`](docs/methodology.md) | RFM approach, segmentation, margin calculation |
+| [`docs/methodology.md`](docs/methodology.md) | RFM approach, segmentation, margin calculation, win-back discount allocation and pilot design |
 | [`docs/measures.md`](docs/measures.md) | Full DAX measure catalogue (107 measures) |
 | [`docs/glossary.md`](docs/glossary.md) | Domain terminology |
 | [`docs/adr/`](docs/adr/) | Fifteen architecture decision records |
