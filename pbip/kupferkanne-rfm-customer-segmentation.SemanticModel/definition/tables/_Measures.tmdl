@@ -453,19 +453,6 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Line revenue of the highest-revenue product category in context.
-	measure 'Top Category Revenue' =
-			
-			MAXX (
-			    VALUES ( dim_Product[Product Category] ),
-			    [Line Revenue]
-			)
-		formatString: "€"#,##0.00;-"€"#,##0.00
-		displayFolder: 01 - Core KPIs
-		lineageTag: 8d6a8337-2079-4809-a95a-69339ad91df5
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Dynamic Page 3 subtitle with live product and brand counts.
 	measure 'Subtitle Page 3' =
 			
@@ -476,24 +463,6 @@ table _Measures
 			    & " brands"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 458efd47-dc70-4f08-a853-b9c5f88dd665
-
-	/// Name of the highest-revenue product category; revenue ties resolve alphabetically.
-	measure 'Top Category Name' =
-			
-			VAR TopCategory =
-			    TOPN (
-			        1,
-			        VALUES ( dim_Product[Product Category] ),
-			        [Line Revenue], DESC,
-			        dim_Product[Product Category], ASC
-			    )
-			RETURN
-			    MAXX (
-			        TopCategory,
-			        dim_Product[Product Category]
-			    )
-		displayFolder: 01 - Core KPIs
-		lineageTag: 1a023e34-320e-4b22-9e58-bf013592f9c5
 
 	/// Dynamic Page 2 subtitle with live segment count.
 	measure 'Subtitle Page 2' =

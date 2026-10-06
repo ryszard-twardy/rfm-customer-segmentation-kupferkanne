@@ -13,7 +13,7 @@ Kupferkanne is a retail analytics platform: a complete data warehouse and the BI
 |                  |     |     10-step SQL      |     |      PBIP / TMDL       |
 +------------------+     +----------------------+     +------------------------+
   80 CSV shards            33 pipeline objects          6 pages + drillthrough
-  ~460K raw records        11 tables + 22 views         109 DAX measures
+  ~460K raw records        11 tables + 22 views         107 DAX measures
 ```
 
 _The counts above cover the objects the SQL pipeline creates; the 80 CSV shards load into 80 source tables in the same dataset. Eight of the views (`eda_*`) exist for the exploratory notebook; the other 25 objects are the transformation pipeline and the views built on top of it._

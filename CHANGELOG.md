@@ -25,6 +25,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Win-back figures after the fixes: At Risk retains 1.85 times the contribution per euro of discount that Hibernating retains at the playbook's rates, and about 1.2 times as much with either rate applied to both segments.
 - Analytical notebook and win-back exhibits on the rebuilt tables: mean order value 50 EUR, P99 264 EUR with 1,688 orders beyond it, the largest at 3.8 times P99, country averages from 49.57 to 51.43 EUR, a reconciliation baseline of 8,476,200.74 EUR, and the bottom half of customers at about 7% of revenue, corrected from about 10%. The contribution chart's heading reads 2,465 against 1,335 EUR, and its gap label reads "+1,130 EUR (1.85 times as much) at the playbook's rates". The exhibits are laid out and rasterised in Lato, and their SVGs carry the text as glyph paths.
 
+### Removed
+
+- Measures `[Top Category Revenue]` and `[Top Category Name]`: no visual was bound to either and no measure referenced them. Both are removed with their generated Q&A entries, and the model now has 107 measures.
+
 ### Fixed
 
 - Theme name in `theme/rfm_dashboard_theme.json` stored an em-dash as a JSON escape; it now decodes to an en-dash and matches the theme registered in the report.
