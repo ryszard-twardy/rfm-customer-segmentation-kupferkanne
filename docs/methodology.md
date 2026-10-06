@@ -82,6 +82,14 @@ The Churn page (PBI Page 4) carries a What-If parameter that simulates reactivat
 
 ## Win-back discount allocation
 
+**In brief.**
+
+- The playbook gives its deepest discount, 20 percent, to the segment with the thinnest margin, Hibernating (46.7 percent).
+- At the playbook's rates, At Risk retains 1.85 times as much contribution per euro of discount as Hibernating; with either rate applied to both segments, about 1.2 times.
+- The two segments hold 3,909 of the 14,967 scored customers and 2.0 percent of the revenue base.
+- The ratios are modelled: they measure margin efficiency once an order is placed, not incrementality.
+- A controlled pilot with holdouts tests Hibernating's rate first, then the allocation; only a 95 percent interval that clears the decision's threshold changes the playbook.
+
 ### Revenue base
 
 `sales_curated[Order Value]` is net of `order_discount_pct`. Across the 274,734 validated line rows (276,379 raw, 272,556 in the BI view) `unit_price` equals the `dim_Product` retail price without exception, and order value over summed line gross tracks `1 - order_discount_pct` within 0.001 for 168,131 of 168,777 orders. The margins below are realised margins, not list margins.
