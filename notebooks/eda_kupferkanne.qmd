@@ -12,6 +12,8 @@ engine: jupyter
 jupyter: python3
 ---
 
+Next: the [win-back exhibits](exhibits_win_back.html); the code is in the [repository on GitHub](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne).
+
 ## Introduction
 
 This notebook is the narrative companion to the eight SQL EDA views in
@@ -576,9 +578,11 @@ the rendered report needs no credentials. To re-render:
 2. **Python environment** (covered by the manifest): `uv sync` at the repo
    root reproduces the full environment (`pyproject.toml` + `uv.lock`).
 3. **Render** (PowerShell, from the repo root). The third command renders the
-   win-back exhibits page and rewrites `docs/img/exhibits/`; it needs Lato
-   installed, or its font check stops the render. Both renders fetch Lato from
-   Google Fonts to embed it:
+   win-back exhibits page and fails if any exhibit it draws differs from the
+   file in `docs/img/exhibits/` (run `$env:KK_WRITE_EXHIBITS = "1"` first to
+   rewrite those files, and `Remove-Item Env:KK_WRITE_EXHIBITS` after); it needs
+   Lato installed, or its font check stops the render. Both renders fetch Lato
+   from Google Fonts to embed it:
 
 ```powershell
 $env:QUARTO_PYTHON = ".venv\Scripts\python.exe"

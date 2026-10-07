@@ -8,12 +8,15 @@ format:
     toc: false
     lightbox: true
     css: exhibits.css
-brand: _brand.yml
 output-file: exhibits_win_back.html
 engine: jupyter
 jupyter: python3
 execute:
   echo: false
+  # A fresh kernel for every render: the page reads KK_WRITE_EXHIBITS from the kernel's
+  # environment and logs to its stderr, and Quarto's kernel daemon would keep the first
+  # render's environment and discard that log.
+  daemon: false
 ---
 
 ```{python}
@@ -21,7 +24,10 @@ execute:
 import base64
 import html
 import math
+import os
 import re
+import sys
+import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -43,10 +49,29 @@ PLAYBOOK = (
     ROOT / "pbip" / "kupferkanne-rfm-customer-segmentation.SemanticModel"
     / "definition" / "tables" / "dim_Segment.tmdl"
 )
-OUT = ROOT / "docs" / "img" / "exhibits"
+EXHIBITS = ROOT / "docs" / "img" / "exhibits"
 for path in (METHODOLOGY, PLAYBOOK):
     assert path.is_file(), f"missing {path}"
-OUT.mkdir(parents=True, exist_ok=True)
+# The render rewrites the tracked exhibit files only when KK_WRITE_EXHIBITS is 1. Otherwise each
+# file goes to a temporary directory and must equal the tracked file of the same name, so an
+# ordinary render cannot change them; the page reads the tracked files either way.
+WRITE_EXHIBITS = os.environ.get("KK_WRITE_EXHIBITS") == "1"
+if WRITE_EXHIBITS:
+    OUT = EXHIBITS
+    OUT.mkdir(parents=True, exist_ok=True)
+else:
+    SCRATCH = tempfile.TemporaryDirectory(prefix="kk-exhibits-")
+    OUT = Path(SCRATCH.name)
+
+
+def check_tracked(path: Path) -> None:
+    """Without the write flag, a file the render wrote must equal its tracked copy byte for byte."""
+    if WRITE_EXHIBITS:
+        return
+    tracked = EXHIBITS / path.name
+    assert tracked.is_file() and tracked.read_bytes() == path.read_bytes(), (
+        f"{path.name} differs from docs/img/exhibits/{path.name}: "
+        "set KK_WRITE_EXHIBITS to 1 and render again to rewrite the tracked exhibits")
 
 client = bigquery.Client(project=PROJECT)
 
@@ -238,7 +263,9 @@ CATEGORY_GUTTER_PX = math.ceil(max(
         name, font_manager.FontProperties(family="DejaVu Sans", size=CATEGORY_SIZE), ismath=False)[0]
     for name in SEGMENT_ORDER)) + CATEGORY_PAD_PX
 PLOT_LEFT_PX = TEXT_LEFT_PX + CATEGORY_GUTTER_PX
-LAYOUT = []  # per variant: plot-area edges and text-column anchors, checked against the grid
+WIDE = SimpleNamespace(w=W, h=H, text_left=TEXT_LEFT_PX, plot_left=PLOT_LEFT_PX, plot_right=PLOT_RIGHT_PX,
+                       gutter=CATEGORY_GUTTER_PX)
+LAYOUT = []  # per wide variant: plot-area edges and text-column anchors, checked against the grid
 mpl.rcParams.update({
     "svg.fonttype": "path",  # text as Lato glyph outlines: viewers need no installed font
     "svg.hashsalt": "kupferkanne-exhibits",  # fixed element ids: identical SVG bytes on every render
@@ -276,8 +303,9 @@ for weight in (400, 700):
     resolved_face = font_manager.get_font(RESOLVED_FONT)
     assert resolved_face.family_name in NAMED_FONTS, (weight, RESOLVED_FONT)
     assert resolved_face.get_sfnt_table("OS/2")["usWeightClass"] == weight, (weight, RESOLVED_FONT)
-# Clearances are measured with DejaVu Sans, the widest common fallback, and must leave
-# MIN_GAP_PX between neighbours.
+# The layout gates measure text as drawn, in Lato. The legend and the E1 bracket are spaced with
+# DejaVu Sans, the widest common fallback, and their clearances and the E1 direct labels are
+# checked in it. Every clearance is at least MIN_GAP_PX.
 MIN_GAP_PX = 8
 TEXT_TO_PATH = TextToPath()
 
@@ -291,6 +319,20 @@ def text_width(text: str, prop) -> float:
     """Widest line of a text, in canvas px, set in the given font properties."""
     return max(TEXT_TO_PATH.get_text_width_height_descent(line, prop, ismath=False)[0]
                for line in text.split("\n"))
+
+
+# Narrow grid, for the contribution exhibit on phones. At 390 px of viewport the page shows an
+# exhibit 339 px wide, so a 1,200 px canvas draws its 12 px text at about 3.4 px; a 360 px canvas
+# keeps 0.94 of the drawn size, and the narrow variant's smallest text is 13 px. The text column
+# is the whole canvas: scaled to the page's text column, the figure's text edges stay on the
+# page's. The category gutter fits the two focus segments' names in Lato. The page shows the
+# narrow variant below NARROW_BELOW_PX of viewport.
+NARROW_W, NARROW_H, NARROW_MARGIN_PX, NARROW_BELOW_PX = 360, 400, 12, 600
+NARROW_GUTTER_PX = math.ceil(max(
+    text_width(name, font_manager.FontProperties(family=FONT_STACK, size=CATEGORY_SIZE)) for name in FOCUS
+)) + CATEGORY_PAD_PX
+NARROW = SimpleNamespace(w=NARROW_W, h=NARROW_H, text_left=0, plot_left=NARROW_GUTTER_PX,
+                         plot_right=NARROW_W, gutter=NARROW_GUTTER_PX)
 
 
 def fallback_prop(text):
@@ -379,6 +421,23 @@ def wrap_note(note: str, fontsize: float) -> list:
         not s[0].endswith((":", ";")), max(text_width(line, fallback) for line in s))))
 
 
+def wrap_phrases(text: str, fontsize: float, width: float, weight=400) -> list:
+    """Lines of at most `width` canvas px in the brand face for the narrow grid, filled phrase by
+    phrase: a line breaks after a comma, colon, semicolon or closing bracket where the phrases
+    fit, else between words. A segment name is one token, so a line never breaks inside it."""
+    prop = font_manager.FontProperties(family=FONT_STACK, size=fontsize, weight=weight)
+    lines = []
+    for phrase in re.split(r"(?<=[,:;)]) ", text):
+        for word in [phrase] if text_width(phrase, prop) <= width else tokens(phrase):
+            line = f"{lines[-1]} {word}" if lines else word
+            if lines and text_width(line, prop) <= width:
+                lines[-1] = line
+            else:
+                lines.append(word)
+    assert all(text_width(line, prop) <= width for line in lines), (text, lines)
+    return check_names_whole(text, lines)
+
+
 def fmt_int(v) -> str:
     return f"{int(v):,}"
 
@@ -445,16 +504,36 @@ def canvas(title: str, footer: str, rows, subtitle: str | None = None, embedded:
         anchored.append(fig.text(left, header_top + shift, "\n".join(wrap_note(subtitle, 14)),
                                  fontsize=14, color=LABEL, va="top", ha="left"))
     anchored.append(fig.text(left, 0.045, footer, fontsize=12, color=LABEL, va="bottom", ha="left"))
-    return SimpleNamespace(fig=fig, ax=ax, legend_top=LEGEND_TOP + shift, title_line=lines[0],
+    return SimpleNamespace(fig=fig, ax=ax, grid=WIDE, legend_top=LEGEND_TOP + shift, title_line=lines[0],
                            anchored=anchored, heading=heading, boxes=[], lines=[])
 
 
-def category_axis(ax, names) -> None:
+def narrow_canvas(title: str, footer: str, subtitle: str, axes_px: tuple):
+    """The narrow variant on the NARROW grid, embedded style: no heading band. The subtitle hangs
+    from the top margin and the footer stands on the bottom margin, both wrapped in Lato to the
+    full width; axes_px gives the plot area's top and bottom, in px from the top edge. Text sizes
+    are 13 px and up."""
+    g = NARROW
+    fig = plt.figure(figsize=(g.w / 72, g.h / 72))
+    top, bottom = axes_px
+    ax = fig.add_axes([g.plot_left / g.w, 1 - bottom / g.h, (g.plot_right - g.plot_left) / g.w,
+                       (bottom - top) / g.h])
+    anchored = [
+        fig.text(0, 1 - NARROW_MARGIN_PX / g.h, "\n".join(wrap_phrases(subtitle, 14, g.w)),
+                 fontsize=14, color=LABEL, va="top", ha="left"),
+        fig.text(0, NARROW_MARGIN_PX / g.h, "\n".join(wrap_phrases(footer, 13, g.w)),
+                 fontsize=13, color=LABEL, va="bottom", ha="left"),
+    ]
+    return SimpleNamespace(fig=fig, ax=ax, grid=g, title_line=wrap_heading(title, 22, 700)[0],
+                           anchored=anchored, heading=None, boxes=[], lines=[])
+
+
+def category_axis(ax, names, gutter=CATEGORY_GUTTER_PX) -> None:
     """Category labels hang from the text column's left edge, left-aligned like the first
     column of the tables: the tick pad spans the whole category gutter."""
     ax.set_yticks(range(len(names))[::-1])
     ax.set_yticklabels(names, fontsize=CATEGORY_SIZE, ha="left")
-    ax.tick_params(axis="y", pad=CATEGORY_GUTTER_PX)
+    ax.tick_params(axis="y", pad=gutter)
 
 
 def finish_axes(variant) -> None:
@@ -465,17 +544,15 @@ def finish_axes(variant) -> None:
     labels[-1].set_horizontalalignment("right")
 
 
-def text_boxes(fig, renderer, drawn: bool = False) -> list:
-    """(text, DejaVu Sans box) for every non-empty text on the figure: figure texts, legend
-    entries, axes annotations, tick labels and the x-axis label. With drawn=True, the box as
-    drawn in the brand face, which every viewer sees: the SVGs carry Lato glyph paths and the
-    PNGs are rasterised in Lato."""
+def text_boxes(fig, renderer) -> list:
+    """(text, box as drawn) for every non-empty text on the figure: figure texts, legend
+    entries, axes annotations, tick labels and the x-axis label. The box takes the brand face's
+    glyph widths, which every viewer sees: the SVGs carry Lato glyph paths and the PNGs are
+    rasterised in Lato."""
     texts = list(fig.texts) + [t for legend in fig.legends for t in legend.get_texts()]
     for ax in fig.axes:
         texts += ax.texts + ax.get_xticklabels() + ax.get_yticklabels() + [ax.xaxis.label]
-    if drawn:
-        return [(t.get_text(), drawn_box(t, renderer)) for t in texts if t.get_text()]
-    return [(t.get_text(), fallback_box(t, renderer)) for t in texts if t.get_text()]
+    return [(t.get_text(), drawn_box(t, renderer)) for t in texts if t.get_text()]
 
 
 def overlaps(a: tuple, b: tuple) -> bool:
@@ -493,7 +570,7 @@ def draw_grid(variant) -> None:
     ax, fig = variant.ax, variant.fig
     fig.draw_without_rendering()
     renderer = fig.canvas.get_renderer()
-    boxes = text_boxes(fig, renderer, drawn=True)
+    boxes = text_boxes(fig, renderer)
     axes_box = ax.get_window_extent(renderer)
     bottom, top = px(fig, axes_box.y0), px(fig, axes_box.y1)
     to_axes = ax.transAxes.inverted()
@@ -537,43 +614,36 @@ def mark_boxes(fig, renderer) -> list:
 
 
 def check_layout(stem: str, variant) -> None:
-    """Grid and collision gates for one drawn variant. The axes span the plot area; every
-    figure-level text and every category label starts at the text column's left edge (0.5 px
-    tolerance). Every text box and every mark lies inside the text column, TEXT_LEFT_PX ..
-    PLOT_RIGHT_PX, and on the canvas; the one exception is the titled heading, which must fit
-    the column in the brand face (in DejaVu Sans it cannot fit two lines and may run into the
-    right margin, still on the canvas). No two text boxes, nor a text box and a mark listed
-    in variant.boxes, overlap; no gridline or spine in variant.lines crosses a text box. Text
-    boxes take DejaVu Sans widths, wider than the Lato the exhibits draw; gridlines are held to
-    the boxes as drawn, which their breaks follow."""
-    fig = variant.fig
+    """Grid and collision gates for one drawn variant on its grid (variant.grid). The axes span
+    the plot area; every figure-level text and every category label starts at the text column's
+    left edge (0.5 px tolerance). Every text box and every mark lies inside the text column,
+    text_left .. plot_right, and on the canvas. No two text boxes, nor a text box and a mark
+    listed in variant.boxes, overlap; no gridline or spine in variant.lines crosses a text box.
+    Text boxes are measured as drawn, in Lato glyph widths."""
+    fig, g = variant.fig, variant.grid
     fig.draw_without_rendering()
     renderer = fig.canvas.get_renderer()
     axes_box = variant.ax.get_window_extent(renderer)
     edges = (px(fig, axes_box.x0), px(fig, axes_box.x1))
     anchors = [px(fig, t.get_window_extent(renderer).x0)
                for t in variant.anchored + variant.ax.get_yticklabels()]
-    assert abs(edges[0] - PLOT_LEFT_PX) <= 0.5 and abs(edges[1] - PLOT_RIGHT_PX) <= 0.5, (stem, edges)
-    assert all(abs(a - TEXT_LEFT_PX) <= 0.5 for a in anchors), (stem, anchors)
-    LAYOUT.append({"stem": stem, "edges": edges, "anchors": anchors})
+    assert abs(edges[0] - g.plot_left) <= 0.5 and abs(edges[1] - g.plot_right) <= 0.5, (stem, edges)
+    assert all(abs(a - g.text_left) <= 0.5 for a in anchors), (stem, anchors)
+    if g is WIDE:
+        LAYOUT.append({"stem": stem, "edges": edges, "anchors": anchors})
     texts = text_boxes(fig, renderer)
     boxes = texts + variant.boxes
+    eps = 1e-6  # float noise: the narrow grid's text column ends on the canvas edge
     for name, (x0, y0, x1, y1) in boxes:
-        assert 0 <= x0 and x1 <= W and 0 <= y0 and y1 <= H, (stem, name)
-    heading = variant.heading.get_text() if variant.heading else None
-    in_band = [(name, box) for name, box in boxes + mark_boxes(fig, renderer) if name != heading]
-    if variant.heading:
-        box = variant.heading.get_window_extent(renderer)
-        in_band.append(("heading, brand face", (px(fig, box.x0), 0, px(fig, box.x1), 0)))
-    for name, (x0, _, x1, _) in in_band:
-        assert TEXT_LEFT_PX - 0.5 <= x0 and x1 <= PLOT_RIGHT_PX + 0.5, (stem, name, x0, x1)
+        assert -eps <= x0 and x1 <= g.w + eps and -eps <= y0 and y1 <= g.h + eps, (stem, name)
+    for name, (x0, _, x1, _) in boxes + mark_boxes(fig, renderer):
+        assert g.text_left - 0.5 <= x0 and x1 <= g.plot_right + 0.5, (stem, name, x0, x1)
     for i, (a, box_a) in enumerate(boxes):
         for b, box_b in boxes[i + 1:]:
             assert not overlaps(box_a, box_b), (stem, a, b)
     assert any(name.startswith("gridline") for name, _ in variant.lines), stem
-    drawn = text_boxes(fig, renderer, drawn=True)
     for line, line_box in variant.lines:
-        for name, box in (drawn if line.startswith("gridline") else texts):
+        for name, box in texts:
             assert not overlaps(line_box, box), (stem, line, name)
 
 
@@ -594,24 +664,23 @@ def legend_band(variant, handles):
     return legend
 
 
-def save_svg(fig, path: Path, embedded: bool, title: str, desc: str) -> str:
-    """Write the SVG with LF line endings (matplotlib writes CRLF on Windows). The
-    embedded variant keeps only the viewBox on its root, so it scales to its container,
-    and carries the heading and the chart description as <title> and <desc>. Returns
-    the drawing as matplotlib wrote it."""
+def save_svg(fig, path: Path, embedded: bool, title: str, desc: str, grid=WIDE) -> str:
+    """Write the SVG with LF line endings (matplotlib writes CRLF on Windows). Every variant
+    carries the heading and the chart description as <title> and <desc>; the embedded variant
+    keeps only the viewBox on its root, so it scales to its container, and the titled variant
+    keeps its width and height. Returns the drawing as matplotlib wrote it."""
     fig.savefig(path, format="svg", transparent=True, metadata={"Date": None})
     data = path.read_bytes().replace(b"\r\n", b"\n")
     assert b"\r" not in data, path
     drawing = data.decode("utf-8")
     root = re.search(rb"<svg[^>]*>", data).group(0)
-    assert b'viewBox="0 0 1200 675"' in root, root
-    if embedded:
-        new_root = re.sub(rb'\s(?:width|height)="[^"]*"', b"", root)
-        assert b"width=" not in new_root and b"height=" not in new_root, new_root
-        labels = (f"\n <title>{html.escape(title, quote=False)}</title>"
-                  f"\n <desc>{html.escape(desc, quote=False)}</desc>").encode("utf-8")
-        data = data.replace(root, new_root + labels, 1)
-        assert data.count(b"<title>") == 1 and data.count(b"<desc>") == 1, path
+    assert f'viewBox="0 0 {grid.w} {grid.h}"'.encode("ascii") in root, root
+    new_root = re.sub(rb'\s(?:width|height)="[^"]*"', b"", root) if embedded else root
+    assert (b"width=" in new_root and b"height=" in new_root) == (not embedded), new_root
+    labels = (f"\n <title>{html.escape(title, quote=False)}</title>"
+              f"\n <desc>{html.escape(desc, quote=False)}</desc>").encode("utf-8")
+    data = data.replace(root, new_root + labels, 1)
+    assert data.count(b"<title>") == 1 and data.count(b"<desc>") == 1, path
     path.write_bytes(data)
     return drawing
 
@@ -641,24 +710,59 @@ def render(stem: str, title: str, desc: str, footer: str, rows, draw, subtitle: 
         drawing = save_svg(variant.fig, path.with_suffix(".svg"), embedded, title, desc)
         variant.fig.savefig(path.with_suffix(".png"), format="png", dpi=144, transparent=True)
         plt.close(variant.fig)
+        for suffix in (".svg", ".png"):
+            check_tracked(path.with_suffix(suffix))
         # In path mode each drawn line is an XML comment by its glyphs: no heading, or no comments, fails the titled half.
         assert (variant.title_line in drawn_lines(drawing)) == (not embedded), path
     return results[0]
 
 
-def exhibit(stem: str, alt: str) -> None:
+def render_narrow(stem: str, title: str, desc: str, footer: str, subtitle: str, axes_px: tuple, draw) -> None:
+    """Draw the exhibit once more on the narrow grid, check it with the same gates and save it as
+    an embedded-style SVG only (<stem>_narrow.svg); `draw` reads the grid from the variant."""
+    variant = narrow_canvas(title, footer, subtitle, axes_px)
+    draw(variant)
+    finish_axes(variant)
+    draw_grid(variant)
+    check_layout(f"{stem}_narrow", variant)
+    path = OUT / f"{stem}_narrow.svg"
+    drawing = save_svg(variant.fig, path, True, title, desc, NARROW)
+    plt.close(variant.fig)
+    check_tracked(path)
+    assert variant.title_line not in drawn_lines(drawing), path
+
+
+def page_copy(stem: str) -> str:
+    """A tracked embedded-style SVG as a data URI. The copy carries its canvas size (the viewBox)
+    as its intrinsic size, so the lightbox opens a wide exhibit at up to 1200 x 675 px; the CSS
+    still scales every copy to the column, and the tracked file keeps a viewBox-only root."""
+    svg = (EXHIBITS / f"{stem}.svg").read_bytes()
+    root = re.search(rb"<svg[^>]*>", svg).group(0)
+    assert svg.count(b"<svg ") == 1 and b"width=" not in root, stem
+    width, height = re.search(rb'viewBox="0 0 (\d+) (\d+)"', root).groups()
+    svg = svg.replace(b"<svg ", b'<svg width="%s" height="%s" ' % (width, height), 1)
+    return "data:image/svg+xml;base64," + base64.b64encode(svg).decode("ascii")
+
+
+def exhibit(stem: str, alt: str, narrow: bool = False) -> None:
     """Print the embedded SVG in the wide exhibit column (the page CSS caps it at 1200 px).
     The image is a data URI: the lightbox link that wraps it then needs no file outside
-    the site, where docs/img/exhibits/ does not exist. The page copy carries the canvas
-    size as its intrinsic size, so the lightbox opens it at up to 1200 x 675 px; the CSS
-    still scales it to the column, and the embedded file keeps a viewBox-only root."""
+    the site, where docs/img/exhibits/ does not exist. With narrow=True, a <picture> shows
+    <stem>_narrow.svg below NARROW_BELOW_PX of viewport; Pandoc writes no <picture>, so that
+    markup is raw HTML, and the lightbox still opens the wide variant."""
     assert '"' not in alt, alt
-    svg = (OUT / f"{stem}.svg").read_bytes()
-    assert svg.count(b"<svg ") == 1 and b"width=" not in re.search(rb"<svg[^>]*>", svg).group(0), stem
-    svg = svg.replace(b"<svg ", f'<svg width="{W}" height="{H}" '.encode("ascii"), 1)
-    uri = "data:image/svg+xml;base64," + base64.b64encode(svg).decode("ascii")
+    uri = page_copy(stem)
+    if not narrow:
+        print(f'::: {{.column-screen-inset .exhibit}}\n'
+              f'![]({uri}){{fig-alt="{alt}"}}\n'
+              f':::\n')
+        return
     print(f'::: {{.column-screen-inset .exhibit}}\n'
-          f'![]({uri}){{fig-alt="{alt}"}}\n'
+          f'```{{=html}}\n'
+          f'<p><a href="{uri}" class="lightbox" data-gallery="{stem}"><picture>'
+          f'<source media="(max-width: {NARROW_BELOW_PX - 0.02}px)" srcset="{page_copy(stem + "_narrow")}">'
+          f'<img src="{uri}" class="img-fluid" alt="{html.escape(alt)}"></picture></a></p>\n'
+          f'```\n'
           f':::\n')
 
 
@@ -780,9 +884,38 @@ assert len(re.findall(r"[.?!](?: |$)", LEDE)) == 5, LEDE
 doc = METHODOLOGY.read_text(encoding="utf-8")
 
 
+def line_of(pos: int) -> int:
+    return doc.count("\n", 0, pos) + 1
+
+
+# Every literal comes from the section that argues it, never from the "In brief." summary at the
+# head of the win-back section, which restates them. Each read from the file is logged to the
+# render console with its line, and fails if it falls inside the summary.
+BRIEF_MARK = "\n**In brief.**\n"
+assert doc.count(BRIEF_MARK) == 1, BRIEF_MARK
+brief_start = doc.index(BRIEF_MARK) + 1
+BRIEF = range(line_of(brief_start), line_of(re.compile(r"^#", re.M).search(doc, brief_start).start()))
+print("\nLiterals read from docs/methodology.md (line <- pattern):", file=sys.__stderr__, flush=True)
+
+
+def note_match(pattern: str, text: str, match) -> None:
+    """Log where a match in docs/methodology.md, or in a section of it, sits in the file, and
+    fail if it lies in the In brief summary. Page strings (the lede, the E3 caption and
+    description) are not in the file and are skipped."""
+    offset = doc.find(text)
+    if offset < 0:
+        return
+    first, last = line_of(offset + match.start()), line_of(offset + match.end())
+    print(f"docs/methodology.md:{first}{f'-{last}' if last != first else ''} <- {pattern}",
+          file=sys.__stderr__, flush=True)
+    assert last < BRIEF[0] or first > BRIEF[-1], (
+        f"literal read from the In brief summary (lines {BRIEF[0]}-{BRIEF[-1]}), line {first}: {pattern}")
+
+
 def grab(pattern: str, text: str = doc) -> tuple:
     match = re.search(pattern, text, flags=re.M)
     assert match, pattern
+    note_match(pattern, text, match)
     return match.groups()
 
 
@@ -907,8 +1040,11 @@ p_common = check_common_rates(doc)
 SHARE_HEADING = "## Appendix: segment shares"
 assert doc.count(SHARE_HEADING) == 1, SHARE_HEADING
 share_section = doc.split(SHARE_HEADING, 1)[1]
-share_rows = re.findall(r"^\| (?!Segment|---)([^|]+?) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \|$",
-                        share_section, flags=re.M)
+SHARE_ROW = r"^\| (?!Segment|---)([^|]+?) \| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \|$"
+share_rows = []
+for match in re.finditer(SHARE_ROW, share_section, flags=re.M):
+    note_match(SHARE_ROW, share_section, match)
+    share_rows.append(match.groups())
 share_doc = {row[0]: "| " + " | ".join(row) + " |" for row in share_rows}
 assert list(share_doc) == SEGMENT_ORDER + ["Total"], list(share_doc)
 for row in seg.itertuples():
@@ -937,7 +1073,7 @@ failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
 assert not failed, f"live results differ from docs/methodology.md: {failed}"
 ```
 
-Back to the [exploratory data analysis](index.html).
+Back to the [exploratory data analysis](index.html); the code is in the [repository on GitHub](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne).
 
 ```{python}
 #| label: lede-text
@@ -1206,7 +1342,11 @@ assert title == HEADING_E3, title
 
 
 def draw_e3(variant):
-    ax = variant.ax
+    """The contribution chart on either grid. The narrow grid takes a longer value axis, so the
+    value labels fit beside the bars, a shorter y range, and the gap label on two lines, set
+    lower so that it clears both bars evenly."""
+    ax, g = variant.ax, variant.grid
+    narrow = g is NARROW
     ys = [1, 0]
     values = list(per_1000["contribution_per_1000"])
     bars = []
@@ -1215,15 +1355,19 @@ def draw_e3(variant):
                         edgecolor="none", zorder=3)
         ax.text(row.contribution_per_1000 + 30, y, fmt_eur(row.contribution_per_1000, 0),
                 va="center", ha="left", fontsize=14)
-    ax.plot([values[1], values[0]], [0.5, 0.5], color=LABEL, linewidth=1, linestyle=(0, (2, 3)), zorder=2)
-    gap = ax.text((values[0] + values[1]) / 2, 0.55,
-                  f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f} times as much) at the playbook's rates",
+    line_y, label_y = (0.35, 0.4) if narrow else (0.5, 0.55)
+    ax.plot([values[1], values[0]], [line_y, line_y], color=LABEL, linewidth=1, linestyle=(0, (2, 3)), zorder=2)
+    gap_text = f"+{values[0] - values[1]:,.0f} EUR ({RATIO:.2f} times as much) at the playbook's rates"
+    if narrow:
+        gap_text = "\n".join(wrap_phrases(gap_text, 15, g.plot_right - g.plot_left, weight=700))
+    gap = ax.text((values[0] + values[1]) / 2, label_y, gap_text,
                   va="bottom", ha="center", fontsize=15, fontweight=700)
-    category_axis(ax, list(per_1000["segment"]))
-    ax.set_ylim(-0.7, 1.7)
-    ax.set_xlim(0, 3000)
-    ax.set_xticks(range(0, 3001, 500))
-    ax.set_xticklabels([f"{v:,}" for v in range(0, 3001, 500)])
+    category_axis(ax, list(per_1000["segment"]), g.gutter)
+    x_max, x_step = (4000, 1000) if narrow else (3000, 500)
+    ax.set_ylim(*((-0.4, 1.4) if narrow else (-0.7, 1.7)))
+    ax.set_xlim(0, x_max)
+    ax.set_xticks(range(0, x_max + 1, x_step))
+    ax.set_xticklabels([f"{v:,}" for v in range(0, x_max + 1, x_step)])
     ax.set_axisbelow(True)
     ax.set_xlabel("Contribution per 1,000 EUR of discount (EUR)", fontsize=13, color=LABEL)
     # The gap label sits between the two bars, MIN_GAP_PX clear of each; the bars join the
@@ -1235,14 +1379,11 @@ def draw_e3(variant):
         b = bar.get_window_extent(renderer)
         variant.boxes.append((f"{name} bar", (px(fig, b.x0), px(fig, b.y0), px(fig, b.x1), px(fig, b.y1))))
     upper, lower = variant.boxes[-2][1], variant.boxes[-1][1]
-    _, label_y0, _, label_y1 = fallback_box(gap, renderer)
+    # Guard: the gap label as drawn (its Lato extent) stays inside its band, MIN_GAP_PX clear of
+    # both bars and within the plot area.
+    x0, label_y0, x1, label_y1 = drawn_box(gap, renderer)
     assert upper[1] - label_y1 >= MIN_GAP_PX and label_y0 - lower[3] >= MIN_GAP_PX, (upper, lower, label_y0, label_y1)
-    # Guard: the gap label as drawn (its Lato extent) stays inside its band: MIN_GAP_PX clear of
-    # both bars (the assert above, on the same vertical extent) and within the plot area (below).
-    # check_layout also holds its wider DejaVu Sans box to the text column.
-    drawn = gap.get_window_extent(renderer)
-    x0, x1 = px(fig, drawn.x0), px(fig, drawn.x1)
-    assert PLOT_LEFT_PX <= x0 and x1 <= PLOT_RIGHT_PX, ("E3 gap label outside the plot area", x0, x1)
+    assert g.plot_left <= x0 and x1 <= g.plot_right, ("E3 gap label outside the plot area", x0, x1)
 
 
 E3_DESC = (
@@ -1266,10 +1407,11 @@ check("Contribution chart description: At Risk / Hibernating contribution ratio"
 check("Contribution chart description: ratio at a common rate", p_common, desc_common, 1)
 failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
 assert not failed, f"live results differ from docs/methodology.md: {failed}"
-render("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, (0.22, 0.54), draw_e3,
-       subtitle="Contribution on orders placed, at the playbook's rates: "
-                "a margin-efficiency figure, not an incremental return")
-exhibit("e3_contribution_per_1000", E3_DESC)
+E3_SUBTITLE = ("Contribution on orders placed, at the playbook's rates: "
+               "a margin-efficiency figure, not an incremental return")
+render("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, (0.22, 0.54), draw_e3, subtitle=E3_SUBTITLE)
+render_narrow("e3_contribution_per_1000", title, E3_DESC, FOOTER_E23, E3_SUBTITLE, (64, 292), draw_e3)
+exhibit("e3_contribution_per_1000", E3_DESC, narrow=True)
 # One grid across the page: three exhibits in two variants share the plot-area edges and the
 # text-column anchor of figure text and category labels, within 0.5 px.
 assert len(LAYOUT) == 6, [entry["stem"] for entry in LAYOUT]

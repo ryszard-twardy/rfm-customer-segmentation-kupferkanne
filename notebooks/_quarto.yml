@@ -9,3 +9,13 @@ project:
 # publishes as the site landing page so the Pages root URL needs no filename;
 # exhibits_win_back.qmd sets its own output-file and overrides this value.
 output-file: index.html
+
+# Straight quotes and apostrophes on both pages, as in the sources: Pandoc's
+# smart extension would curl them.
+from: markdown-smart
+
+# Light brand only. A brand file given as a plain path is read as a light and a
+# dark brand, and Quarto 1.9 then embeds three identical Bootstrap stylesheets,
+# each with all four Lato faces inlined; a light brand alone embeds one.
+brand:
+  light: _brand.yml

@@ -2,6 +2,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1200pt" height="675pt" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>A quarter of scored customers sit in At Risk or Hibernating, and their lifetime spend is 2% of the revenue base</title>
+ <desc>Paired horizontal bar chart of the six RFM segments: a filled bar gives each segment's share of scored customers, an outlined bar its share of the revenue base. At Risk holds 9.12% of customers and 1.25% of revenue, Hibernating 17.00% and 0.76%; together 26.1% of scored customers and 2.0% of the revenue base. The other four segments are grey context.</desc>
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>

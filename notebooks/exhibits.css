@@ -1,5 +1,7 @@
 /* Win-back exhibits: the SVGs are drawn on a 1200 px canvas with 12-15 px text. The wide
-   column keeps that text close to its drawn size; the cap stops the figures scaling past it. */
+   column keeps that text close to its drawn size; the cap stops the figures scaling past it.
+   Below 600 px of viewport the contribution chart shows its narrow variant instead, drawn on a
+   360 px canvas (a <picture> source in exhibits_win_back.qmd). */
 .exhibit img {
   display: block;
   width: 100%;

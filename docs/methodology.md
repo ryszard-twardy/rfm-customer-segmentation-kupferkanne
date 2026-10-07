@@ -109,7 +109,7 @@ The assumption, stated so it can be challenged: the win-back discount is a perce
 
 ### Recommendation
 
-Pilot Hibernating's discount rate first, then, on the same data, the allocation as a break-even floor for each offer and, where the budget cannot cover every eligible customer, a contact priority for At Risk that lasts until its pool is exhausted. For every 1,000 EUR of discount granted, expected contribution is 2,465 EUR in At Risk against 1,335 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
+Pilot a 15 percent rate for Hibernating first, then, on the same data, the allocation as a break-even floor for each offer and, where the budget cannot cover every eligible customer, a contact priority for At Risk that lasts until its pool is exhausted. For every 1,000 EUR of discount granted, expected contribution is 2,465 EUR in At Risk against 1,335 EUR in Hibernating, at a discount rate of 15 percent against 20 percent of order value.
 
 The playbook grants its deepest discount to its thinnest margin. At Risk retains 36.9711 points of contribution after a 15-point concession; Hibernating retains 26.6905 points after 20. The ranking is the finding: it is robust to the assumptions stated above and holds at any common discount rate, but not to the relative rates the playbook sets, as shown below. The absolute per-euro figures carry the limitations below.
 

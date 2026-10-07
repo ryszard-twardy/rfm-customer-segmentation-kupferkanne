@@ -14,8 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `notebooks/exhibits_win_back.qmd`: three win-back exhibits (segment shares, margin before and after the discount, contribution per 1,000 EUR of discount), each checked against the `docs/methodology.md` literals before any file is written; a failed check stops the render.
 - Exhibits page layout: a link back to the analytical notebook, a lede with checked literals, each chart before its table, the charts in a wide column capped at their 1,200 px canvas (`notebooks/exhibits.css`) that open in a lightbox, alt texts and SVG `<title>` and `<desc>` with key values, and the check table in a collapsed callout at the end.
 - Exhibit precision: shares, margins and realised discounts show two decimals, except the combined At Risk and Hibernating shares on the segment-share chart (one decimal); win-back rates show whole percents.
-- Exhibit render guards: direct labels with a bracket replace the segment-share legend; label and legend clearance is asserted with DejaVu Sans metrics, and layout and PNG rasterisation must use Lato.
+- Exhibit render guards: direct labels with a bracket replace the segment-share legend; the layout gates measure text as drawn, in Lato, while the legend, the bracket and the segment-share labels are asserted with DejaVu Sans metrics; layout and PNG rasterisation must use Lato.
 - Twelve exhibit image files under `docs/img/exhibits/`: the three exhibits in an embedded variant (no heading, responsive SVG root) and a titled variant, each saved as SVG and PNG.
+- A narrow variant of the contribution exhibit, `docs/img/exhibits/e3_contribution_per_1000_narrow.svg`, drawn on a 360 px canvas with text from 13 px; the exhibits page shows it below 600 px of viewport, and its lightbox still opens the wide chart.
+- Both Quarto pages open with a line that links to the other page and to the GitHub repository.
 - Analytical notebook (`notebooks/eda_kupferkanne.qmd`): its introduction links to the win-back exhibits page, and the page shows a last-modified date.
 - A country-coverage assertion as the last numbered pipeline script, with a negative test in `tools/queries/`.
 - Harness `baseline` command: baselines change only through the comparison queries, with a stated reason logged on every accept.
@@ -30,8 +32,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Analytical notebook: the bottom half of customers holds about 7% of revenue, corrected from about 10%.
 - Contribution exhibit: heading 2,465 against 1,335 EUR and gap label "+1,130 EUR (1.85 times as much) at the playbook's rates"; the exhibits are laid out and rasterised in Lato, with SVG text as glyph paths.
 - Analytical notebook: the monthly revenue chart marks a partial final month with a dashed segment and its day coverage, table columns align text left and numbers right, and the Synthesis table's ADR column is sized so its numbers do not break.
-- Win-back exhibits align to the page's body column: on wide desktop viewports the 1,200 px canvas shows at 1:1 and its plot and text edges line up with the text column; on narrower viewports they drift.
+- Win-back exhibits align to the page's body column: on wide desktop viewports the 1,200 px canvas shows at 1:1 and its plot and text edges line up with the text column; on narrower viewports they drift, except the contribution chart's narrow variant below 600 px, whose text edges sit on the column's.
 - The exhibits are inlined as data URIs, so neither an image nor its lightbox link points outside the site.
+- Exhibit files are rewritten only when `KK_WRITE_EXHIBITS` is `1`; any other render draws them to a temporary directory and fails if one differs from its file in `docs/img/exhibits/`. The exhibits page runs without Quarto's kernel daemon, so each render reads the flag afresh. The render steps in `README.md` and the notebook appendix say so.
+- Titled exhibit SVGs carry the same `<title>` and `<desc>` as the embedded ones.
+- Smart punctuation is off on both Quarto pages (`from: markdown-smart`), so quotes and apostrophes stay straight.
+- The Quarto project declares its brand as a light brand only, so each page embeds one Bootstrap stylesheet with the four Lato faces instead of three identical copies.
+- The exhibits render logs the `docs/methodology.md` line behind every literal it checks, and fails if one comes from the "In brief." summary of the win-back section.
 
 ### Removed
 
@@ -77,6 +84,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Dated notes in ADRs 0002, 0006, 0007 and 0008 record what the fixes changed; `harness/README.md` states the order of the baseline and log writes.
 - Executive Summary screenshot in `README.md` (`docs/img/exec-summary.png`) replaced with the published report after the fixes; its cards now match the scale table in `README.md`.
 - Limitation added to `docs/methodology.md`: Frequency and Monetary count every order in the 39-month window with no lookback limit, so a customer acquired late in the window scores lower on both than an equally active customer acquired early.
+- The win-back recommendation in `docs/methodology.md` names the pilot's first test: a 15 percent rate for Hibernating.
 
 ---
 
