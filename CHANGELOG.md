@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Analytical notebook (`notebooks/eda_kupferkanne.qmd`): its introduction links to the win-back exhibits page, and the page shows a last-modified date.
 - A country-coverage assertion as the last numbered pipeline script, with a negative test in `tools/queries/`.
 - Harness `baseline` command: baselines change only through the comparison queries, with a stated reason logged on every accept.
+- Both Quarto pages carry a page description, Open Graph tags and an inline favicon.
+- The exhibits page names the project in its title and shows a last-modified date, as the analytical notebook does.
 
 ### Changed
 
@@ -39,6 +41,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Smart punctuation is off on both Quarto pages (`from: markdown-smart`), so quotes and apostrophes stay straight.
 - The Quarto project declares its brand as a light brand only, so each page embeds one Bootstrap stylesheet with the four Lato faces instead of three identical copies.
 - The exhibits render logs the `docs/methodology.md` line behind every literal it checks, and fails if one comes from the "In brief." summary of the win-back section.
+- Analytical notebook figures scale down to the column width on narrow screens and open in a lightbox.
+- The exhibits page links back to the site root instead of `index.html`.
 
 ### Removed
 

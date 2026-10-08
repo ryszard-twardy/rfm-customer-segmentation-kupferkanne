@@ -3,11 +3,19 @@ title: "Kupferkanne RFM – Exploratory Data Analysis"
 author: "Ryszard Twardy"
 date: 2026-07-14
 date-modified: last-modified
+# The page description and Open Graph URL for the head; the metadata.html partial writes them,
+# with the favicon, before the inlined dependencies. A `description` key would also print in
+# the title block.
+description-meta: "Exploratory analysis of the synthetic Kupferkanne order data before the RFM segmentation: recency, frequency, order value, monthly revenue, countries, revenue concentration and data quality."
+og-url: "https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/"
 format:
   html:
     embed-resources: true
     code-fold: true
     toc: true
+    lightbox: true
+    template-partials:
+      - metadata.html
 engine: jupyter
 jupyter: python3
 ---
@@ -555,6 +563,10 @@ an EDA-only data-quality check.
    IDs and kept on one line instead. */
 table.dataframe .col-text { text-align: left; }
 table.dataframe .col-num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Figures: Jupyter writes each chart's size as width and height attributes, and Quarto leaves an
+   image with a height attribute without img-fluid, so the charts would keep their full width on
+   narrow screens. They scale down to the column instead, keeping their aspect ratio. */
+img.figure-img { max-width: 100%; height: auto; }
 #tbl-synthesis td:nth-child(3) { width: 1%; white-space: nowrap; }
 #tbl-synthesis td:nth-child(3) a { word-break: normal; }
 </style>
@@ -594,3 +606,19 @@ Caching note: Quarto's `freeze` (render caching) requires a Quarto *project*
 (`_quarto.yml`). This repository defines one in `notebooks/` that renders two
 documents – this notebook as the site landing page and the win-back exhibits
 page – and it does not enable `freeze`, so every render re-runs the queries.
+
+```{=html}
+<script>
+// Quarto points each figure's lightbox link at the chart's image file, which this self-contained
+// page does not publish. Point the links at the images' data: URIs instead and mark them as
+// images: a data: URI carries no file extension for GLightbox to infer the type from. The
+// lightbox initialises after the page content.
+document.querySelectorAll("a.lightbox").forEach((a) => {
+  const img = a.querySelector("img");
+  if (img) {
+    a.setAttribute("href", img.getAttribute("src"));
+    a.dataset.type = "image";
+  }
+});
+</script>
+```

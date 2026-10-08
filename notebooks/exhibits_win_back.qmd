@@ -1,13 +1,21 @@
 ---
-title: "Win-back exhibits"
+title: "Kupferkanne RFM – Win-back exhibits"
 author: "Ryszard Twardy"
 date: 2026-09-28
+date-modified: last-modified
+# The page description and Open Graph URL for the head; the metadata.html partial writes them,
+# with the favicon, before the inlined dependencies. A `description` key would also print in
+# the title block.
+description-meta: "The three win-back exhibits of the Kupferkanne RFM analysis on synthetic order data: segment shares, gross margin before the discount and contribution after it, and contribution per 1,000 EUR of discount."
+og-url: "https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/exhibits_win_back.html"
 format:
   html:
     embed-resources: true
     toc: false
     lightbox: true
     css: exhibits.css
+    template-partials:
+      - metadata.html
 output-file: exhibits_win_back.html
 engine: jupyter
 jupyter: python3
@@ -1073,7 +1081,7 @@ failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
 assert not failed, f"live results differ from docs/methodology.md: {failed}"
 ```
 
-Back to the [exploratory data analysis](index.html); the code is in the [repository on GitHub](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne).
+Back to the [exploratory data analysis](./); the code is in the [repository on GitHub](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne).
 
 ```{python}
 #| label: lede-text

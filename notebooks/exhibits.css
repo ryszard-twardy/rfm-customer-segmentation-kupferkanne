@@ -15,3 +15,6 @@
 table.exhibit-table .col-text { text-align: left; }
 table.exhibit-table .col-num { text-align: right; font-variant-numeric: tabular-nums; }
 table.exhibit-table td.col-num { white-space: nowrap; }
+
+/* Page title: balanced lines when it wraps on a narrow screen. */
+h1.title { text-wrap: balance; }

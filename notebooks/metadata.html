@@ -1,0 +1,38 @@
+$-- Template partial override for both Quarto pages: a copy of share/formats/html/pandoc/metadata.html
+$-- from Quarto 1.9.38 (Copyright (C) 2020-2024 Posit Software, PBC; MIT License, see the installed
+$-- share/COPYRIGHT and https://opensource.org/license/mit/), with one added block below. The block
+$-- puts the favicon and the Open Graph tags near the top of the head, before the inlined dependencies.
+$-- This pins Quarto 1.9.38's partial: after any Quarto upgrade, diff this file against the installed
+$-- original before the next render.
+<meta charset="utf-8" />
+$if(quarto-version)$
+<meta name="generator" content="quarto-$quarto-version$" />
+$else$
+<meta name="generator" content="quarto" />
+$endif$
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+$for(author-meta)$
+<meta name="author" content="$author-meta$" />
+$endfor$
+$if(date-meta)$
+<meta name="dcterms.date" content="$date-meta$" />
+$endif$
+$if(keywords)$
+<meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+$endif$
+$if(description-meta)$
+<meta name="description" content="$description-meta$" />
+$endif$
+$-- Added block: the inline favicon (three bars in the brand primary, c1 in _brand.yml), then the Open
+$-- Graph tags from the page title, its description-meta text and its og-url key.
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2016%2016%27%3E%3Cpath%20fill=%27%234A7AA0%27%20d=%27M1%209h4v6H1zM6%205h4v10H6zM11%201h4v14h-4z%27/%3E%3C/svg%3E" />
+$if(og-url)$
+<meta property="og:type" content="website" />
+<meta property="og:title" content="$pagetitle$" />
+<meta property="og:description" content="$description-meta$" />
+<meta property="og:url" content="$og-url$" />
+$endif$
+
+<title>$pagetitle$$if(title-prefix)$ – $title-prefix$$endif$</title>
