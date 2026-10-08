@@ -8,8 +8,14 @@
 
 <meta name="author" content="Ryszard Twardy">
 <meta name="dcterms.date" content="2026-09-28">
+<meta name="description" content="The three win-back exhibits of the Kupferkanne RFM analysis on synthetic order data: segment shares, gross margin before the discount and contribution after it, and contribution per 1,000 EUR of discount.">
+<link href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2016%2016%27%3E%3Cpath%20fill=%27%234A7AA0%27%20d=%27M1%209h4v6H1zM6%205h4v10H6zM11%201h4v14h-4z%27/%3E%3C/svg%3E" rel="icon" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kupferkanne RFM – Win-back exhibits">
+<meta property="og:description" content="The three win-back exhibits of the Kupferkanne RFM analysis on synthetic order data: segment shares, gross margin before the discount and contribution after it, and contribution per 1,000 EUR of discount.">
+<meta property="og:url" content="https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/exhibits_win_back.html">
 
-<title>Win-back exhibits</title>
+<title>Kupferkanne RFM – Win-back exhibits</title>
 <style>
 
 code{white-space: pre-wrap;}
@@ -2216,6 +2222,8 @@ margin-inline: auto;
 table.exhibit-table .col-text { text-align: left; }
 table.exhibit-table .col-num { text-align: right; font-variant-numeric: tabular-nums; }
 table.exhibit-table td.col-num { white-space: nowrap; }
+
+h1.title { text-wrap: balance; }
 </style>
 </head>
 
@@ -2227,7 +2235,7 @@ table.exhibit-table td.col-num { white-space: nowrap; }
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Win-back exhibits</h1>
+<h1 class="title">Kupferkanne RFM – Win-back exhibits</h1>
 </div>
 
 
@@ -2248,6 +2256,12 @@ table.exhibit-table td.col-num { white-space: nowrap; }
     </div>
   </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">October 8, 2026</p>
+    </div>
+  </div>
     
   </div>
   
@@ -2256,7 +2270,7 @@ table.exhibit-table td.col-num { white-space: nowrap; }
 </header>
 
 
-<p>Back to the <a href="index.html">exploratory data analysis</a>; the code is in the <a href="https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne">repository on GitHub</a>.</p>
+<p>Back to the <a href="./">exploratory data analysis</a>; the code is in the <a href="https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne">repository on GitHub</a>.</p>
 <div id="lede-text" class="cell" data-execution_count="7">
 <p>Does the win-back playbook give its deeper discount where a discount euro keeps the most contribution? Not at its current rates. At the playbook&#39;s rates (15% for At Risk, 20% for Hibernating), each euro of discount retains 1.85 times as much contribution in At Risk as in Hibernating. Most of that gap comes from the deeper discount Hibernating gets: with either rate applied to both segments, At Risk retains about 1.2 times as much. A pilot against randomised holdouts tests Hibernating at both rates; if the budget is short, At Risk goes first only if At Risk retains more on an incremental basis.</p>
 </div>
