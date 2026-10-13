@@ -1,7 +1,7 @@
 table 'Reactivation Rate'
 	lineageTag: d0018cdb-994a-4b2d-9eb5-2c1306376579
 
-	/// Auto-generated What-If parameter value from the Reactivation Rate table; read by [Subtitle Risk Concentration] and [Subtitle Whatif Upside].
+	/// Auto-generated What-If parameter value from the Reactivation Rate table; read by [Subtitle Risk Concentration].
 	measure 'Reactivation Rate Value' = SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)
 		formatString: 0
 		lineageTag: 19a78948-f5db-4d99-9e0f-a81cbd192465

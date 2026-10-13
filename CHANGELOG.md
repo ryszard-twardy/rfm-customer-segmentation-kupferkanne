@@ -53,7 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Removed
 
-- Measures `[Top Category Revenue]` and `[Top Category Name]`: no visual was bound to either and no measure referenced them. Both are removed with their generated Q&A entries, and the model now has 107 measures.
+- Measures `[Top Category Revenue]` and `[Top Category Name]`: no visual was bound to either and no measure referenced them. Both are removed with their generated Q&A entries.
+- Measures `[Subtitle Whatif Upside]` and `[Title Whatif Upside]`, written for the Upside of acting chart: no visual was bound to either and no measure referenced them. Their generated Q&A entries are removed with them, and the model now has 105 measures.
 - The R/F/M and Average Health Score cards on Segment Deep Dive: unfiltered they read 3.0 per score and 9.0 out of 15 by construction, and the profile table gives each segment's average R, F and M; the health score stays in the scatter tooltip.
 - The Upside of acting chart on Churn Risk & What-If: the recoverable revenue is a column of the risk table, and the chart's revenue-at-risk bar repeated the table's total.
 - The Spec-Kit memory file is no longer tracked (`.specify/memory/` is ignored); `AGENTS.md` no longer lists it.

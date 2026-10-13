@@ -1009,15 +1009,6 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 6b428315-bd5b-429f-aea3-f66b7d128cf2
 
-	/// Dynamic Page 4 subtitle for the Upside of acting chart; injects the live What-If reactivation rate.
-	measure 'Subtitle Whatif Upside' =
-			
-			VAR _Rate = FORMAT ( [Reactivation Rate Value] / 100, "0%" )
-			RETURN
-			    "Gross recoverable revenue at " & _Rate & " reactivation. Gross of win-back discount – see methodology."
-		displayFolder: 06 - Formatting & Regional
-		lineageTag: 54e20eff-815c-4418-9d9f-da081784dc2a
-
 	/// Static Page 4 title for the Revenue by recency stage chart.
 	measure 'Title Recency Stages' =
 			
@@ -1038,13 +1029,6 @@ table _Measures
 			"Who to win back"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 034bc11c-02f2-4d6b-b71b-4b18fcc69301
-
-	/// Static Page 4 title for the Upside of acting chart.
-	measure 'Title Whatif Upside' =
-			
-			"Upside of acting"
-		displayFolder: 06 - Formatting & Regional
-		lineageTag: ab53a705-8a4d-43a7-a298-3ac3f1b57f21
 
 	/// Static Page 5 title for the Revenue Concentration (Pareto) chart.
 	measure 'Title Pareto' =

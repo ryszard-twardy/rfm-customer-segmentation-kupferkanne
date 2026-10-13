@@ -16750,22 +16750,6 @@ cultureInfo en-US
 			        }
 			      ]
 			    },
-			    "entity__measure.subtitle_whatif_upside": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "_Measures",
-			          "ConceptualProperty": "Subtitle Whatif Upside"
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "subtitle whatif upside": {
-			            "State": "Generated"
-			          }
-			        }
-			      ]
-			    },
 			    "entity__measure.title_recency_stages": {
 			      "Definition": {
 			        "Binding": {
@@ -17076,82 +17060,6 @@ cultureInfo en-US
 			        },
 			        {
 			          "label winback scatter": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.591
-			          }
-			        }
-			      ]
-			    },
-			    "entity__measure.title_whatif_upside": {
-			      "Definition": {
-			        "Binding": {
-			          "ConceptualEntity": "_Measures",
-			          "ConceptualProperty": "Title Whatif Upside"
-			        }
-			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "title whatif upside": {
-			            "State": "Generated"
-			          }
-			        },
-			        {
-			          "designation whatif upside": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.609
-			          }
-			        },
-			        {
-			          "name whatif upside": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.591
-			          }
-			        },
-			        {
-			          "award whatif upside": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.591
-			          }
-			        },
-			        {
-			          "call whatif upside": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.591
-			          }
-			        },
-			        {
-			          "heading whatif upside": {
-			            "Type": "Noun",
-			            "State": "Suggested",
-			            "Source": {
-			              "Agent": "Thesaurus"
-			            },
-			            "Weight": 0.591
-			          }
-			        },
-			        {
-			          "label whatif upside": {
 			            "Type": "Noun",
 			            "State": "Suggested",
 			            "Source": {
@@ -21262,39 +21170,6 @@ cultureInfo en-US
 			        }
 			      ]
 			    },
-			    "entity__measure_has_title_whatif_upside": {
-			      "Binding": {
-			        "ConceptualEntity": "_Measures"
-			      },
-			      "State": "Generated",
-			      "Roles": {
-			        "entity__measure": {
-			          "Target": {
-			            "Entity": "entity__measure"
-			          }
-			        },
-			        "entity__measure.title_whatif_upside": {
-			          "Target": {
-			            "Entity": "entity__measure.title_whatif_upside"
-			          }
-			        }
-			      },
-			      "Phrasings": [
-			        {
-			          "Attribute": {
-			            "Subject": {
-			              "Role": "entity__measure"
-			            },
-			            "Object": {
-			              "Role": "entity__measure.title_whatif_upside"
-			            }
-			          },
-			          "State": "Generated",
-			          "Weight": 0.99,
-			          "ID": "Phrasing_measures_have_title_whatif_upside"
-			        }
-			      ]
-			    },
 			    "entity__measure_has_title_winback_scatter": {
 			      "Binding": {
 			        "ConceptualEntity": "_Measures"
@@ -21391,39 +21266,6 @@ cultureInfo en-US
 			          "State": "Generated",
 			          "Weight": 0.99,
 			          "ID": "Phrasing_measures_have_title_recency_stages"
-			        }
-			      ]
-			    },
-			    "reactivation_rate_has_entity__measure_subtitle_whatif_upside": {
-			      "Binding": {
-			        "ConceptualEntity": "Reactivation Rate"
-			      },
-			      "State": "Generated",
-			      "Roles": {
-			        "reactivation_rate": {
-			          "Target": {
-			            "Entity": "reactivation_rate"
-			          }
-			        },
-			        "entity__measure.subtitle_whatif_upside": {
-			          "Target": {
-			            "Entity": "entity__measure.subtitle_whatif_upside"
-			          }
-			        }
-			      },
-			      "Phrasings": [
-			        {
-			          "Attribute": {
-			            "Subject": {
-			              "Role": "reactivation_rate"
-			            },
-			            "Object": {
-			              "Role": "entity__measure.subtitle_whatif_upside"
-			            }
-			          },
-			          "State": "Generated",
-			          "Weight": 0.99,
-			          "ID": "reactivation_rates_have_subtitle_whatif_upside"
 			        }
 			      ]
 			    },

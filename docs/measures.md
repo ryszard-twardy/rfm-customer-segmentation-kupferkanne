@@ -1,5 +1,5 @@
 # DAX Measures Reference
-## Kupferkanne – 107 DAX Measures (106 in 6 Display Folders + 1 What-If Parameter Measure)
+## Kupferkanne – 105 DAX Measures (104 in 6 Display Folders + 1 What-If Parameter Measure)
 ### Author: Ryszard Twardy
 
 > Reference catalogue for the DAX measures; the TMDL files under `pbip/` are the source of truth, and this page is synced to them by hand. Every table and column name verified against BigQuery SQL scripts (03_rfm_pipeline, 05_analytics_marts). **Since the dual-grain design (2026-05-07)**, Power BI imports `sales_curated` (order-grain fact table from script 03_rfm_pipeline) as the primary fact source. `dim_Customer` (the BI-facing customer dimension) carries the customer-grain analytics after the single-direction refactor. Model-wide hygiene policies on FormatString, SummarizeBy, Hidden, and Relationships are documented in the **Model Hygiene** section below.
@@ -57,12 +57,12 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 54 of 107 measures carry an explicit `FormatString`, and `[Dynamic KPI Selector]` carries a dynamic format string; the other 52 are intentional text measures. Three special-case formats preserved:
+**Coverage:** 54 of 105 measures carry an explicit `FormatString`, and `[Dynamic KPI Selector]` carries a dynamic format string; the other 50 are intentional text measures. Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
 - `[Dynamic KPI Selector]` → dynamic format string: the format of the measure it returns (`"€"#,##0.00;-"€"#,##0.00` for Total Revenue, Average Order Value and Revenue at Risk; `#,##0` for Total Customers and Average Recency Days)
 
-**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The BPA "Provide format string for measures" rule currently reports 52 flags, all intentional – see the coverage note above.
+**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The BPA "Provide format string for measures" rule currently reports 50 flags, all intentional – see the coverage note above.
 
 **BPA accepted exception – percentage decimals.** The BPA rule "Percentages should be formatted with thousands separators and 1 decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
 
@@ -561,7 +561,7 @@ RETURN
     )
 ```
 
-**What-If parameter measure (no display folder):** `Reactivation Rate Value` = `SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)` (format `0`) lives on the `Reactivation Rate` what-if parameter table, not in a display folder. It is the auto-generated parameter value; `[What-If Revenue Impact]` consumes the parameter, and `[Subtitle Risk Concentration]` and `[Subtitle Whatif Upside]` read this measure to print the selected rate. Not bound to any visual.
+**What-If parameter measure (no display folder):** `Reactivation Rate Value` = `SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)` (format `0`) lives on the `Reactivation Rate` what-if parameter table, not in a display folder. It is the auto-generated parameter value; `[What-If Revenue Impact]` consumes the parameter, and `[Subtitle Risk Concentration]` reads this measure to print the selected rate. Not bound to any visual.
 
 ---
 
@@ -605,11 +605,9 @@ RETURN
 | Subtitle New Returning | Static subtitle for the New vs Returning revenue chart | Text | 5 |
 | Subtitle RFM Heatmap | Static subtitle for the RFM Distribution Map | Text | 5 |
 | Subtitle Revenue Trend | Dynamic Page 1 subtitle with subset-aware segment and market counts | Text | 1 |
-| Subtitle Whatif Upside | Dynamic subtitle text injecting the live What-If reactivation rate; not bound to any visual | Text | – |
 | Title Recency Stages | Static title text for the Revenue by recency stage chart; not bound to any visual (the recency tile on Page 4 carries the same text) | Text | – |
 | Title Risk Concentration | Static Page 4 title for the Where the risk concentrates table | Text | 4 |
 | Title Winback Scatter | Static Page 4 title for the Who to win back scatter chart | Text | 4 |
-| Title Whatif Upside | Static title text for the what-if upside; not bound to any visual | Text | – |
 | Title Pareto | Static Page 5 title for the Revenue Concentration (Pareto) chart | Text | 5 |
 | Title RFM Heatmap | Static Page 5 title for the RFM Distribution Map | Text | 5 |
 | Title Segment Strategy | Static Page 2 title for the Recommended Strategy by Segment table | Text | 2 |
@@ -996,14 +994,6 @@ RETURN
     _SegText & ", " & _MktText & " · Trailing 12M on right axis"
 ```
 
-```dax
-Subtitle Whatif Upside =
-VAR _Rate =
-    FORMAT ( [Reactivation Rate Value] / 100, "0%" )
-RETURN
-    "Gross recoverable revenue at " & _Rate & " reactivation. Gross of win-back discount – see methodology."
-```
-
 ---
 
 ## Product, brand and category measures (Page 3)
@@ -1124,7 +1114,7 @@ The auto-detected inactive relationship `v_items_for_bi[Order ID] → sales_cura
 
 ---
 
-## Total: 107 measures – 106 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. `[Total Orders]` is a deliberate alias of `[Distinct Orders]`, and `[Revenue % of Total]` and `[Country Revenue Share]` compute the same ratio for Pages 2 and 6.
+## Total: 105 measures – 104 across 6 display folders + 1 What-If parameter measure (`Reactivation Rate Value`). The `RFM Score Selector` field parameter is a table, not a measure. `[Total Orders]` is a deliberate alias of `[Distinct Orders]`, and `[Revenue % of Total]` and `[Country Revenue Share]` compute the same ratio for Pages 2 and 6.
 
 ---
 
