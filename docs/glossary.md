@@ -23,7 +23,7 @@ Domain and technical terms used across the project.
 | **Retains** | The verb for the win-back metric: contribution retained per euro of discount, as in "At Risk retains more contribution per euro of discount than Hibernating at the playbook's rates". Not "returns" or "earns", which would imply an observed campaign return. |
 | **RFM** | Recency, Frequency, Monetary – a customer segmentation framework based on observed transaction behaviour. |
 | **Sharding (BigQuery)** | Splitting a logical table across many physically-named tables (`orders202301`, `orders202302`, ...). BigQuery scans them via wildcard syntax (`orders20*`). |
-| **`sales_curated`** | The order-grain curated fact table (~169K rows) used by all six report pages and the Customer Drillthrough. See [ADR 0005](adr/0005-dual-grain-fact-model.md). |
+| **`sales_curated`** | The order-grain curated fact table (~169K rows) used by five of the six report pages and the Customer Drillthrough. See [ADR 0005](adr/0005-dual-grain-fact-model.md). |
 | **Star schema** | Database design with central fact tables surrounded by dimension tables, enabling simple SQL joins and fast aggregation. |
 | **`v_items_for_bi`** | The line-grain BI view (~273K rows) used by the Product & Brand page and the Customer Drillthrough. |
 | **Weighted margin** | `SUM(profit) / SUM(revenue)`, contrasted with `AVG(margin_per_order)` which double-weights small orders. See [ADR 0007](adr/0007-two-tier-margin-calculation.md). |

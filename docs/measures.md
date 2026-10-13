@@ -57,12 +57,12 @@ Per BPA rule **"Provide format string for measures"**, every numeric measure car
 | Date | `dd-mmm-yyyy` | calc-table date columns |
 | Text | *(none – no FormatString applied)* | `[Health Indicator]`, `[Subtitle Page N]`, `[Top Brand Name]` |
 
-**Coverage:** 54 of 107 measures carry an explicit `FormatString`. The 53 without: 52 intentional text measures + `[Dynamic KPI Selector]` (format inherited at evaluation via `SWITCH`). Three special-case formats preserved:
+**Coverage:** 54 of 107 measures carry an explicit `FormatString`, and `[Dynamic KPI Selector]` carries a dynamic format string; the other 52 are intentional text measures. Three special-case formats preserved:
 - `[Avg Health Score]` → `0.0 "/ 15"` (score-out-of-15 semantic)
 - `[Reactivation Rate Value]` → `0` (integer percentage points, not a ratio)
-- `[Dynamic KPI Selector]` → format inherited via `SWITCH` from the selected measure
+- `[Dynamic KPI Selector]` → dynamic format string: the format of the measure it returns (`"€"#,##0.00;-"€"#,##0.00` for Total Revenue, Average Order Value and Revenue at Risk; `#,##0` for Total Customers and Average Recency Days)
 
-**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The BPA "Provide format string for measures" rule currently reports 53 flags, all intentional – see the coverage note above.
+**Batch script:** `tools/format_string_batch.csx` (`dryRun=true` default, explicit manual-override helper, BPA pre-flight via `INFO.VIEW.MEASURES()` introspection). Reference implementation for future TE2 pattern-matching batches. The BPA "Provide format string for measures" rule currently reports 52 flags, all intentional – see the coverage note above.
 
 **BPA accepted exception – percentage decimals.** The BPA rule "Percentages should be formatted with thousands separators and 1 decimal" flags every percentage measure. The house standard for precision-sensitive percentages (margins, rates) is `0.00%` (2dp), where the second decimal carries real information; this is a deliberate convention, not a defect, accepted as a standing exception (mirrors the accepted `Is Closed Month` exception). Affected 2dp measures (the 11 precision-sensitive percentage measures use `0.00%`): `Segment % of Total`, `Revenue % of Total`, `Country Revenue Share`, `Profit Margin %`, `Avg Brand Margin %`, `Line Margin %`, `Margin Baseline`, `% Revenue at Risk`, `Cumulative Revenue %`, `Pareto Threshold 80%`, `Profit Margin PY`. The 1dp (`0.0%`) exceptions are three year-over-year measures – `Revenue YoY %`, `Profit YoY %`, and `Profit Margin YoY (pp)` – where a single decimal is sufficient for a year-over-year delta.
 
@@ -136,20 +136,20 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 | Measure | Formula | Format | Pages |
 |---|---|---|---|
-| Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 3, 5, 6, 7 |
+| Total Revenue | `SUM(sales_curated[Order Value])` | € Currency (€ DE), 2dp, display Millions | 1, 2, 5, 6, 7 |
 | Total Customers | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 1, 2, 4, 5, 6 |
 | Customers at Risk | `CALCULATE(DISTINCTCOUNT(dim_Customer[Customer ID]), dim_Customer[Segment] IN {"At Risk", "Hibernating"}, NOT ISBLANK(dim_Customer[Order Count]))` | # 0dp | 4 |
 | Total Orders | `[Distinct Orders]` | # 0dp | 7 |
 | Avg Order Value | `DIVIDE([Total Revenue], [Total Orders], 0)` | € Currency, 2dp | 7 |
 | Avg Customer LTV | `DIVIDE([Total Revenue], [Total Customers], 0)` | € Currency, 0dp | – |
-| Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 1 |
+| Avg Recency Days | `AVERAGE(dim_Customer[Recency Days])` | # 0dp | 1 |
 | Median Recency Days | `MEDIAN(dim_Customer[Recency Days])` | Custom `#,##0 "days"` | 4 |
 | Avg Frequency | `AVERAGE(dim_Customer[Order Count])` | Dec 1dp | 2 |
-| Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2 |
+| Avg Monetary | `AVERAGE(dim_Customer[Total Spend])` | € Currency, 2dp | 2, 4 |
 | Median Total Spend | `MEDIAN(dim_Customer[Total Spend])` | € Currency, 2dp | 4 |
 | Distinct Orders | `DISTINCTCOUNT(sales_curated[Order ID])` | # 0dp | 4 |
 | Total Profit | `SUM(sales_curated[Order Profit])` | € Currency (€ DE), 2dp, display Millions | 1 |
-| Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1, 3 |
+| Profit Margin % | `DIVIDE([Total Profit], [Total Revenue], 0)` | % 2dp | 1 |
 | Line Revenue | `SUM(v_items_for_bi[Line Net Amount])` | € Currency, 2dp | 3, 7 |
 | Line Profit | `SUM(v_items_for_bi[Line Profit])` | € Currency, 2dp | – |
 | Line Margin % | `DIVIDE([Line Profit], [Line Revenue], 0)` | % 2dp | 3 |
@@ -163,7 +163,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 | Margin Baseline | `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` | % 2dp | 3 |
 | Lifecycle Revenue | `SUM(v_revenue_new_returning[Revenue])` | € Currency, 2dp | 5 |
 
-**Dependency / diagnostic measures:** `Line Revenue`, `Line Profit` and `Line Margin %` are line-grain building blocks consumed by the brand measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Line Revenue` is also bound on Pages 3 and 7 and `Line Margin %` on Page 3. `Line Profit` and `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`, a QA invariant, expected 0) are bound to no visual. `[Top Brand Name]` is bound to no visual either; it feeds `[Combo Chart Title]`, the Page 3 combo chart title.
+**Dependency / diagnostic measures:** `Line Revenue`, `Line Profit` and `Line Margin %` are line-grain building blocks consumed by the brand measures (`[Top Brand Revenue]`, `[Avg Brand Margin %]`, …); `Line Revenue` is also bound on Pages 3 and 7 and `Line Margin %` on Page 3. On Page 3 they also drive the cards labelled Total Revenue and Profit Margin %: at line grain these cards follow a product, brand or category selection on the page, and unfiltered they equal `[Total Revenue]` and `[Profit Margin %]`. `Line Profit` and `Grain Reconciliation` (`[Total Revenue] - [Line Revenue]`, a QA invariant, expected 0) are bound to no visual. `[Top Brand Name]` is bound to no visual either; it feeds `[Combo Chart Title]`, the Page 3 brand chart title.
 
 **`[Distinct Orders]` (Pages = 4):** order-grain distinct order count from `sales_curated[Order ID]`. Not slice-able by `dim_Product` – `sales_curated` has no relationship path to `dim_Product` in the single-direction star, so a product slice returns the unfiltered grand total. Bound on the Page 4 scatter; do not place on a product axis.
 
@@ -173,7 +173,7 @@ These remain accessible via `[Total Revenue]`, `[Total Profit]`, `[Line Revenue]
 
 **Equal-weight benchmark:** `Avg Brand Margin %` uses `AVERAGEX` over brands – equal-weight semantic for benchmarking, NOT P&L. Returns 59.63% vs `Profit Margin %` 59.52% (revenue-weighted) – the two now sit close but remain distinct semantics. Both legitimate, qualifying labels mandatory in UI ("Average Brand Margin", never "Margin").
 
-**Margin Baseline:** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.52%). Drives the Page 3 brand combo reference line, replacing the prior built-in equal-weight Average line (which violated the weighted-margin principle). Rendered as a hidden secondary-axis series anchoring an Average analytics line (Average of a flat series returns the flat value), giving an edge-to-edge labelled reference with full DAX control.
+**Margin Baseline:** `Margin Baseline` = `CALCULATE([Line Margin %], REMOVEFILTERS(dim_Product[Brand]))` – the revenue-weighted overall line margin, flat across the Brand axis (59.52% unfiltered). It is the blended margin in the Page 3 brand chart's tooltip, next to each brand's `[Line Margin %]`, so a brand's margin reads against the weighted whole rather than an equal-weight average (the weighted-margin principle). Only the Brand filter is removed, so under a selection on the page it is the margin of the selection across all brands, for example a product's own margin or a category's margin.
 
 **Fact-grain principle (dual-grain naming):** measures `[Total Revenue]` and `[Total Profit]` refactored to source from `sales_curated` (order-grain fact table). Dimensional views serve as drill-down axes/legends only.
 
@@ -206,7 +206,7 @@ RETURN
     )
 ```
 
-**Edge case:** ties in revenue resolve alphabetically first (TOPN ASC tiebreak on the name column); a tie changes only the Page 3 combo chart title.
+**Edge case:** ties in revenue resolve alphabetically first (TOPN ASC tiebreak on the name column); a tie changes only the Page 3 brand chart title.
 
 ### Lifecycle Revenue – full formula
 
@@ -372,7 +372,7 @@ RETURN
 |---|---|---|
 | Revenue Active (0–90d) | € 2dp | 4 |
 | Revenue Cooling (91–180d) | € 2dp | 4 |
-| Revenue Dormant (180d+) | € 2dp | 4 |
+| Revenue Dormant (over 180d) | € 2dp | 4 |
 | Revenue Rolling 12M | € 0dp | 1 |
 | Revenue YoY % | % 1dp | – |
 | Profit YoY % | % 1dp | – |
@@ -498,7 +498,7 @@ CALCULATE (
 | Measure | Format | Pages |
 |---|---|---|
 | What-If Revenue Impact | € 2dp | 4 |
-| Dynamic KPI Selector | varies | 2 |
+| Dynamic KPI Selector | Dynamic: the returned measure's format | 2 |
 | Dynamic KPI Label | Text | 2 |
 
 ```dax
@@ -540,7 +540,28 @@ RETURN
     )
 ```
 
-**What-If parameter measure (no display folder):** `Reactivation Rate Value` = `SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)` (format `0`) lives on the `Reactivation Rate` what-if parameter table, not in a display folder. It is the auto-generated parameter value; `[What-If Revenue Impact]` consumes the parameter. Not bound to any visual.
+```dax
+-- format string expression of [Dynamic KPI Selector]
+VAR Selected =
+    SELECTEDVALUE (
+        dim_KPI_Selector[KPI],
+        "Total Revenue"
+    )
+VAR FormatCurrency = """€""#,##0.00;-""€""#,##0.00"
+VAR FormatCount = "#,##0"
+RETURN
+    SWITCH (
+        Selected,
+        "Total Revenue", FormatCurrency,
+        "Total Customers", FormatCount,
+        "Average Order Value", FormatCurrency,
+        "Average Recency Days", FormatCount,
+        "Revenue at Risk", FormatCurrency,
+        FormatCurrency
+    )
+```
+
+**What-If parameter measure (no display folder):** `Reactivation Rate Value` = `SELECTEDVALUE('Reactivation Rate'[Reactivation Rate], 10)` (format `0`) lives on the `Reactivation Rate` what-if parameter table, not in a display folder. It is the auto-generated parameter value; `[What-If Revenue Impact]` consumes the parameter, and `[Subtitle Risk Concentration]` and `[Subtitle Whatif Upside]` read this measure to print the selected rate. Not bound to any visual.
 
 ---
 
@@ -555,15 +576,15 @@ RETURN
 | Revenue Trend Chart Title | Dynamic line chart title with live month count | Text | 1 |
 | Subtitle Page 1 | Dynamic Page 1 subtitle with live market + month counts | Text | 1 |
 | Subtitle Page 2 | Dynamic Page 2 subtitle with live segment count | Text | 2 |
-| Subtitle Page 3 | Dynamic Page 3 subtitle with product + brand counts | Text | 3 |
+| Subtitle Page 3 | Dynamic Page 3 subtitle with live product and brand counts, singular/plural-aware | Text | 3 |
 | Subtitle Page 4 | Dynamic Page 4 subtitle with live at-risk customer count | Text | 4 |
 | Subtitle Page 5 | Static Page 5 subtitle literal (RFM distribution, revenue concentration, cohort retention, new vs returning revenue) | Text | 5 |
 | Subtitle Page 6 | Dynamic Page 6 subtitle with live market and city counts, singular/plural-aware | Text | 6 |
 | Subtitle Page 7 | Dynamic Page 7 drillthrough header (customer ID · segment · city, country); prompts the drill-through gesture when no single customer is in context | Text | 7 |
-| R Label | Static axis caption for the RFM Field Parameter | Text | 2 |
-| M Label | Static axis caption for the RFM Field Parameter | Text | 2 |
-| F Label | Static axis caption for the RFM Field Parameter | Text | 2 |
-| Combo Chart Title | Dynamic Page 3 combo chart title with top brand name + revenue | Text | 3 |
+| R Label | Static axis caption for the RFM Field Parameter | Text | – |
+| M Label | Static axis caption for the RFM Field Parameter | Text | – |
+| F Label | Static axis caption for the RFM Field Parameter | Text | – |
+| Combo Chart Title | Dynamic Page 3 brand chart title with the top brand name + revenue and the brand margin range | Text | 3 |
 | Subtitle Cohort Retention | Dynamic Page 5 cohort-matrix subtitle: cohort count, span, tenure window | Text | 5 |
 | Retention Font Color | Per-cell font contrast for the diverging cohort heatmap | Hex text | 5 |
 | Lifecycle Headline | Dynamic Page 5 headline: repeat-customer share of revenue | Text | 5 |
@@ -576,19 +597,19 @@ RETURN
 | Country Total Revenue | Country-grain revenue immune to the Region slicer (choropleth fill driver) | € 2dp | 6 |
 | Subtitle Segment Strategy | Static subtitle for the Recommended Strategy by Segment table | Text | 2 |
 | Subtitle Segment Scatter | Static subtitle for the Frequency x Monetary by Segment scatter chart | Text | 2 |
-| Subtitle Brand Margin | Static data-claim subtitle for the Page 3 brand combo chart - revalidate if margin ranking changes | Text | 3 |
-| Subtitle Recency Stages | Static subtitle for the Revenue by recency stage chart (90/180-day cooling curve) | Text | 4 |
-| Subtitle Risk Concentration | Static subtitle for the Where the risk concentrates table | Text | 4 |
-| Subtitle Winback Scatter | Static subtitle for the Who to win back scatter chart | Text | 4 |
+| Subtitle Brand Margin | Static data-claim subtitle for the Page 3 brand chart – revalidate if margin ranking changes | Text | 3 |
+| Subtitle Recency Stages | Static subtitle text for the Revenue by recency stage chart: days since last order, Active 0–90, Cooling 91–180, Dormant over 180; not bound to any visual (the recency tile on Page 4 carries the same text) | Text | – |
+| Subtitle Risk Concentration | Dynamic subtitle for the Where the risk concentrates table, injecting the live What-If reactivation rate: value, customers, offer and gross revenue recoverable at that rate (a scenario, not a forecast) | Text | 4 |
+| Subtitle Winback Scatter | Dynamic subtitle for the Who to win back scatter chart, injecting the live median lifetime spend of its horizontal reference line | Text | 4 |
 | Subtitle Pareto | Static subtitle for the Revenue Concentration (Pareto) chart | Text | 5 |
 | Subtitle New Returning | Static subtitle for the New vs Returning revenue chart | Text | 5 |
 | Subtitle RFM Heatmap | Static subtitle for the RFM Distribution Map | Text | 5 |
 | Subtitle Revenue Trend | Dynamic Page 1 subtitle with subset-aware segment and market counts | Text | 1 |
-| Subtitle Whatif Upside | Dynamic Page 4 subtitle injecting the live What-If reactivation rate | Text | 4 |
-| Title Recency Stages | Static Page 4 title for the Revenue by recency stage chart | Text | 4 |
+| Subtitle Whatif Upside | Dynamic subtitle text injecting the live What-If reactivation rate; not bound to any visual | Text | – |
+| Title Recency Stages | Static title text for the Revenue by recency stage chart; not bound to any visual (the recency tile on Page 4 carries the same text) | Text | – |
 | Title Risk Concentration | Static Page 4 title for the Where the risk concentrates table | Text | 4 |
 | Title Winback Scatter | Static Page 4 title for the Who to win back scatter chart | Text | 4 |
-| Title Whatif Upside | Static Page 4 title for the Upside of acting chart | Text | 4 |
+| Title Whatif Upside | Static title text for the what-if upside; not bound to any visual | Text | – |
 | Title Pareto | Static Page 5 title for the Revenue Concentration (Pareto) chart | Text | 5 |
 | Title RFM Heatmap | Static Page 5 title for the RFM Distribution Map | Text | 5 |
 | Title Segment Strategy | Static Page 2 title for the Recommended Strategy by Segment table | Text | 2 |
@@ -678,14 +699,22 @@ Subtitle Page 1 =
 
 ```dax
 Subtitle Page 2 =
-"RFM profile comparison across "
-    & DISTINCTCOUNT ( dim_Segment[Segment] )
-    & " segments"
+VAR _Segments =
+    DISTINCTCOUNT ( dim_Segment[Segment] )
+RETURN
+    "RFM profile comparison across "
+        & _Segments & IF ( _Segments = 1, " segment", " segments" )
 ```
 
 ```dax
-Subtitle Page 3 = 
-"Profitability across " & [Total Products] & " products and " & [Total Brands] & " brands"
+Subtitle Page 3 =
+VAR _Products = [Total Products]
+VAR _Brands = [Total Brands]
+RETURN
+    "Profitability across "
+        & _Products & IF ( _Products = 1, " product", " products" )
+        & " and "
+        & _Brands & IF ( _Brands = 1, " brand", " brands" )
 ```
 
 ```dax
@@ -735,13 +764,49 @@ RETURN
 
 ```dax
 Combo Chart Title =
-"Brand Revenue x Margin % - top brand "
-    & [Top Brand Name]
-    & " drives "
-    & FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )
+VAR _SoldBrands =
+    FILTER (
+        VALUES ( dim_Product[Brand] ),
+        NOT ISBLANK ( [Line Revenue] )
+    )
+VAR _Brands =
+    COUNTROWS ( _SoldBrands )
+VAR _TopBrand = [Top Brand Name]
+VAR _TopValue = [Top Brand Revenue]
+VAR _TopRevenue =
+    IF (
+        _TopValue >= 1000000,
+        FORMAT ( _TopValue, "€#,##0,,.0M" ),
+        FORMAT ( _TopValue, "€#,##0,.0K" )
+    )
+VAR _MinMargin =
+    MINX (
+        _SoldBrands,
+        [Line Margin %]
+    )
+VAR _MaxMargin =
+    MAXX (
+        _SoldBrands,
+        [Line Margin %]
+    )
+RETURN
+    IF (
+        _Brands < 2,
+        "Revenue by brand – "
+            & _TopBrand
+            & " drives "
+            & _TopRevenue,
+        _TopBrand
+            & " leads revenue at "
+            & _TopRevenue
+            & "; brand margins "
+            & FORMAT ( _MinMargin, "0.0%" )
+            & "–"
+            & FORMAT ( _MaxMargin, "0.0%" )
+    )
 ```
 
-**Design decision – dynamic combo title:** the Page 3 brand combo chart binds its Title to `[Combo Chart Title]` via fx (Field value), following the `[Revenue Trend Chart Title]` pattern. The headline brand and its compact-formatted revenue come from `[Top Brand Name]` and `FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )`, so the title auto-updates under slicer context – no manual edits as the leader changes.
+**Design decision – dynamic brand chart title:** the Page 3 brand chart, a column chart of revenue by brand, binds its Title to `[Combo Chart Title]` via fx (Field value), following the `[Revenue Trend Chart Title]` pattern; the measure keeps the name it had on the earlier combo chart. The title states the top brand's revenue and the range of brand margins. The brand comes from `[Top Brand Name]`; its revenue, `[Top Brand Revenue]`, reads in millions at one decimal from €1M up (`"€#,##0,,.0M"`) and in thousands at one decimal below (`"€#,##0,.0K"`), so revenue under €1M reads in thousands rather than as a rounded fraction of a million. The range is `MINX` and `MAXX` of `[Line Margin %]` over the brands with revenue in the filter context, `FILTER ( VALUES ( dim_Product[Brand] ), NOT ISBLANK ( [Line Revenue] ) )`, formatted `0.0%`, so a brand without sales neither opens the range at 0.0% nor counts as a second brand. Both parts are computed in the visual's filter context, so the title follows filters – no manual edits as the leader or the range changes. A selection in Top 15 Products by Revenue, the Profitability by Category, Brand and Product matrix or Revenue Trend by Category filters the brand chart instead of highlighting it, so the bars and the title show the same brands. With fewer than two brands with sales in the filter context a range says nothing, so the title falls back to the top-brand wording. The chart plots revenue only: brand margins differ by about one percentage point, while the largest brand's revenue is about four times the smallest's, so a margin series on the same chart is either exaggerated by a truncated axis or flat on a zero-based one. The title carries the margin range instead, and the tooltip shows each brand's margin next to the blended margin, `[Margin Baseline]`.
 
 ```dax
 Subtitle Cohort Retention =
@@ -897,6 +962,23 @@ CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_Customer[State] ) )
 ```
 
 ```dax
+Subtitle Risk Concentration =
+VAR _Rate =
+    FORMAT ( [Reactivation Rate Value] / 100, "0%" )
+RETURN
+    "At Risk and Hibernating – value, customers, offer and gross revenue recoverable at " & _Rate & " reactivation (a scenario, not a forecast)"
+```
+
+```dax
+Subtitle Winback Scatter =
+VAR _Median =
+    FORMAT ( [Median Total Spend], """€""#,##0.00;-""€""#,##0.00" )
+RETURN
+    "Value vs recency for at-risk customers – prioritise the top-right; median lifetime spend "
+        & _Median & " (horizontal dashed line)"
+```
+
+```dax
 Subtitle Revenue Trend =
 VAR _SegVisible =
     DISTINCTCOUNT ( dim_Segment[Segment] )
@@ -981,7 +1063,7 @@ DATATABLE (
     "SortOrder", INTEGER,
     "SegmentColor", STRING,
     {
-        { "Champions", "Monthly newsletter", "VIP Tier", "None - full price", "High (40%)", 1, "#4A7AA0" },
+        { "Champions", "Monthly newsletter", "VIP Tier", "None – full price", "High (40%)", 1, "#4A7AA0" },
         { "Loyal Customers", "Bi-weekly", "Standard tier", "Selective 5%", "Medium (25%)", 2, "#7BA8B8" },
         { "Potential Loyalists", "Weekly nurture", "Eligibility offer", "Welcome 10%", "Medium (15%)", 3, "#8FA87E" },
         { "Recent Customers", "Weekly onboarding", "Eligibility offer", "First-buy 10%", "Low (10%)", 4, "#D4A762" },

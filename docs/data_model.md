@@ -75,7 +75,7 @@ Two curated fact objects feed Power BI, each at a different grain:
 
 | Object | Grain | Rows | Used by PBI pages |
 |---|---|---|---|
-| `sales_curated` | Order | ~169K | 1 Executive Summary, 2 Segment Deep Dive, 3 Product & Brand, 4 Churn Risk & What-If, 5 Customer Lifecycle Intelligence, 6 Regional Analysis, 7 Customer Drillthrough |
+| `sales_curated` | Order | ~169K | 1 Executive Summary, 2 Segment Deep Dive, 4 Churn Risk & What-If, 5 Customer Lifecycle Intelligence, 6 Regional Analysis, 7 Customer Drillthrough |
 | `v_items_for_bi` | Line item | ~273K | 3 Product & Brand, 7 Customer Drillthrough |
 
 The dual-grain approach prevents aggregation errors that would arise from joining order-level and line-level metrics in a single fact table. Power BI measures follow a naming convention: `[Total *]` for order-grain measures and `[Line *]` for line-grain, enforcing clarity at consumption time. See [measures.md](measures.md) for the full catalogue.

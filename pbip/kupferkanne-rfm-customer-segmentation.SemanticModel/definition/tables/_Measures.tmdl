@@ -227,7 +227,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Projected recovered revenue: at-risk spend times the selected reactivation rate.
+	/// Gross win-back scenario: lifetime spend of At Risk and Hibernating times the selected reactivation rate; a scenario, not a forecast.
 	measure 'What-If Revenue Impact' =
 			
 			VAR AtRiskRev =
@@ -272,6 +272,25 @@ table _Measures
 			    )
 		displayFolder: 05 - Dynamic & What-If
 		lineageTag: cc8df1f6-cf08-4c78-ac86-c62abc92d1ca
+
+		formatStringDefinition =
+				VAR Selected =
+				    SELECTEDVALUE (
+				        dim_KPI_Selector[KPI],
+				        "Total Revenue"
+				    )
+				VAR FormatCurrency = """€""#,##0.00;-""€""#,##0.00"
+				VAR FormatCount = "#,##0"
+				RETURN
+				    SWITCH (
+				        Selected,
+				        "Total Revenue", FormatCurrency,
+				        "Total Customers", FormatCount,
+				        "Average Order Value", FormatCurrency,
+				        "Average Recency Days", FormatCount,
+				        "Revenue at Risk", FormatCurrency,
+				        FormatCurrency
+				    )
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -453,23 +472,27 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Dynamic Page 3 subtitle with live product and brand counts.
+	/// Dynamic Page 3 subtitle: live product and brand counts with singular/plural handling.
 	measure 'Subtitle Page 3' =
 			
-			"Profitability across "
-			    & [Total Products]
-			    & " products and "
-			    & [Total Brands]
-			    & " brands"
+			VAR _Products = [Total Products]
+			VAR _Brands = [Total Brands]
+			RETURN
+			    "Profitability across "
+			        & _Products & IF ( _Products = 1, " product", " products" )
+			        & " and "
+			        & _Brands & IF ( _Brands = 1, " brand", " brands" )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 458efd47-dc70-4f08-a853-b9c5f88dd665
 
 	/// Dynamic Page 2 subtitle with live segment count.
 	measure 'Subtitle Page 2' =
 			
-			"RFM profile comparison across "
-			    & DISTINCTCOUNT ( dim_Segment[Segment] )
-			    & " segments"
+			VAR _Segments =
+			    DISTINCTCOUNT ( dim_Segment[Segment] )
+			RETURN
+			    "RFM profile comparison across "
+			        & _Segments & IF ( _Segments = 1, " segment", " segments" )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 50e22469-7d24-4b4d-8799-fd8fd3a7749a
 
@@ -501,7 +524,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Line-grain net revenue from v_items_for_bi; building block for brand/category measures, not visual-bound.
+	/// Line-grain net revenue from v_items_for_bi; building block for brand/category measures; bound on Pages 3 and 7, including the Page 3 card labelled Total Revenue.
 	measure 'Line Revenue' =
 			
 			SUM ( v_items_for_bi[Line Net Amount] )
@@ -511,7 +534,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Line-grain margin: Line Profit / Line Revenue.
+	/// Line-grain margin: Line Profit / Line Revenue; bound on Page 3, including the card labelled Profit Margin %.
 	measure 'Line Margin %' =
 			
 			DIVIDE (
@@ -551,17 +574,53 @@ table _Measures
 		displayFolder: 01 - Core KPIs
 		lineageTag: ff617895-baec-4674-926a-44ee836c100b
 
-	/// Dynamic Page 3 combo chart title naming the top brand and its compact revenue; bound via fx (Field value); text measure, no FormatString by design.
+	/// Dynamic Page 3 brand chart title: the top brand's revenue (millions at one decimal from €1M, otherwise thousands) and the margin range of the brands with sales at one decimal; top-brand wording when fewer than two brands with sales are in the filter context; bound via fx (Field value); text measure, no FormatString by design.
 	measure 'Combo Chart Title' =
 			
-			"Brand Revenue x Margin % - top brand "
-			    & [Top Brand Name]
-			    & " drives "
-			    & FORMAT ( [Top Brand Revenue], "€#,##0,,.0M" )
+			VAR _SoldBrands =
+			    FILTER (
+			        VALUES ( dim_Product[Brand] ),
+			        NOT ISBLANK ( [Line Revenue] )
+			    )
+			VAR _Brands =
+			    COUNTROWS ( _SoldBrands )
+			VAR _TopBrand = [Top Brand Name]
+			VAR _TopValue = [Top Brand Revenue]
+			VAR _TopRevenue =
+			    IF (
+			        _TopValue >= 1000000,
+			        FORMAT ( _TopValue, "€#,##0,,.0M" ),
+			        FORMAT ( _TopValue, "€#,##0,.0K" )
+			    )
+			VAR _MinMargin =
+			    MINX (
+			        _SoldBrands,
+			        [Line Margin %]
+			    )
+			VAR _MaxMargin =
+			    MAXX (
+			        _SoldBrands,
+			        [Line Margin %]
+			    )
+			RETURN
+			    IF (
+			        _Brands < 2,
+			        "Revenue by brand – "
+			            & _TopBrand
+			            & " drives "
+			            & _TopRevenue,
+			        _TopBrand
+			            & " leads revenue at "
+			            & _TopRevenue
+			            & "; brand margins "
+			            & FORMAT ( _MinMargin, "0.0%" )
+			            & "–"
+			            & FORMAT ( _MaxMargin, "0.0%" )
+			    )
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 0215e522-d609-4d83-b7ca-851929a13598
 
-	/// Revenue-weighted margin across all brands; flat baseline for the Page 3 brand combo.
+	/// Revenue-weighted margin across all brands; the blended margin in the Page 3 brand chart's tooltip.
 	measure 'Margin Baseline' =
 			
 			CALCULATE (
@@ -881,31 +940,37 @@ table _Measures
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 7a658494-621d-45a9-8406-46b63910fe0a
 
-	/// Static Page 3 subtitle for the brand combo chart; data-claim literal, revalidate if margin ranking changes.
+	/// Static Page 3 subtitle for the brand chart; data-claim literal, revalidate if margin ranking changes.
 	measure 'Subtitle Brand Margin' =
 			
 			"Eigenmarke leads on margin"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 566e7193-22bd-47ff-94e7-65e35d33f653
 
-	/// Static Page 4 subtitle for the Revenue by recency stage chart (90/180-day cooling curve).
+	/// Static Page 4 subtitle for the Revenue by recency stage chart: the day ranges of [Revenue Active], [Revenue Cooling] and [Revenue Dormant].
 	measure 'Subtitle Recency Stages' =
 			
-			"Where customer value sits on the 90 / 180-day cooling curve"
+			"Days since last order: Active 0–90, Cooling 91–180, Dormant over 180"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: c7bfcd57-9eb5-45db-a0a8-51f9b5ea21f5
 
-	/// Static Page 4 subtitle for the Where the risk concentrates table.
+	/// Dynamic Page 4 subtitle for the Where the risk concentrates table; injects the live What-If reactivation rate and labels the recovered revenue as a gross scenario, not a forecast.
 	measure 'Subtitle Risk Concentration' =
 			
-			"At-Risk and Hibernating segments - value, heads, recommended win-back"
+			VAR _Rate = FORMAT ( [Reactivation Rate Value] / 100, "0%" )
+			RETURN
+			    "At Risk and Hibernating – value, customers, offer and gross revenue recoverable at " & _Rate & " reactivation (a scenario, not a forecast)"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: f84668a5-0de3-4b35-90fa-4a5e0f1cdd42
 
-	/// Static Page 4 subtitle for the Who to win back scatter chart.
+	/// Dynamic Page 4 subtitle for the Who to win back scatter chart, with the live median lifetime spend of its horizontal reference line.
 	measure 'Subtitle Winback Scatter' =
 			
-			"Value vs recency for at-risk customers - prioritise the top-right"
+			VAR _Median =
+			    FORMAT ( [Median Total Spend], """€""#,##0.00;-""€""#,##0.00" )
+			RETURN
+			    "Value vs recency for at-risk customers – prioritise the top-right; median lifetime spend "
+			        & _Median & " (horizontal dashed line)"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: a6e47313-03db-4816-b8bf-081af6b84172
 
@@ -926,7 +991,7 @@ table _Measures
 	/// Static Page 5 subtitle for the RFM Distribution Map.
 	measure 'Subtitle RFM Heatmap' =
 			
-			"Customer count across all 25 R x F combinations"
+			"Customer count across all 25 R × F combinations"
 		displayFolder: 06 - Formatting & Regional
 		lineageTag: 46478b3b-a4b7-4b9c-9d39-8a0840e1f0d7
 

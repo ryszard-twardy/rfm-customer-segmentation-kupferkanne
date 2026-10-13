@@ -155,6 +155,7 @@ table dim_Customer
 
 	column 'Total Spend'
 		dataType: double
+		formatString: "€"#,##0.00;-"€"#,##0.00
 		lineageTag: 6c80c9e3-5a6f-45de-b975-d8d90191de0f
 		summarizeBy: none
 		sourceColumn: total_spend

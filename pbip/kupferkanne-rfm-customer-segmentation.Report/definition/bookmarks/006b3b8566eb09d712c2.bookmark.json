@@ -191,7 +191,7 @@
                     "From": [
                       {
                         "Name": "d",
-                        "Entity": "dim_Customer",
+                        "Entity": "dim_Segment",
                         "Type": 0
                       }
                     ],
@@ -236,7 +236,7 @@
                     "Column": {
                       "Expression": {
                         "SourceRef": {
-                          "Entity": "dim_Customer"
+                          "Entity": "dim_Segment"
                         }
                       },
                       "Property": "Segment"
@@ -248,18 +248,13 @@
                   "name": "0af357ac6e901617802e",
                   "type": "Advanced",
                   "expression": {
-                    "Aggregation": {
+                    "Measure": {
                       "Expression": {
-                        "Column": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Entity": "dim_Customer"
-                            }
-                          },
-                          "Property": "Total Spend"
+                        "SourceRef": {
+                          "Entity": "_Measures"
                         }
                       },
-                      "Function": 0
+                      "Property": "Revenue at Risk"
                     }
                   },
                   "howCreated": 0
@@ -278,46 +273,72 @@
                     }
                   },
                   "howCreated": 0
+                },
+                {
+                  "name": "5d91c5f61805c7d52159",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Avg Monetary"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "4d3e2450e57774ab6cc5",
+                  "type": "Categorical",
+                  "expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_Segment"
+                        }
+                      },
+                      "Property": "Discount Approach"
+                    }
+                  },
+                  "howCreated": 0
+                },
+                {
+                  "name": "57cfd14165924d826ad7",
+                  "type": "Advanced",
+                  "expression": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "What-If Revenue Impact"
+                    }
+                  },
+                  "howCreated": 0
                 }
               ]
             },
             "singleVisual": {
-              "visualType": "pivotTable",
+              "visualType": "tableEx",
               "objects": {},
               "orderBy": [
                 {
                   "Direction": 2,
                   "Expression": {
-                    "Aggregation": {
+                    "Measure": {
                       "Expression": {
-                        "Column": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Entity": "dim_Customer"
-                            }
-                          },
-                          "Property": "Total Spend"
+                        "SourceRef": {
+                          "Entity": "_Measures"
                         }
                       },
-                      "Function": 0
+                      "Property": "Revenue at Risk"
                     }
                   }
                 }
-              ],
-              "activeProjections": {
-                "Rows": [
-                  {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_Customer"
-                        }
-                      },
-                      "Property": "Segment"
-                    }
-                  }
-                ]
-              }
+              ]
             }
           },
           "9bb1d975c76ea1e4891d": {
@@ -770,61 +791,6 @@
                         }
                       },
                       "Property": "What-If Revenue Impact"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "f453b6e39b30ac6c7103": {
-            "filters": {
-              "byExpr": [
-                {
-                  "name": "253b8728227a496811c4",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Revenue at Risk"
-                    }
-                  },
-                  "howCreated": 0
-                },
-                {
-                  "name": "31cd757f4560eb50b40e",
-                  "type": "Advanced",
-                  "expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "What-If Revenue Impact"
-                    }
-                  },
-                  "howCreated": 0
-                }
-              ]
-            },
-            "singleVisual": {
-              "visualType": "clusteredColumnChart",
-              "objects": {},
-              "orderBy": [
-                {
-                  "Direction": 2,
-                  "Expression": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Revenue at Risk"
                     }
                   }
                 }

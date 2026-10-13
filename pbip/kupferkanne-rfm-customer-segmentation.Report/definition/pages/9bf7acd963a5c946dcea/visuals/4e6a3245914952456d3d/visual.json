@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "4e6a3245914952456d3d",
   "position": {
     "x": 0,
@@ -248,7 +248,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "118.73354739270752D"
+                  "Value": "120D"
                 }
               }
             }
@@ -262,7 +262,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "237.74007294773585D"
+                  "Value": "238D"
                 }
               }
             }
@@ -290,7 +290,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "104D"
+                  "Value": "97D"
                 }
               }
             }
@@ -489,7 +489,7 @@
             "autoSizeColumnWidth": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             },
@@ -511,6 +511,20 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            },
+            "columnAdjustment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'fixedWidth'"
+                }
+              }
+            },
+            "defaultColumnWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
                 }
               }
             }

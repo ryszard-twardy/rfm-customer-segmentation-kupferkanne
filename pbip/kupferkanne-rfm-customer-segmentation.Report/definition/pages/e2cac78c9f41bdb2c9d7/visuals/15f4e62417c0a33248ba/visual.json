@@ -3,10 +3,10 @@
   "name": "15f4e62417c0a33248ba",
   "position": {
     "x": 0,
-    "y": 40,
+    "y": 34,
     "z": 2000,
-    "height": 90,
-    "width": 400,
+    "height": 110,
+    "width": 280,
     "tabOrder": 0
   },
   "visual": {
@@ -139,6 +139,20 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
           }
         }
       ],

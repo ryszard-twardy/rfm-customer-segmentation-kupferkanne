@@ -43,10 +43,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The exhibits render logs the `docs/methodology.md` line behind every literal it checks, and fails if one comes from the "In brief." summary of the win-back section.
 - Analytical notebook figures scale down to the column width on narrow screens and open in a lightbox.
 - The exhibits page links back to the site root instead of `index.html`.
+- The brand chart on the Product & Brand page is a column chart of revenue by brand; each brand's margin and the blended margin are in its tooltip. The margin line on a second axis and its reference line are removed: brand margins differ by about one percentage point, a spread that a shared chart either exaggerates or flattens.
+- The brand chart title states the top brand's revenue, in millions from 1 million EUR up and in thousands below, and the range of margins across the brands with sales; with fewer than two such brands it names the top brand and its revenue. A selection in Top 15 Products by Revenue, the Profitability by Category, Brand and Product matrix or Revenue Trend by Category filters the brand chart instead of highlighting it, and the title follows the selection.
+- Report titles, subtitles and labels use the multiplication sign and the en dash, for example "R × F" in the RFM heatmap subtitle and "None – full price" in the segment strategy table.
+- Segment Deep Dive: the KPI row holds the selected metric card and a segment-mix tile, two 100% bars with each segment's share of customers and of revenue under the title "Champions: 21% of customers, 70% of revenue".
+- Churn Risk & What-If runs in full-width rows: the recency strip, the risk table and the customer scatter. The risk table gives, for At Risk and Hibernating, customers, revenue at risk with a data bar, average spend, the win-back offer and the gross revenue recoverable at the reactivation rate, which is set in a tile of the KPI row, with an input box and a slider, next to the "Win-back Scenario (Gross)" card; the subtitle follows the rate, for example "At Risk and Hibernating – value, customers, offer and gross revenue recoverable at 10% reactivation (a scenario, not a forecast)". The figure is labelled "Gross recoverable" in the table and "Win-back Scenario (Gross)" on the KPI card (formerly "Recoverable Revenue").
+- The recency strip on Churn Risk & What-If labels each stage inside the bar with its name and share, and the title line above the bar gives the day ranges the measures use: Active 0–90, Cooling 91–180 and Dormant over 180 days since the last order.
+- The customer scatter on Churn Risk & What-If plots lifetime spend on a log axis from 1 to 1,000 EUR, so customers with a low lifetime spend are no longer pressed against the bottom of the chart; days since the last order run from 0 to 1,200, and both axes keep their range when a segment is selected. The median lifetime spend moves from a label on its line, which covered the densest points, into the subtitle.
 
 ### Removed
 
 - Measures `[Top Category Revenue]` and `[Top Category Name]`: no visual was bound to either and no measure referenced them. Both are removed with their generated Q&A entries, and the model now has 107 measures.
+- The R/F/M and Average Health Score cards on Segment Deep Dive: unfiltered they read 3.0 per score and 9.0 out of 15 by construction, and the profile table gives each segment's average R, F and M; the health score stays in the scatter tooltip.
+- The Upside of acting chart on Churn Risk & What-If: the recoverable revenue is a column of the risk table, and the chart's revenue-at-risk bar repeated the table's total.
 
 ### Fixed
 
@@ -64,6 +73,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The `Revenue Month` key of `v_revenue_new_returning` is now hidden, in line with the documented key policy; no visual binds it.
 - Figures in the documentation reconciled with the model, the report and the warehouse: record and row counts, the customer and measure counts, the pages each measure is bound on, the cohort retention figures and the columns and types of the raw schema diagram.
 - The EDA notebook no longer says that the Frequency quintiles separate cleanly; tied order counts spread one-order customers across the two lowest bands.
+- The "Where the risk concentrates" table on the Churn Risk & What-If page reads `[Revenue at Risk]` per segment row through `dim_Segment`, so its values carry the euro format (€106.11K, €64.70K, total €170.81K), and the Reset All Filters bookmark captures the same fields.
+- The Total Revenue and Profit Margin % cards on the Product & Brand page follow product, brand and category selections, which they ignored before: they read the line-grain revenue and margin, as the page's charts do, and show the same totals when nothing is selected.
+- The Product & Brand subtitle uses the singular for one product or one brand, for example "1 product and 1 brand" instead of "1 products and 1 brands".
+- The Frequency × Monetary scatter on Segment Deep Dive starts its log axes at 0.5 orders and 5 EUR, so the Hibernating bubble is no longer cut off at the axis; smaller bubbles and label backgrounds keep the At Risk label readable beside Recent Customers.
+- The customer scatter on Churn Risk & What-If has axis titles ("Days since last order", "Lifetime spend € (log)"), euro values from a format string on `dim_Customer[Total Spend]`, a reference-line label that names the median recency ("Median days since last order: 481"), and the report's segment colours for At Risk and Hibernating.
+- The Churn Risk & What-If subtitle keeps the full count of at-risk and hibernating customers when a point of the customer scatter is selected, as the KPI cards do.
+- The metric card on Segment Deep Dive shows each metric in the format of its measure, for example €50.22 for Average Order Value instead of 50.22.
+- The Segment Deep Dive subtitle uses the singular for one segment, for example "across 1 segment" instead of "across 1 segments".
 
 ### Documentation
 
@@ -72,7 +89,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Palette description in `docs/architecture.md` corrected to the live theme: muted-blue primary (`#4A7AA0`) on white, with a `#F7F5F1` page background.
 - `AGENTS.md` tracker statement matches the repository settings: issue tracking is disabled and planned work is listed under Roadmap in this file.
 - Forward note in ADR 0003 naming the two view scripts beside the nine the record lists; with the country-coverage assertion, `sql/` holds twelve scripts in this release.
-- Euro format notation in `docs/measures.md` aligned with the model: five measures documented as `€ 0dp` carry a two-decimal format string and now read `€ 2dp`.
+- Format notation in `docs/measures.md` aligned with the model: five measures documented as `€ 0dp` carry a two-decimal format string and now read `€ 2dp`, and `[Avg Recency Days]`, documented with a "days" suffix, reads `# 0dp`.
 - Recorded the likely root cause of the pre-fix staging row loss – sandbox partition expiration rather than a `PARTITION BY` interaction – as a dated note in ADR 0002.
 - Page count in `README.md`, `docs/architecture.md` and `docs/methodology.md` aligned to six report pages plus a customer drillthrough: the README heading, the architecture overview, both system diagrams and the lead-in to the methodology page list.
 - Known issue recorded in `docs/methodology.md` Limitations: 646 of 168,777 orders fall outside the 0.001 order-value tolerance.

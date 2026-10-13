@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "7b3777e0340b9071da49",
   "position": {
     "x": 0,
     "y": 0,
-    "z": 1500,
-    "height": 240,
-    "width": 580,
-    "tabOrder": 0
+    "z": 500,
+    "height": 100,
+    "width": 1180,
+    "tabOrder": 500
   },
   "visual": {
     "visualType": "hundredPercentStackedBarChart",
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "_Measures.Revenue Active",
-              "nativeQueryRef": "Revenue Active"
+              "nativeQueryRef": "Revenue Active",
+              "displayName": "Active"
             },
             {
               "field": {
@@ -41,7 +42,8 @@
                 }
               },
               "queryRef": "_Measures.Revenue Cooling",
-              "nativeQueryRef": "Revenue Cooling"
+              "nativeQueryRef": "Revenue Cooling",
+              "displayName": "Cooling"
             },
             {
               "field": {
@@ -55,7 +57,8 @@
                 }
               },
               "queryRef": "_Measures.Revenue Dormant",
-              "nativeQueryRef": "Revenue Dormant"
+              "nativeQueryRef": "Revenue Dormant",
+              "displayName": "Dormant"
             }
           ]
         }
@@ -94,6 +97,13 @@
               "expr": {
                 "Literal": {
                   "Value": "8D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -204,7 +214,7 @@
             "enableTitleDataLabel": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             },
@@ -233,6 +243,27 @@
               "expr": {
                 "Literal": {
                   "Value": "'SingleLine'"
+                }
+              }
+            },
+            "titleFontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "titleFontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "detailLabelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "1L"
                 }
               }
             }
@@ -331,15 +362,17 @@
       "title": [
         {
           "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
             "text": {
               "expr": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Title Recency Stages"
+                "Literal": {
+                  "Value": "'Revenue by recency stage'"
                 }
               }
             },
@@ -359,7 +392,7 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "5D"
+                  "Value": "0D"
                 }
               }
             },
@@ -390,6 +423,13 @@
       "border": [
         {
           "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
             "radius": {
               "expr": {
                 "Literal": {
@@ -419,19 +459,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Subtitle Recency Stages"
+                  "Value": "false"
                 }
               }
             },
@@ -483,6 +511,32 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "keepLayerOrder": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

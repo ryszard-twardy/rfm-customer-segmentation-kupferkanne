@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
   "name": "efcc794202cea3eae048",
   "position": {
-    "x": 900,
+    "x": 960,
     "y": 0,
     "z": 2000,
     "height": 90,
-    "width": 280,
+    "width": 220,
     "tabOrder": 3000
   },
   "visual": {
@@ -196,7 +196,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Recoverable Revenue'"
+                  "Value": "'Win-back Scenario (Gross)'"
                 }
               }
             }
@@ -269,7 +269,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Recoverable Revenue'"
+                  "Value": "'Win-back Scenario (Gross)'"
                 }
               }
             }
