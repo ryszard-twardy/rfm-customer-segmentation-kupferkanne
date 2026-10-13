@@ -69,6 +69,8 @@ desktop.ini
 # Spec-Kit caches
 .specify/cache/
 .specify/state/
+# Spec-Kit memory, kept local, not public
+.specify/memory/
 
 # Cut P1: dead DDD-grilling husks kept local, not public
 /CONTEXT.md

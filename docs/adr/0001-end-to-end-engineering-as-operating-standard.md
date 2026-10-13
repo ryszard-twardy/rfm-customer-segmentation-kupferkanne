@@ -31,3 +31,7 @@ Scope stays narrow (one business problem, six dashboard pages, ~460K records) so
 - **Multiple smaller analytical exercises** – rejected. One end-to-end platform builds integration discipline that disconnected exercises do not.
 
 Note (2026-06-09): the report now has 7 pages (Customer Lifecycle Intelligence added at page 5). Canonical page list: methodology.md.
+
+Note (2026-10-08): the raw tables hold 461,960 records, about 462K, the figure `README.md` uses; "~460K records" above is the same count rounded more coarsely.
+
+Note (2026-10-08): the command in Consequences names synth-datagen's classic retail generator and leaves the seed open. synth-datagen's changelog pins this dataset to its Kupferkanne generator at tag `v0.3.0` with seed 42; to regenerate: `synth-datagen kupferkanne-rfm generate --config configs/kupferkanne_rfm_v3.yaml --seed 42`, from an install of that tag. The steps are in `README.md` under Reproduce it.

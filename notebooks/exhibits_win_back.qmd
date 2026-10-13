@@ -1083,6 +1083,8 @@ assert not failed, f"live results differ from docs/methodology.md: {failed}"
 
 Back to the [exploratory data analysis](./); the code is in the [repository on GitHub](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne).
 
+Kupferkanne and its order data are synthetic; the figures on this page are outputs of the pipeline, not market observations.
+
 ```{python}
 #| label: lede-text
 #| output: asis

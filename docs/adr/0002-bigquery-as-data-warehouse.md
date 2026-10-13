@@ -33,3 +33,5 @@ Note (2026-09-07): the sandbox tier referenced in Consequences no longer applies
 Note (2026-09-24): Root cause of the staging row loss. The pre-fix row loss behind the `PARTITION BY` conflict cited above, recorded in the 1.0.0 changelog entry, is most consistent with the BigQuery sandbox tier's 60-day partition expiration (https://docs.cloud.google.com/bigquery/docs/sandbox) rather than an interaction between DDL and window-function `PARTITION BY`: the table was partitioned by order date, only partitions from the final two source months survived, and the same query without partitioning retained every row. Staging tables remain unpartitioned, and dataset retention is now set explicitly (ADR 0015).
 
 Note (2026-10-02): `APPROX_QUANTILES`, listed among the idioms in Consequences, is no longer used. Since commit 18d6330 the order-value distribution and outlier views compute exact percentiles with `PERCENTILE_CONT`, so P99 no longer varies between runs.
+
+Note (2026-10-08): the raw tables hold 461,960 records, about 462K, the figure `README.md` uses; "~460K records" in Context is the same count rounded more coarsely.

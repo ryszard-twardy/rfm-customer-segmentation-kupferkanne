@@ -20,7 +20,6 @@ Master configuration for `rfm-customer-segmentation-kupferkanne`. Read this file
 | `notebooks/` | Quarto analytical notebook. |
 | `docs/` | Reviewer-facing narrative. |
 | `docs/adr/` | Architectural Decision Records. |
-| `.specify/memory/constitution-data.md` | Stack-specific invariants. |
 
 ## Checks
 

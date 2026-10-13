@@ -37,3 +37,5 @@ The naming rule lets a reader immediately tell which grain is being aggregated, 
 - **One fact, with a degenerate "level" column** – rejected: encourages grain-mixing bugs; SQLBI strongly recommends separate facts when grains genuinely differ.
 
 Note (2026-06-09): report page numbering changed after this ADR – Customer Lifecycle Intelligence inserted at page 5; Regional Analysis is now page 6, Customer Drillthrough page 7. Canonical page list: methodology.md.
+
+Note (2026-10-08): `v_items_for_bi` holds 272,556 line-grain rows, about 273K, the figure `README.md` uses; "~275K rows" above is the same count rounded to the nearest 5K.
