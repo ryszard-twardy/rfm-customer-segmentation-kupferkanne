@@ -2,7 +2,7 @@
 
 **End-to-end customer analytics: a BigQuery warehouse, a Kimball star schema, and a Power BI semantic model shipped as code.**
 
-[![Status](https://img.shields.io/badge/status-v1.2.0-blue)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-v1.3.0-blue)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![BigQuery](https://img.shields.io/badge/warehouse-BigQuery-4285F4)](docs/architecture.md)
 [![Power BI](https://img.shields.io/badge/BI-Power%20BI%20(PBIP%2FTMDL)-F2C811)](pbip/)
@@ -13,6 +13,8 @@ Fifteen thousand customers, one retention budget. This project is what the analy
 ![Executive Summary – Kupferkanne RFM dashboard (Power BI)](docs/img/exec-summary.png)
 
 **Live report:** [open the interactive dashboard in the Power BI Service](https://app.powerbi.com/view?r=eyJrIjoiM2JlNGExNDMtN2U0ZS00MmYxLWE4M2ItYzMzZjhkY2ZhZWM0IiwidCI6ImNhYTk3MmQ2LWFhYTctNDE0NS1iMTgyLTA2NzkzZWY5NWVhNiJ9&pageName=46bfe20b629145b40be4) – no sign-in required.
+
+**Notebooks:** [the analytical notebook and the win-back exhibits](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/) on GitHub Pages, rendered with Quarto from [`notebooks/`](notebooks/).
 
 **Offline:** the Power BI file with its data (`.pbix`) and a PDF of the six visible report pages are attached to the [latest release](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/latest).
 

@@ -8,8 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+---
+
+## [1.3.0] – 2026-10-14
+
+Notebook publication and report refinements. The analytical notebook and the new win-back exhibits page are published on GitHub Pages, rendered locally with Quarto from the committed sources; the Churn Risk & What-If and Segment Deep Dive pages are reworked, and four unused measures are removed, leaving 105. A cleaning fix reads 69 line amounts in 67 orders as cents, so Total Revenue moves from 8,531,365.52 to 8,476,200.74 EUR; Customers stay at 14,967.
+
 ### Added
 
+- The analytical notebook and the win-back exhibits page are published on GitHub Pages at [ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/), rendered locally with Quarto from the committed sources.
 - Brand file `notebooks/_brand.yml` derived from the Power BI theme (ten data colours, segment colours, page and border surfaces), with Lato from Google Fonts, `label_text` for muted chart text and `hibernating_focus`, a darker Hibernating shade for focus marks.
 - `notebooks/exhibits_win_back.qmd`: three win-back exhibits (segment shares, gross margin before the discount and contribution after it, contribution per 1,000 EUR of discount), each checked against the `docs/methodology.md` literals before any file is written; a failed check stops the render.
 - Exhibits page layout: a link back to the analytical notebook, a lede with checked literals, each chart before its table, the charts in a wide column capped at their 1,200 px canvas (`notebooks/exhibits.css`) that open in a lightbox, alt texts and SVG `<title>` and `<desc>` with key values, and the check table in a collapsed callout at the end.
@@ -54,7 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Removed
 
 - Measures `[Top Category Revenue]` and `[Top Category Name]`: no visual was bound to either and no measure referenced them. Both are removed with their generated Q&A entries.
-- Measures `[Subtitle Whatif Upside]` and `[Title Whatif Upside]`, written for the Upside of acting chart: no visual was bound to either and no measure referenced them. Their generated Q&A entries are removed with them, and the model now has 105 measures.
+- Measures `[Subtitle Whatif Upside]` and `[Title Whatif Upside]`, written for the Upside of acting chart, which this release removes: with the chart gone no visual is bound to either, and no measure references them. Their generated Q&A entries are removed with them, and the model now has 105 measures.
 - The R/F/M and Average Health Score cards on Segment Deep Dive: unfiltered they read 3.0 per score and 9.0 out of 15 by construction, and the profile table gives each segment's average R, F and M; the health score stays in the scatter tooltip.
 - The Upside of acting chart on Churn Risk & What-If: the recoverable revenue is a column of the risk table, and the chart's revenue-at-risk bar repeated the table's total.
 - The Spec-Kit memory file is no longer tracked (`.specify/memory/` is ignored); `AGENTS.md` no longer lists it.
@@ -83,7 +90,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The Churn Risk & What-If subtitle keeps the full count of at-risk and hibernating customers when a point of the customer scatter is selected, as the KPI cards do.
 - The metric card on Segment Deep Dive shows each metric in the format of its measure, for example €50.22 for Average Order Value instead of 50.22.
 - The Segment Deep Dive subtitle uses the singular for one segment, for example "across 1 segment" instead of "across 1 segments".
-- The Product Category column of the Profitability by Category, Brand and Product matrix on Product & Brand opened too narrow and cut its labels; the matrix now sets that width as its default column width (238 px).
 
 ### Documentation
 
@@ -109,9 +115,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Executive Summary screenshot in `README.md` (`docs/img/exec-summary.png`) replaced with the published report after the fixes; its cards now match the scale table in `README.md`.
 - Limitation added to `docs/methodology.md`: Frequency and Monetary count every order in the 39-month window with no lookback limit, so a customer acquired late in the window scores lower on both than an equally active customer acquired early.
 - The win-back recommendation in `docs/methodology.md` names the pilot's first test: a 15 percent rate for Hibernating.
-- Roadmap: the executive report and the companion deck follow after 1.3.0; 1.3.0 publishes the analytical notebook and the win-back exhibits page.
 - Seeded-defect wording in `README.md`, `docs/methodology.md` and the analytical notebook matches what the generator seeds; the README names synth-datagen v0.3.0 and seed 42 for regeneration; dated notes in ADRs 0001, 0002, 0005 and 0008 record the counts, the defect list and the command.
 - `docs/methodology.md` shows that gross margin falls with each step down the composite score across all six segments, so Hibernating has the thinnest margin, and says that the post-clean audit runs its own 29 checks; the win-back exhibits page states that Kupferkanne and its order data are synthetic.
+- `README.md` links the notebook site on GitHub Pages next to the live report.
 
 ---
 
@@ -337,9 +343,9 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ## Roadmap
 
-### [1.3.0] – planned
+### [1.4.0] – planned
 
-- Publish the analytical notebook and the win-back exhibits page to GitHub Pages at `ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne`; both are rendered locally with Quarto from the committed sources. The executive report and the companion deck follow after 1.3.0.
+- The executive report and the companion deck.
 - Investigate the 646 orders that fall outside the 0.001 order-value reconciliation tolerance, then fix them or document the cause (known issue in `docs/methodology.md` Limitations).
 
 ### Considered, not committed
@@ -350,7 +356,8 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ---
 
-[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.3.0
 [1.2.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.2.0
 [1.1.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.1.0
 [1.0.2]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.0.2
