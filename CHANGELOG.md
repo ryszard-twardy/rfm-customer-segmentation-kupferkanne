@@ -83,6 +83,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The Churn Risk & What-If subtitle keeps the full count of at-risk and hibernating customers when a point of the customer scatter is selected, as the KPI cards do.
 - The metric card on Segment Deep Dive shows each metric in the format of its measure, for example €50.22 for Average Order Value instead of 50.22.
 - The Segment Deep Dive subtitle uses the singular for one segment, for example "across 1 segment" instead of "across 1 segments".
+- The Product Category column of the Profitability by Category, Brand and Product matrix on Product & Brand opened too narrow and cut its labels; the matrix now sets that width as its default column width (238 px).
 
 ### Documentation
 

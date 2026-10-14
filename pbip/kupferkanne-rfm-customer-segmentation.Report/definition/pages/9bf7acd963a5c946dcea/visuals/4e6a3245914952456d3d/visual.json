@@ -524,7 +524,7 @@
             "defaultColumnWidth": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "238D"
                 }
               }
             }
