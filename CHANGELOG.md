@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Documentation
+
+- `README.md`: a link to the case study on the portfolio site; a "The finding" section with the win-back result at the playbook's rates and at a common rate, cited to `docs/methodology.md`; the live report link goes through the portfolio's short link; the Risk question asks what a win-back would recover and the Churn Risk & What-If row describes a gross scenario, instead of "the upside of acting"; the 60-second review path starts with the finding; the render step names Quarto 1.9.38; the footer links the portfolio.
+
 ---
 
 ## [1.3.0] – 2026-10-14

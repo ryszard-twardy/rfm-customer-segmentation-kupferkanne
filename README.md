@@ -12,13 +12,15 @@ Fifteen thousand customers, one retention budget. This project is what the analy
 
 ![Executive Summary – Kupferkanne RFM dashboard (Power BI)](docs/img/exec-summary.png)
 
-**Live report:** [open the interactive dashboard in the Power BI Service](https://app.powerbi.com/view?r=eyJrIjoiM2JlNGExNDMtN2U0ZS00MmYxLWE4M2ItYzMzZjhkY2ZhZWM0IiwidCI6ImNhYTk3MmQ2LWFhYTctNDE0NS1iMTgyLTA2NzkzZWY5NWVhNiJ9&pageName=46bfe20b629145b40be4) – no sign-in required.
+**Case study:** [the finding, the build and the report in brief](https://ryszard-twardy.github.io/kupferkanne/) on the portfolio site.
+
+**Live report:** [open the interactive dashboard in the Power BI Service](https://ryszard-twardy.github.io/kupferkanne/report/) – no sign-in required.
 
 **Notebooks:** [the analytical notebook and the win-back exhibits](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/) on GitHub Pages, rendered with Quarto from [`notebooks/`](notebooks/).
 
 **Offline:** the Power BI file with its data (`.pbix`) and a PDF of the six visible report pages are attached to the [latest release](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/latest).
 
-> **Reviewing in 60 seconds?** Skim [the six report pages](#the-report-six-report-pages-plus-a-customer-drillthrough), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
+> **Reviewing in 60 seconds?** Start with [the finding](#the-finding), then skim [the six report pages](#the-report-six-report-pages-plus-a-customer-drillthrough), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
 
 ---
 
@@ -28,9 +30,17 @@ A retailer with a fixed marketing budget cannot spend uniformly across 14,967 cu
 
 1. **Investment** – which customers deserve disproportionate retention spend, and why?
 2. **Profitability** – which products and brands actually drive margin, under which definition of margin?
-3. **Risk** – how much revenue sits in disengaging customers, and what is the upside of acting on it?
+3. **Risk** – how much revenue sits in disengaging customers, and what would winning some of those customers back recover?
 
 Each question maps to specific report pages, and every figure on those pages is reproducible from the SQL in this repo.
+
+## The finding
+
+- **The win-back playbook gives its deepest discount to its thinnest margin.** Hibernating gets 20% off at a 46.69% gross margin; At Risk gets 15% at 51.97%.
+- **Most of the per-euro gap comes from the rates, not from the segments.** At the playbook's rates, each 1,000 EUR of discount retains an expected 2,465 EUR of contribution in At Risk against 1,335 EUR in Hibernating, 1.85 times as much. With either rate applied to both segments, At Risk retains about 1.2 times as much, and swapping the rates reverses the ranking.
+- **The pool is broad but shallow, and the figures are modelled.** The two segments hold 3,909 of the 14,967 scored customers (26.1%) but 2.0% of the revenue base. The figures measure margin efficiency once an order is placed, not incrementality. The recommendation is a controlled pilot with holdouts that tests Hibernating's rate first.
+
+Derivation and pilot design: [`docs/methodology.md`](docs/methodology.md#win-back-discount-allocation). Charts: [win-back exhibits](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/exhibits_win_back.html).
 
 ## The system
 
@@ -70,7 +80,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 | 1 | Executive Summary | Is the business healthy, and where should attention go first? |
 | 2 | Segment Deep Dive | Who are the six segments, and how do their R/F/M profiles differ? |
 | 3 | Product & Brand | Where is profit actually made – and under which margin definition? |
-| 4 | Churn Risk & What-If | How much revenue is at risk, and what is the upside of acting? A live reactivation parameter prices the scenario on the page. |
+| 4 | Churn Risk & What-If | How much revenue is at risk, and what would a win-back recover? A live reactivation parameter prices a gross scenario on the page. |
 | 5 | Customer Lifecycle Intelligence | How does value concentrate and retain over time? Pareto by customer decile, cohort retention, RFM distribution map. |
 | 6 | Regional Analysis | How do the nine markets compare? Includes a Deneb / Vega-Lite choropleth. |
 | 7 | Customer Drillthrough (hidden) | What does one specific customer look like? Reached by drillthrough from the customer scatter on page 4. |
@@ -108,7 +118,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 2. **Load to BigQuery.** One dataset (`kupferkanne-2026.sales`) with monthly-sharded fact tables (`orders20YYMM`, `items20YYMM`) plus two dimension tables. Load them with `scripts/upload_to_bigquery_schema_enforced.py`, passing `--data-dir data --project kupferkanne-2026 --dataset sales --location EU`. The project runs with billing enabled and the dataset carries no default table or partition expiration, so warehouse tables persist between pipeline runs ([ADR 0015](docs/adr/0015-warehouse-table-retention.md)).
 3. **Run the pipeline.** Execute the numbered `sql/` scripts in order, then the two view scripts (`sql/v_cohort_retention.sql`, `sql/v_revenue_new_returning.sql`), which read `sales_curated`. Every script is idempotent (`CREATE OR REPLACE` for views and most tables; three tables are dropped first with `DROP TABLE IF EXISTS`), so re-runs are safe. The scripts, the Power Query sources and the notebooks name the BigQuery project `kupferkanne-2026`; running elsewhere means replacing that ID.
 4. **Open the report.** Open the `.pbip` in Power BI Desktop, authenticate the BigQuery connector (OAuth), and refresh.
-5. **Render the notebooks.** With Quarto 1.9+, Application Default Credentials with read access to `kupferkanne-2026.sales` and Lato installed, run `uv sync`, then `quarto render notebooks/eda_kupferkanne.qmd` and `quarto render notebooks/exhibits_win_back.qmd` from the repo root (on Windows, set `QUARTO_PYTHON` to `.venv\Scripts\python.exe` first). The exhibits render fails if any exhibit it draws differs from the file in `docs/img/exhibits/`; set `KK_WRITE_EXHIBITS` to `1` to rewrite those files instead. The notebook's appendix gives the full steps.
+5. **Render the notebooks.** With Quarto 1.9.38, Application Default Credentials with read access to `kupferkanne-2026.sales` and Lato installed, run `uv sync`, then `quarto render notebooks/eda_kupferkanne.qmd` and `quarto render notebooks/exhibits_win_back.qmd` from the repo root (on Windows, set `QUARTO_PYTHON` to `.venv\Scripts\python.exe` first). The exhibits render fails if any exhibit it draws differs from the file in `docs/img/exhibits/`; set `KK_WRITE_EXHIBITS` to `1` to rewrite those files instead. The notebook's appendix gives the full steps.
 
 ## Scope, honestly
 
@@ -133,4 +143,4 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 ---
 
 **Ryszard Twardy** – Data Analyst, Erlangen (DE)
-[LinkedIn](https://linkedin.com/in/ryszard-twardy/) · [GitHub](https://github.com/ryszard-twardy)
+[Portfolio](https://ryszard-twardy.github.io/) · [LinkedIn](https://linkedin.com/in/ryszard-twardy/) · [GitHub](https://github.com/ryszard-twardy)
