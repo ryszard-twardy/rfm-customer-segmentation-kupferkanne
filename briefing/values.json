@@ -1,0 +1,610 @@
+{
+  "about": "Figures quoted by the executive deck and report, computed and checked by notebooks/exhibits_win_back.qmd.",
+  "focus": {
+    "at_risk": {
+      "aov_eur": {
+        "class": "derived",
+        "formula": "revenue_eur / orders",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 40.28449506454062
+      },
+      "budget_allocation": {
+        "class": "live",
+        "source": "docs/methodology.md#limitations",
+        "unit": "text",
+        "value": "Low (7%)"
+      },
+      "budget_share_pct": {
+        "class": "derived",
+        "formula": "the percentage in focus.at_risk.budget_allocation",
+        "source": "docs/methodology.md#limitations",
+        "unit": "pct",
+        "value": 7
+      },
+      "contact_cost_eur": {
+        "class": "derived",
+        "formula": "per_order_eur / (100 / other.planning_reactivation_rate_pct)",
+        "source": "docs/methodology.md#cost-basis",
+        "unit": "eur",
+        "value": 1.4893605163249812
+      },
+      "discount_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 15.0
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 51.97106079991436
+      },
+      "kept_pts": {
+        "class": "derived",
+        "formula": "gross_margin_pct - discount_pct",
+        "source": "docs/methodology.md#recommendation",
+        "unit": "pts",
+        "value": 36.97106079991436
+      },
+      "mean_realised_discount_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#limitations",
+        "unit": "pct",
+        "value": 25.7006036
+      },
+      "off_list_with_offer_pct": {
+        "class": "derived",
+        "formula": "100 x (1 - (1 - mean_realised_discount_pct / 100) x (1 - discount_pct / 100))",
+        "source": "docs/methodology.md#limitations",
+        "unit": "pct",
+        "value": 36.84551306
+      },
+      "orders": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "count",
+        "value": 2634
+      },
+      "per_1000_eur": {
+        "class": "derived",
+        "formula": "per_euro x 1,000",
+        "source": "docs/methodology.md#recommendation",
+        "unit": "eur",
+        "value": 2464.7373866609573
+      },
+      "per_euro": {
+        "class": "derived",
+        "formula": "kept_pts / discount_pct",
+        "source": "docs/methodology.md#derivation",
+        "unit": "ratio",
+        "value": 2.4647373866609574
+      },
+      "per_order_eur": {
+        "class": "derived",
+        "formula": "aov_eur x kept_pts / 100",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 14.893605163249813
+      },
+      "profit_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 55146.16
+      },
+      "revenue_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 106109.36
+      }
+    },
+    "hibernating": {
+      "aov_eur": {
+        "class": "derived",
+        "formula": "revenue_eur / orders",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 24.999760432766614
+      },
+      "budget_allocation": {
+        "class": "live",
+        "source": "docs/methodology.md#limitations",
+        "unit": "text",
+        "value": "Minimal (3%)"
+      },
+      "budget_share_pct": {
+        "class": "derived",
+        "formula": "the percentage in focus.hibernating.budget_allocation",
+        "source": "docs/methodology.md#limitations",
+        "unit": "pct",
+        "value": 3
+      },
+      "contact_cost_eur": {
+        "class": "derived",
+        "formula": "per_order_eur / (100 / other.planning_reactivation_rate_pct)",
+        "source": "docs/methodology.md#cost-basis",
+        "unit": "eur",
+        "value": 0.6672567233384853
+      },
+      "discount_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 20.0
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 46.690524700545815
+      },
+      "kept_pts": {
+        "class": "derived",
+        "formula": "gross_margin_pct - discount_pct",
+        "source": "docs/methodology.md#recommendation",
+        "unit": "pts",
+        "value": 26.690524700545815
+      },
+      "mean_realised_discount_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#limitations",
+        "unit": "pct",
+        "value": 33.1194977
+      },
+      "off_list_with_offer_pct": {
+        "class": "derived",
+        "formula": "100 x (1 - (1 - mean_realised_discount_pct / 100) x (1 - discount_pct / 100))",
+        "source": "docs/methodology.md#limitations",
+        "unit": "pct",
+        "value": 46.49559815999999
+      },
+      "orders": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "count",
+        "value": 2588
+      },
+      "per_1000_eur": {
+        "class": "derived",
+        "formula": "per_euro x 1,000",
+        "source": "docs/methodology.md#recommendation",
+        "unit": "eur",
+        "value": 1334.5262350272908
+      },
+      "per_euro": {
+        "class": "derived",
+        "formula": "kept_pts / discount_pct",
+        "source": "docs/methodology.md#derivation",
+        "unit": "ratio",
+        "value": 1.3345262350272908
+      },
+      "per_order_eur": {
+        "class": "derived",
+        "formula": "aov_eur x kept_pts / 100",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 6.672567233384853
+      },
+      "profit_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 30208.48
+      },
+      "revenue_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "eur",
+        "value": 64699.38
+      }
+    }
+  },
+  "other": {
+    "observed_max_discount_pct": {
+      "class": "live",
+      "source": "docs/methodology.md#limitations",
+      "unit": "pct",
+      "value": 55.00000000000001
+    },
+    "pilot_interval_pct": {
+      "class": "cited",
+      "source": "docs/methodology.md#pilot-design",
+      "unit": "pct",
+      "value": 95.0
+    },
+    "planning_reactivation_rate_pct": {
+      "class": "cited",
+      "source": "docs/methodology.md#cost-basis",
+      "unit": "pct",
+      "value": 10.0
+    }
+  },
+  "rates": {
+    "per_1000_eur": {
+      "at_risk": {
+        "r15": {
+          "class": "derived",
+          "formula": "(focus.at_risk.gross_margin_pct - 15) / 15 x 1,000",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "eur",
+          "value": 2464.7373866609573
+        },
+        "r20": {
+          "class": "derived",
+          "formula": "(focus.at_risk.gross_margin_pct - 20) / 20 x 1,000",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "eur",
+          "value": 1598.5530399957177
+        }
+      },
+      "hibernating": {
+        "r15": {
+          "class": "derived",
+          "formula": "(focus.hibernating.gross_margin_pct - 15) / 15 x 1,000",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "eur",
+          "value": 2112.7016467030544
+        },
+        "r20": {
+          "class": "derived",
+          "formula": "(focus.hibernating.gross_margin_pct - 20) / 20 x 1,000",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "eur",
+          "value": 1334.5262350272906
+        }
+      }
+    },
+    "per_euro": {
+      "at_risk": {
+        "r15": {
+          "class": "derived",
+          "formula": "(focus.at_risk.gross_margin_pct - 15) / 15",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "ratio",
+          "value": 2.4647373866609574
+        },
+        "r20": {
+          "class": "derived",
+          "formula": "(focus.at_risk.gross_margin_pct - 20) / 20",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "ratio",
+          "value": 1.5985530399957177
+        }
+      },
+      "hibernating": {
+        "r15": {
+          "class": "derived",
+          "formula": "(focus.hibernating.gross_margin_pct - 15) / 15",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "ratio",
+          "value": 2.1127016467030546
+        },
+        "r20": {
+          "class": "derived",
+          "formula": "(focus.hibernating.gross_margin_pct - 20) / 20",
+          "source": "docs/methodology.md#recommendation",
+          "unit": "ratio",
+          "value": 1.3345262350272906
+        }
+      }
+    }
+  },
+  "ratios": {
+    "common": {
+      "class": "derived",
+      "formula": "rates.per_euro.at_risk.r15 / rates.per_euro.hibernating.r15; the other playbook rate gives the same ratio at 1 dp",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "ratio",
+      "value": 1.1666282319168289
+    },
+    "playbook": {
+      "class": "derived",
+      "formula": "focus.at_risk.per_euro / focus.hibernating.per_euro",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "ratio",
+      "value": 1.846900661799694
+    }
+  },
+  "schema": 1,
+  "segments": {
+    "at_risk": {
+      "customer_share_pct": {
+        "class": "derived",
+        "formula": "customers / totals.scored_customers x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 9.120064141110444
+      },
+      "customers": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "count",
+        "value": 1365
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 51.97106079991436
+      },
+      "lifetime_spend_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "eur",
+        "value": 106109.36
+      },
+      "revenue_share_pct": {
+        "class": "derived",
+        "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 1.2518504841356553
+      }
+    },
+    "champions": {
+      "customer_share_pct": {
+        "class": "derived",
+        "formula": "customers / totals.scored_customers x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 21.44050243869847
+      },
+      "customers": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "count",
+        "value": 3209
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 61.10984738922303
+      },
+      "lifetime_spend_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "eur",
+        "value": 5973272.78
+      },
+      "revenue_share_pct": {
+        "class": "derived",
+        "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 70.47111038571275
+      }
+    },
+    "hibernating": {
+      "customer_share_pct": {
+        "class": "derived",
+        "formula": "customers / totals.scored_customers x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 16.997394267388255
+      },
+      "customers": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "count",
+        "value": 2544
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 46.690524700545815
+      },
+      "lifetime_spend_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "eur",
+        "value": 64699.38
+      },
+      "revenue_share_pct": {
+        "class": "derived",
+        "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 0.7633063678480083
+      }
+    },
+    "loyal_customers": {
+      "customer_share_pct": {
+        "class": "derived",
+        "formula": "customers / totals.scored_customers x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 13.87719649896439
+      },
+      "customers": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "count",
+        "value": 2077
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 57.922370552540016
+      },
+      "lifetime_spend_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "eur",
+        "value": 1096121.16
+      },
+      "revenue_share_pct": {
+        "class": "derived",
+        "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 12.931750835339464
+      }
+    },
+    "potential_loyalists": {
+      "customer_share_pct": {
+        "class": "derived",
+        "formula": "customers / totals.scored_customers x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 19.7434355582281
+      },
+      "customers": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "count",
+        "value": 2955
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 55.18012537990828
+      },
+      "lifetime_spend_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "eur",
+        "value": 874921.68
+      },
+      "revenue_share_pct": {
+        "class": "derived",
+        "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 10.322097208849257
+      }
+    },
+    "recent_customers": {
+      "customer_share_pct": {
+        "class": "derived",
+        "formula": "customers / totals.scored_customers x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 18.821407095610343
+      },
+      "customers": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "count",
+        "value": 2817
+      },
+      "gross_margin_pct": {
+        "class": "live",
+        "source": "docs/methodology.md#derivation",
+        "unit": "pct",
+        "value": 53.07192345287166
+      },
+      "lifetime_spend_eur": {
+        "class": "live",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "eur",
+        "value": 361076.38
+      },
+      "revenue_share_pct": {
+        "class": "derived",
+        "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+        "source": "docs/methodology.md#appendix-segment-shares",
+        "unit": "pct",
+        "value": 4.259884718114876
+      }
+    }
+  },
+  "totals": {
+    "dax_measures": {
+      "class": "cited",
+      "source": "README.md#the-system",
+      "unit": "count",
+      "value": 105
+    },
+    "order_value_tolerance": {
+      "class": "cited",
+      "source": "docs/methodology.md#revenue-base",
+      "unit": "number",
+      "value": 0.001
+    },
+    "orders": {
+      "class": "live",
+      "source": "docs/methodology.md#revenue-base",
+      "unit": "count",
+      "value": 168777
+    },
+    "orders_outside_tolerance": {
+      "class": "cited",
+      "source": "docs/methodology.md#limitations",
+      "unit": "count",
+      "value": 646
+    },
+    "profit_margin_pct": {
+      "class": "live",
+      "source": "README.md#the-system",
+      "unit": "pct",
+      "value": 59.51870531088909
+    },
+    "raw_records": {
+      "class": "cited",
+      "source": "README.md#the-system",
+      "unit": "text",
+      "value": "~462K"
+    },
+    "revenue_base_eur": {
+      "class": "live",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "eur",
+      "value": 8476200.74
+    },
+    "scored_customers": {
+      "class": "live",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "count",
+      "value": 14967
+    },
+    "sql_pipeline_steps": {
+      "class": "cited",
+      "source": "README.md#the-system",
+      "unit": "count",
+      "value": 10
+    },
+    "standalone_views": {
+      "class": "cited",
+      "source": "README.md#repository-map",
+      "unit": "count",
+      "value": 2
+    }
+  },
+  "win_back": {
+    "customer_share_pct": {
+      "class": "derived",
+      "formula": "customers / totals.scored_customers x 100",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "pct",
+      "value": 26.117458408498695
+    },
+    "customers": {
+      "class": "derived",
+      "formula": "segments.at_risk.customers + segments.hibernating.customers",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "count",
+      "value": 3909
+    },
+    "lifetime_spend_eur": {
+      "class": "derived",
+      "formula": "segments.at_risk.lifetime_spend_eur + segments.hibernating.lifetime_spend_eur",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "eur",
+      "value": 170808.74
+    },
+    "revenue_share_pct": {
+      "class": "derived",
+      "formula": "lifetime_spend_eur / totals.revenue_base_eur x 100",
+      "source": "docs/methodology.md#recommendation",
+      "unit": "pct",
+      "value": 2.0151568519836633
+    }
+  }
+}

@@ -45,6 +45,18 @@ color:
     page: "#F7F5F1"     # report page background
     border: "#DDD6CC"   # visual border; exhibit gridlines only (context bars use a 32% foreground blend computed in the notebook)
     label: "#64748B"    # theme label text class; source of label_text, the exhibits' muted text colour
+    # Executive deck and report (briefing/). One accent, c1, marks only the discount rate under
+    # test, so Champions takes a neutral there; in the Power BI report c1 is the Champions colour.
+    # Hibernating takes hibernating_focus. The other three segments take segment_context, a warm
+    # grey that replaces the exhibits' computed context grey in these two documents only.
+    heading_text: "#2A3139"       # titles and hero numbers
+    cover: "#F1EFE9"              # cover slide and report cover
+    tile: "#ECE8E1"               # pilot group tiles
+    on_fill_text: "#FDFCFA"       # text on segment and accent fills
+    at_risk_tint: "#E1CECA"       # At Risk discount and offer fills
+    hibernating_tint: "#DCD9D4"   # Hibernating discount and offer fills
+    champions_context: "#B8B2A7"  # Champions as contrast in the share bars
+    segment_context: "#CFC8BC"    # the other three segments
   foreground: "#3D4752"  # theme foreground: text on the canvas
   background: "#FFFFFF"  # canvas
   primary: c1            # theme tableAccent

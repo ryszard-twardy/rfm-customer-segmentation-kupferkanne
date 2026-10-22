@@ -21,9 +21,9 @@ engine: jupyter
 jupyter: python3
 execute:
   echo: false
-  # A fresh kernel for every render: the page reads KK_WRITE_EXHIBITS from the kernel's
-  # environment and logs to its stderr, and Quarto's kernel daemon would keep the first
-  # render's environment and discard that log.
+  # A fresh kernel for every render: the page reads KK_WRITE_EXHIBITS and KK_WRITE_VALUES
+  # from the kernel's environment and logs to its stderr, and Quarto's kernel daemon would
+  # keep the first render's environment and discard that log.
   daemon: false
 ---
 
@@ -31,6 +31,7 @@ execute:
 #| label: setup
 import base64
 import html
+import json
 import math
 import os
 import re
@@ -58,7 +59,9 @@ PLAYBOOK = (
     / "definition" / "tables" / "dim_Segment.tmdl"
 )
 EXHIBITS = ROOT / "docs" / "img" / "exhibits"
-for path in (METHODOLOGY, PLAYBOOK):
+README = ROOT / "README.md"
+VALUES_FILE = ROOT / "briefing" / "values.json"
+for path in (METHODOLOGY, PLAYBOOK, README):
     assert path.is_file(), f"missing {path}"
 # The render rewrites the tracked exhibit files only when KK_WRITE_EXHIBITS is 1. Otherwise each
 # file goes to a temporary directory and must equal the tracked file of the same name, so an
@@ -80,6 +83,11 @@ def check_tracked(path: Path) -> None:
     assert tracked.is_file() and tracked.read_bytes() == path.read_bytes(), (
         f"{path.name} differs from docs/img/exhibits/{path.name}: "
         "set KK_WRITE_EXHIBITS to 1 and render again to rewrite the tracked exhibits")
+
+# The values file for the executive deck and report follows the same rule: the render rewrites
+# briefing/values.json only when KK_WRITE_VALUES is 1, and otherwise fails unless the tracked
+# file equals the values it computed.
+WRITE_VALUES = os.environ.get("KK_WRITE_VALUES") == "1"
 
 client = bigquery.Client(project=PROJECT)
 
@@ -226,23 +234,26 @@ for name in FOCUS:
     assert delta_e(tint(FOCUS_COLOR[name], TINT_SHARE), GRID) >= 5, name
 
 
-# Playbook: segment order, segment colour and win-back discount rate come from
-# the semantic model, so the exhibits cannot drift from dim_Segment.
+# Playbook: segment order, segment colour, win-back discount rate and budget allocation come
+# from the semantic model, so the exhibits and the values file cannot drift from dim_Segment.
 segment_rows = re.findall(
-    r'\{ "([^"]+)", "[^"]*", "[^"]*", "([^"]*)", "[^"]*", (\d+), "(#[0-9A-Fa-f]{6})" \}',
+    r'\{ "([^"]+)", "[^"]*", "[^"]*", "([^"]*)", "([^"]*)", (\d+), "(#[0-9A-Fa-f]{6})" \}',
     PLAYBOOK.read_text(encoding="utf-8"),
 )
 assert len(segment_rows) == 6, segment_rows
-SEGMENT_ORDER = [row[0] for row in sorted(segment_rows, key=lambda row: int(row[2]))]
-model_colors = {row[0]: row[3] for row in segment_rows}
+SEGMENT_ORDER = [row[0] for row in sorted(segment_rows, key=lambda row: int(row[3]))]
+model_colors = {row[0]: row[4] for row in segment_rows}
 assert model_colors == SEGMENT_COLOR, (model_colors, SEGMENT_COLOR)
 DISCOUNT = {}
-for name, approach, _, _ in segment_rows:
+BUDGET = {}
+for name, approach, budget, _, _ in segment_rows:
     if name in FOCUS:
         match = re.fullmatch(r"Win-back (\d+)%", approach)
         assert match, f"unexpected Discount Approach label for {name}: {approach!r}"
         DISCOUNT[name] = int(match.group(1)) / 100
-assert set(DISCOUNT) == set(FOCUS), DISCOUNT
+        assert re.fullmatch(r"\w+ \(\d+%\)", budget), f"unexpected Budget Allocation label for {name}: {budget!r}"
+        BUDGET[name] = budget
+assert set(DISCOUNT) == set(BUDGET) == set(FOCUS), (DISCOUNT, BUDGET)
 
 W, H = 1200, 675  # logical px: SVG viewBox 0 0 1200 675, PNG saved at twice that size
 # Shared grid. On desktop viewports the exhibit column shows the canvas at 1:1 (it is wider
@@ -868,6 +879,39 @@ COMMON_RATIO = next(iter(COMMON_RATIOS.values()))
 ```
 
 ```{python}
+#| label: values-query
+# For the values file: gross margin and mean realised discount for all six segments, unrounded,
+# and the totals over all of sales_curated.
+by_segment = query(f"""
+SELECT
+    r.segment,
+    SUM(s.order_value) AS revenue,
+    SUM(s.order_profit) AS profit,
+    AVG(s.order_discount_pct) AS mean_order_discount_pct
+FROM `{DATASET}.sales_curated` AS s
+INNER JOIN `{DATASET}.v_rfm_for_bi` AS r
+    ON s.customer_id = r.customer_id
+GROUP BY r.segment
+""")
+by_segment = by_segment.set_index("segment").loc[SEGMENT_ORDER].reset_index()
+for col in ("revenue", "profit", "mean_order_discount_pct"):
+    by_segment[col] = by_segment[col].astype(float)
+by_segment["gross_margin"] = by_segment["profit"] / by_segment["revenue"]
+totals = query(f"""
+SELECT
+    COUNT(*) AS orders,
+    SUM(order_value) AS revenue,
+    SUM(order_profit) AS profit,
+    MAX(order_discount_pct) AS max_order_discount_pct
+FROM `{DATASET}.sales_curated`
+""").iloc[0]
+TOTAL_ORDERS = int(totals["orders"])
+TOTAL_REVENUE = float(totals["revenue"])
+TOTAL_PROFIT = float(totals["profit"])
+MAX_DISCOUNT = float(totals["max_order_discount_pct"])
+```
+
+```{python}
 #| label: lede
 # "Not at its current rates": the playbook's deeper discount goes to the segment where a
 # discount euro retains less contribution at those rates.
@@ -1438,6 +1482,268 @@ show(pd.DataFrame({
     "Win-back discount": (per_1000["discount_rate"] * 100).map(lambda v: fmt_pct(v, 0)),
     "Contribution per 1,000 EUR of discount (EUR)": per_1000["contribution_per_1000"].map(lambda v: fmt_num(v, 0)),
 }), aligned=True)
+```
+
+```{python}
+#| label: values-file
+# The values file the executive deck and report read: every figure they quote, computed above,
+# checked here against the published literals and written to briefing/values.json. The cell
+# shows nothing on the page: its docs/methodology.md checks join the checks table, and the
+# README.md literals are asserted and logged to the render console, since the table's title
+# names docs/methodology.md. Values are stored as computed, percentages in percent.
+print("\nLiterals read for briefing/values.json (line <- pattern):", file=sys.__stderr__, flush=True)
+readme = README.read_text(encoding="utf-8")
+
+
+def grab_readme(pattern: str) -> tuple:
+    """grab() for README.md: the match's line goes to the render console."""
+    match = re.search(pattern, readme, flags=re.M)
+    assert match, pattern
+    line = readme.count("\n", 0, match.start()) + 1
+    print(f"README.md:{line} <- {pattern}", file=sys.__stderr__, flush=True)
+    return match.groups()
+
+
+def check_readme(name: str, published_text: str, live_text: str) -> None:
+    assert published_text == live_text, f"README.md {name}: published {published_text}, live {live_text}"
+    print(f"README.md {name}: {published_text} (live {live_text})", file=sys.__stderr__, flush=True)
+
+
+def falls_each_step(margins) -> str:
+    margins = list(margins)
+    falls = all(a > b for a, b in zip(margins, margins[1:]))
+    return "falls with each step" if falls else "does not fall with each step"
+
+
+# Gross margin across the six segments, in segment order (Derivation).
+p_falls, p_margin_top, p_margin_bottom = grab(
+    r"gross margin (falls with each step) down the composite score, from ([\d.]+) percent for "
+    r"Champions to ([\d.]+) percent for Hibernating")
+margin_pct = dict(zip(by_segment["segment"], by_segment["gross_margin"] * 100))
+check("Champions gross margin %", num(p_margin_top), margin_pct["Champions"], 4)
+check("Hibernating gross margin % (six-segment sentence)", num(p_margin_bottom), margin_pct["Hibernating"], 4)
+check_text("Gross margin across the six segments, in segment order", p_falls,
+           falls_each_step(margin_pct[name] for name in SEGMENT_ORDER))
+
+# The file takes the margins and the mean realised discount from the unrounded by-segment
+# query; for the focus segments they must agree with the page's figures.
+by_name = focus.set_index("segment")
+by_segment_name = by_segment.set_index("segment")
+mean_pct = dict(zip(by_segment["segment"], by_segment["mean_order_discount_pct"] * 100))
+for name in FOCUS:
+    assert abs(margin_pct[name] / 100 - MARGIN[name]) < 1e-9, (name, margin_pct[name], MARGIN[name])
+    for col in ("revenue", "profit"):
+        assert f"{by_segment_name.loc[name, col]:.2f}" == f"{by_name.loc[name, col]:.2f}", (name, col)
+    assert f"{mean_pct[name] / 100:.4f}" == f"{by_name.loc[name, 'mean_order_discount_pct']:.4f}", name
+rate_pct = {name: DISCOUNT[name] * 100 for name in FOCUS}
+kept_pts = {name: margin_pct[name] - rate_pct[name] for name in FOCUS}
+per_order_eur = {name: float(by_name.loc[name, "aov"] * kept_pts[name] / 100) for name in FOCUS}
+
+# Discount already realised, compounded with the win-back offer (Limitations).
+p_off_list_at_risk, p_off_list_hibernating, p_max_discount = map(num, grab(
+    r"compounds to roughly ([\d.]+) and ([\d.]+) percent off list, against an observed maximum of ([\d.]+)\."))
+off_list = {name: 100 * (1 - (1 - mean_pct[name] / 100) * (1 - rate_pct[name] / 100)) for name in FOCUS}
+check("At Risk off list with the win-back offer %", p_off_list_at_risk, off_list["At Risk"], 1)
+check("Hibernating off list with the win-back offer %", p_off_list_hibernating, off_list["Hibernating"], 1)
+check("Observed maximum order_discount_pct", p_max_discount, MAX_DISCOUNT, 2)
+
+# Break-even contact cost: contribution per order spread over the contacts behind each
+# recovered order at the What-If parameter's default rate (Cost basis).
+(p_planning_rate,) = map(num, grab(r"the What-If parameter's default rate of (\d+) percent"))
+p_contact_cost = dict(zip(FOCUS, map(num, grab(
+    r"exhausted at a contact cost of ([\d.]+) EUR in At Risk and ([\d.]+) EUR in Hibernating"))))
+contact_cost = {name: float(per_order_eur[name] / (100 / p_planning_rate)) for name in FOCUS}
+for name in FOCUS:
+    check(f"{name} break-even contact cost (EUR)", p_contact_cost[name], contact_cost[name], 2)
+
+# Budget allocation labels in dim_Segment (Limitations).
+p_budget = dict(zip(FOCUS, grab(
+    r'`dim_Segment\[Budget Allocation\]` reads "([^"]+)" for At Risk and "([^"]+)" for Hibernating')))
+for name in FOCUS:
+    check_text(f"{name} budget allocation (dim_Segment)", p_budget[name], BUDGET[name])
+
+# Order count and the order-value reconciliation (Revenue base, Limitations): the orders
+# outside the tolerance must equal all orders minus those within it.
+p_tolerance, p_within, p_orders = grab(r"within ([\d.]+) for ([\d,]+) of ([\d,]+) orders")
+p_outside, p_orders_again, p_tolerance_again = grab(
+    r"([\d,]+) of ([\d,]+) orders fall outside the ([\d.]+) tolerance")
+check("Orders in sales_curated (revenue base)", num(p_orders), TOTAL_ORDERS, 0)
+check("Orders in sales_curated (order-value reconciliation)", num(p_orders_again), TOTAL_ORDERS, 0)
+check_text("Order-value tolerance (order-value reconciliation)", p_tolerance_again, p_tolerance)
+check("Orders outside the order-value tolerance (orders - orders within it)", num(p_outside),
+      TOTAL_ORDERS - num(p_within), 0)
+(p_interval,) = map(num, grab(r"only a (\d+) percent interval that clears its threshold"))
+
+failed = [c["Literal"] for c in checks if c["Result"] != "pass"]
+assert not failed, f"live results differ from docs/methodology.md: {failed}"
+
+# README.md: the totals over sales_curated are checked; the counts of the system are cited.
+(r_revenue,) = grab_readme(r"^\| Revenue \| EUR ([\d,.]+) \|$")
+(r_margin,) = grab_readme(r"\(weighted margin ([\d.]+)%\)")
+(r_measures,) = grab_readme(r"(\d+) DAX measures")
+(r_raw_records,) = grab_readme(r"(~\d+K) raw records")
+(r_sql_steps,) = grab_readme(r"(\d+)-step SQL")
+(r_views,) = grab_readme(r"\+ (\d+) standalone analytical views")
+check_readme("revenue (EUR)", r_revenue, f"{TOTAL_REVENUE:,.2f}")
+check_readme("weighted margin %", r_margin, f"{TOTAL_PROFIT / TOTAL_REVENUE * 100:.2f}")
+print(f"README.md revenue equals the revenue base: {TOTAL_REVENUE == REVENUE_BASE}",
+      file=sys.__stderr__, flush=True)
+
+
+def source_of(path: str, text: str, heading: str) -> str:
+    """The file and the GitHub anchor of the heading above a literal; the heading must exist."""
+    assert re.search(rf"^#+ {re.escape(heading)}$", text, flags=re.M), (path, heading)
+    return f"{path}#{re.sub(r'[^a-z0-9 -]', '', heading.lower()).replace(' ', '-')}"
+
+
+SRC = SimpleNamespace(
+    revenue_base=source_of("docs/methodology.md", doc, "Revenue base"),
+    cost_basis=source_of("docs/methodology.md", doc, "Cost basis"),
+    derivation=source_of("docs/methodology.md", doc, "Derivation"),
+    recommendation=source_of("docs/methodology.md", doc, "Recommendation"),
+    pilot_design=source_of("docs/methodology.md", doc, "Pilot design"),
+    limitations=source_of("docs/methodology.md", doc, "Limitations"),
+    segment_shares=source_of("docs/methodology.md", doc, "Appendix: segment shares"),
+    the_system=source_of("README.md", readme, "The system"),
+    repository_map=source_of("README.md", readme, "Repository map"),
+)
+UNITS = ("count", "eur", "pct", "pts", "ratio", "number", "text")
+
+
+def leaf(value, unit: str, kind: str, source: str, formula: str | None = None) -> dict:
+    """One figure: live (warehouse or model file), derived (a formula over live values, given)
+    or cited (a literal read from the docs, not recomputed)."""
+    assert unit in UNITS and kind in ("live", "derived", "cited"), (unit, kind)
+    assert (kind == "derived") == (formula is not None), (kind, formula)
+    assert re.fullmatch(r"(docs/methodology|README)\.md#[a-z0-9-]+", source), source
+    if unit == "text":
+        assert type(value) is str, value
+    else:
+        assert type(value) in (int, float) and math.isfinite(value), (value, type(value))
+    node = {"value": value, "unit": unit, "class": kind, "source": source}
+    if formula is not None:
+        node["formula"] = formula
+    return node
+
+
+def key(name: str) -> str:
+    return name.lower().replace(" ", "_")
+
+
+shares = seg.set_index("segment")
+win_back_customers = int(shares.loc[list(FOCUS), "customers"].sum())
+win_back_spend = float(shares.loc[list(FOCUS), "revenue"].sum())
+per_euro = {name: kept_pts[name] / rate_pct[name] for name in FOCUS}
+at_rate = {(name, rate): (margin_pct[name] / 100 - rate) / rate for name in FOCUS for rate in DISCOUNT.values()}
+COMMON_RATE = next(iter(COMMON_RATIOS))
+for name in FOCUS:
+    assert abs(per_euro[name] - per_1000.set_index("segment").loc[name, "contribution_per_eur"]) < 1e-8, name
+    for rate in DISCOUNT.values():
+        assert abs(at_rate[(name, rate)] - AT_RATE[(name, rate)]) < 1e-8, (name, rate)
+playbook_ratio = per_euro["At Risk"] / per_euro["Hibernating"]
+common_ratio = at_rate[("At Risk", COMMON_RATE)] / at_rate[("Hibernating", COMMON_RATE)]
+assert abs(playbook_ratio - RATIO) < 1e-8 and abs(common_ratio - COMMON_RATIO) < 1e-8, (playbook_ratio, common_ratio)
+
+
+def focus_leaves(name: str) -> dict:
+    k = key(name)
+    budget_share = int(re.fullmatch(r"\w+ \((\d+)%\)", BUDGET[name]).group(1))
+    return {
+        "orders": leaf(int(by_name.loc[name, "orders"]), "count", "live", SRC.derivation),
+        "revenue_eur": leaf(float(by_name.loc[name, "revenue"]), "eur", "live", SRC.derivation),
+        "profit_eur": leaf(float(by_name.loc[name, "profit"]), "eur", "live", SRC.derivation),
+        "aov_eur": leaf(float(by_name.loc[name, "aov"]), "eur", "derived", SRC.derivation, "revenue_eur / orders"),
+        "gross_margin_pct": leaf(float(margin_pct[name]), "pct", "live", SRC.derivation),
+        "discount_pct": leaf(rate_pct[name], "pct", "live", SRC.derivation),
+        "kept_pts": leaf(float(kept_pts[name]), "pts", "derived", SRC.recommendation,
+                         "gross_margin_pct - discount_pct"),
+        "per_euro": leaf(float(per_euro[name]), "ratio", "derived", SRC.derivation, "kept_pts / discount_pct"),
+        "per_order_eur": leaf(per_order_eur[name], "eur", "derived", SRC.derivation, "aov_eur x kept_pts / 100"),
+        "per_1000_eur": leaf(float(per_euro[name] * 1000), "eur", "derived", SRC.recommendation,
+                             "per_euro x 1,000"),
+        "mean_realised_discount_pct": leaf(float(mean_pct[name]), "pct", "live", SRC.limitations),
+        "off_list_with_offer_pct": leaf(
+            float(off_list[name]), "pct", "derived", SRC.limitations,
+            "100 x (1 - (1 - mean_realised_discount_pct / 100) x (1 - discount_pct / 100))"),
+        "contact_cost_eur": leaf(contact_cost[name], "eur", "derived", SRC.cost_basis,
+                                 "per_order_eur / (100 / other.planning_reactivation_rate_pct)"),
+        "budget_allocation": leaf(BUDGET[name], "text", "live", SRC.limitations),
+        "budget_share_pct": leaf(budget_share, "pct", "derived", SRC.limitations,
+                                 f"the percentage in focus.{k}.budget_allocation"),
+    }
+
+
+def rate_leaves(scale: int, unit: str) -> dict:
+    return {key(name): {
+        f"r{rate * 100:.0f}": leaf(
+            float(at_rate[(name, rate)] * scale), unit, "derived", SRC.recommendation,
+            f"(focus.{key(name)}.gross_margin_pct - {rate * 100:.0f}) / {rate * 100:.0f}"
+            + (f" x {scale:,}" if scale != 1 else ""))
+        for rate in DISCOUNT.values()} for name in FOCUS}
+
+
+tree = {
+    "schema": 1,
+    "about": "Figures quoted by the executive deck and report, computed and checked by notebooks/exhibits_win_back.qmd.",
+    "totals": {
+        "scored_customers": leaf(SCORED_CUSTOMERS, "count", "live", SRC.recommendation),
+        "revenue_base_eur": leaf(REVENUE_BASE, "eur", "live", SRC.recommendation),
+        "orders": leaf(TOTAL_ORDERS, "count", "live", SRC.revenue_base),
+        "profit_margin_pct": leaf(TOTAL_PROFIT / TOTAL_REVENUE * 100, "pct", "live", SRC.the_system),
+        "orders_outside_tolerance": leaf(int(num(p_outside)), "count", "cited", SRC.limitations),
+        "order_value_tolerance": leaf(num(p_tolerance), "number", "cited", SRC.revenue_base),
+        "raw_records": leaf(r_raw_records, "text", "cited", SRC.the_system),
+        "dax_measures": leaf(int(r_measures), "count", "cited", SRC.the_system),
+        "sql_pipeline_steps": leaf(int(r_sql_steps), "count", "cited", SRC.the_system),
+        "standalone_views": leaf(int(r_views), "count", "cited", SRC.repository_map),
+    },
+    "segments": {key(name): {
+        "customers": leaf(int(shares.loc[name, "customers"]), "count", "live", SRC.segment_shares),
+        "customer_share_pct": leaf(float(shares.loc[name, "customer_share_pct"]), "pct", "derived",
+                                   SRC.segment_shares, "customers / totals.scored_customers x 100"),
+        "lifetime_spend_eur": leaf(float(shares.loc[name, "revenue"]), "eur", "live", SRC.segment_shares),
+        "revenue_share_pct": leaf(float(shares.loc[name, "revenue_share_pct"]), "pct", "derived",
+                                  SRC.segment_shares, "lifetime_spend_eur / totals.revenue_base_eur x 100"),
+        "gross_margin_pct": leaf(float(margin_pct[name]), "pct", "live", SRC.derivation),
+    } for name in SEGMENT_ORDER},
+    "win_back": {
+        "customers": leaf(win_back_customers, "count", "derived", SRC.recommendation,
+                          "segments.at_risk.customers + segments.hibernating.customers"),
+        "customer_share_pct": leaf(win_back_customers / SCORED_CUSTOMERS * 100, "pct", "derived",
+                                   SRC.recommendation, "customers / totals.scored_customers x 100"),
+        "lifetime_spend_eur": leaf(win_back_spend, "eur", "derived", SRC.recommendation,
+                                   "segments.at_risk.lifetime_spend_eur + segments.hibernating.lifetime_spend_eur"),
+        "revenue_share_pct": leaf(win_back_spend / REVENUE_BASE * 100, "pct", "derived", SRC.recommendation,
+                                  "lifetime_spend_eur / totals.revenue_base_eur x 100"),
+    },
+    "focus": {key(name): focus_leaves(name) for name in FOCUS},
+    "rates": {"per_euro": rate_leaves(1, "ratio"), "per_1000_eur": rate_leaves(1000, "eur")},
+    "ratios": {
+        "playbook": leaf(float(playbook_ratio), "ratio", "derived", SRC.recommendation,
+                         "focus.at_risk.per_euro / focus.hibernating.per_euro"),
+        "common": leaf(float(common_ratio), "ratio", "derived", SRC.recommendation,
+                       f"rates.per_euro.at_risk.r{COMMON_RATE * 100:.0f} / "
+                       f"rates.per_euro.hibernating.r{COMMON_RATE * 100:.0f}; the other playbook rate "
+                       "gives the same ratio at 1 dp"),
+    },
+    "other": {
+        "observed_max_discount_pct": leaf(MAX_DISCOUNT * 100, "pct", "live", SRC.limitations),
+        "planning_reactivation_rate_pct": leaf(p_planning_rate, "pct", "cited", SRC.cost_basis),
+        "pilot_interval_pct": leaf(p_interval, "pct", "cited", SRC.pilot_design),
+    },
+}
+
+# The render rewrites briefing/values.json only when KK_WRITE_VALUES is 1; otherwise the tracked
+# file must equal what this render computed, byte for byte.
+VALUES_JSON = (json.dumps(tree, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
+if WRITE_VALUES:
+    VALUES_FILE.parent.mkdir(exist_ok=True)
+    VALUES_FILE.write_bytes(VALUES_JSON)
+assert VALUES_FILE.is_file() and VALUES_FILE.read_bytes() == VALUES_JSON, (
+    "briefing/values.json differs from the values this render computed: "
+    "set KK_WRITE_VALUES to 1 and render again to rewrite it")
+print(f"briefing/values.json: {len(VALUES_JSON)} B, {'written' if WRITE_VALUES else 'unchanged'}",
+      file=sys.__stderr__, flush=True)
 ```
 
 The live values on this page are checked against the literals published in [`docs/methodology.md`](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/blob/main/docs/methodology.md), and the render fails on any mismatch.
