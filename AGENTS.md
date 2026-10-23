@@ -18,7 +18,7 @@ Master configuration for `rfm-customer-segmentation-kupferkanne`. Read this file
 | `pbip/` | Power BI project: TMDL semantic model and report definition. |
 | `harness/` | Python KPI-parity harness (checks the model against BigQuery baselines); see `harness/README.md`. |
 | `notebooks/` | Quarto analytical notebook. |
-| `briefing/` | Executive deck and decision report: templates, the values file written by the exhibits notebook, and the render and checks script. |
+| `briefing/` | Executive deck and decision report: templates, the values file written by the exhibits notebook, the render script `render.py` and the checks it runs, `checks.py`. |
 | `docs/` | Reviewer-facing narrative. |
 | `docs/adr/` | Architectural Decision Records. |
 

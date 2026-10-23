@@ -11,6 +11,9 @@
 {% set y_top, y_bottom, v_max, v_min = 25.49, 167.26, values | max, values | min %}
 {% macro y(value, offset=0) %}{{ (linear(value, v_max, v_min, y_top, y_bottom) + offset) | round(2) }}{% endmacro %}
 {% set full_width_points = 60 %}
+{% do on_scale(5, "At Risk's discount off list with the offer", ar.off_list_with_offer_pct, full_width_points) %}
+{% do on_scale(5, "Hibernating's discount off list with the offer", hb.off_list_with_offer_pct, full_width_points) %}
+{% do on_scale(5, "the observed maximum discount", v.other.observed_max_discount_pct, full_width_points) %}
 {% set rule = (v.other.observed_max_discount_pct / full_width_points * 100) | round(2) %}
 {% macro discount_bars(seg, fill, tint) %}{% set dark = (seg.mean_realised_discount_pct / full_width_points * 100) | round(2) %}{% set total = (seg.off_list_with_offer_pct / full_width_points * 100) | round(2) %}<div style="display:flex;height:8mm"><div class="{{ fill }}" style="width:{{ dark }}%"></div><div class="{{ tint }}" style="width:{{ (total - dark) | round(2) }}%"></div></div>{% endmacro %}
 <article id="cause" class="page">

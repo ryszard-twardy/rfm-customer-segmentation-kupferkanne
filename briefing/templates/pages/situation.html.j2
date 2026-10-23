@@ -7,6 +7,8 @@
 {% set customers = split_track(order | map(attribute="customer_share_pct") | list, 10000) %}
 {% set revenue = split_track(order | map(attribute="revenue_share_pct") | list, 10000) %}
 {% set track_points = 70 %}
+{% do on_scale(3, "At Risk's gross margin", ar.gross_margin_pct, track_points) %}
+{% do on_scale(3, "Hibernating's gross margin", hb.gross_margin_pct, track_points) %}
 {% macro stack(parts) %}{% for part in parts %}<div class="{{ fills[loop.index0] }}" style="width:{{ part / 100 }}%"></div>{% endfor %}{% endmacro %}
 {% macro win_back_label() %}<span class="c-at-risk" style="font-weight:700">At&nbsp;Risk</span> + <span class="c-hibernating" style="font-weight:700">Hibernating</span>{% endmacro %}
 {% macro track(seg, fill, tint) %}{% set parts = split_track([seg.kept_pts, seg.discount_pct], 10000) %}<div class="track"><div style="display:flex;width:{{ (seg.gross_margin_pct / track_points * 100) | round(2) }}%"><div class="seg {{ fill }} c-on-fill" style="width:{{ parts[0] / 100 }}%">{{ seg.kept_pts | num(2) }} points kept</div><div class="seg {{ tint }} c-text" style="width:{{ parts[1] / 100 }}%">{{ seg.discount_pct | pct(0) }} off</div></div><span class="c-muted" style="font-size:8.5pt">{{ seg.gross_margin_pct | pct(2) }} gross margin</span></div>{% endmacro %}

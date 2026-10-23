@@ -1,5 +1,6 @@
 {# Cover: the decision asked for and the headline finding. Bars scale with the per-1,000 figures. #}
 {% set at_risk_bar = 480 %}
+{% do on_scale(1, "Hibernating's contribution per €1,000 of discount over At Risk's", v.focus.hibernating.per_1000_eur / v.focus.at_risk.per_1000_eur, 1) %}
 <section id="cover" class="slide slide--cover">
 <div class="col" style="width:820px;gap:32px">
 <p class="label">Leadership decision paper</p>

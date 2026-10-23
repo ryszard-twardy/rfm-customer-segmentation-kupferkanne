@@ -1,6 +1,10 @@
-{# The uncertainty: realised discount today plus the offer on top, 1,000 px = 60% off list,
-   with a rule at the deepest observed discount. #}
-{% set px_per_pct = 1000 / 60 %}
+{# The uncertainty: realised discount today plus the offer on top, 1,000 px = full_width_points
+   points of discount off list, with a rule at the deepest observed discount. #}
+{% set full_width_points = 60 %}
+{% set px_per_pct = 1000 / full_width_points %}
+{% do on_scale(5, "At Risk's discount off list with the offer", v.focus.at_risk.off_list_with_offer_pct, full_width_points) %}
+{% do on_scale(5, "Hibernating's discount off list with the offer", v.focus.hibernating.off_list_with_offer_pct, full_width_points) %}
+{% do on_scale(5, "the observed maximum discount", v.other.observed_max_discount_pct, full_width_points) %}
 {% macro discount_row(tone, seg, fill, tint) %}
 <div class="row" style="gap:64px;align-items:end">
 <div class="col" style="width:1000px;gap:8px">

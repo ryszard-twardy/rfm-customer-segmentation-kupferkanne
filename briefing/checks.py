@@ -1,10 +1,11 @@
 """Checks for the executive deck and the decision report.
 
 render.py renders each document, prints it to PDF and measures its pages in Chromium with the
-JavaScript below. Every check takes the spec of the document it checks (a render.Document) first
-and returns a list of failures, empty when the check passes. The spec supplies what differs
-between the documents: page size and count, flow limit, word limits, the non-data constants and
-the speaker notes, if any.
+JavaScript below; the templates reach check_scale through render.py's on_scale guard. Every check
+takes the spec of the document it checks (a render.Document) first and returns a list of
+failures, empty when the check passes. The spec supplies what differs between the documents:
+page size and count, flow limit, the pages with a .cap-top note, word limits, the non-data
+constants and the speaker notes, if any.
 """
 
 from __future__ import annotations
@@ -84,6 +85,17 @@ def lint_templates(doc, root: pathlib.Path) -> list[str]:
     return fails
 
 
+# --- Chart scales ----------------------------------------------------------------------
+
+def check_scale(doc, exhibit: int, figure: str, value: float, limit: float) -> list[str]:
+    """A figure a template draws on a fixed-length scale must lie in (0, limit], limit being the
+    template's scale constant; past it, the bar or track would run beyond its length."""
+    if 0 < value <= limit:
+        return []
+    return [f"{doc.name}: Exhibit {exhibit}: {figure} is {value:g}, outside the scale "
+            f"(0, {limit:g}]"]
+
+
 # --- Browser measurements --------------------------------------------------------------
 
 JS_FACES = """() => [...document.fonts].map(f => ({
@@ -140,6 +152,35 @@ JS_PAGES = """(selector) => [...document.querySelectorAll(selector)].map(s => {
 })"""
 
 
+# Per page named in the spec's cap_top_pages: the number of .cap-top notes and of elements marked
+# data-cap-top-anchor; with one of each, the note's computed text-box-trim and text-box-edge, the
+# top of its box and of the anchor's, its first baseline (a zero-size inline-block probe, inserted
+# and removed again) and the cap height of its font (the ink of "H" in Lato at its weight, drawn
+# at 1000 px on a canvas), all in px from the top of the page.
+JS_CAP_TOP = """([selector, ids]) => [...document.querySelectorAll(selector)]
+    .filter(s => ids.includes(s.id)).map(s => {
+  const notes = s.querySelectorAll('.cap-top');
+  const anchors = s.querySelectorAll('[data-cap-top-anchor]');
+  const out = {id: s.id, notes: notes.length, anchors: anchors.length};
+  if (notes.length !== 1 || anchors.length !== 1) return out;
+  const note = notes[0], top = s.getBoundingClientRect().top;
+  const probe = document.createElement('span');
+  probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+  note.insertBefore(probe, note.firstChild);
+  out.baseline = probe.getBoundingClientRect().bottom - top;
+  probe.remove();
+  const cs = getComputedStyle(note);
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = `${cs.fontWeight} 1000px Lato`;
+  out.cap = ctx.measureText('H').actualBoundingBoxAscent / 1000 * parseFloat(cs.fontSize);
+  out.trim = cs.textBoxTrim;
+  out.edge = cs.textBoxEdge;
+  out.note_top = note.getBoundingClientRect().top - top;
+  out.anchor_top = anchors[0].getBoundingClientRect().top - top;
+  return out;
+})"""
+
+
 def font_fallbacks(doc, page) -> list[str]:
     """Every text node must be drawn with the loaded Lato web font, never a platform fallback."""
     cdp = page.context.new_cdp_session(page)
@@ -183,9 +224,44 @@ def check_fit(doc, pages: list[dict]) -> list[str]:
         fails += [f"{s['id']}: box outside the {doc.unit}: {name}" for name in s["outside"]]
         fails += [f"{s['id']}: child spills out of its sized box: {name}" for name in s["spill"]]
         fails += [f"{s['id']}: text overflows its box: {name}" for name in s["overflow"]]
-        limit = doc.flow_allowance.get(s["id"], doc.flow_limit)
-        if s["lowest"] > limit:
-            fails.append(f"{s['id']}: content ends at y {s['lowest']:.1f}, past {limit:g}")
+        if s["lowest"] > doc.flow_limit:
+            fails.append(f"{s['id']}: content ends at y {s['lowest']:.1f}, "
+                         f"past {doc.flow_limit:g}")
+    return fails
+
+
+CAP_TOP = ("trim-start", "cap alphabetic")  # computed text-box-trim and text-box-edge
+CAP_TOP_TOLERANCE = 0.5  # px
+
+
+def check_cap_top(doc, measured: list[dict]) -> list[str]:
+    """Each page in doc.cap_top_pages holds one .cap-top note and one table marked
+    data-cap-top-anchor. The note's cap trim must be applied, so that its box starts at its first
+    line's cap height (baseline less the cap height of its font), and that box top must be level
+    with the table's, each within CAP_TOP_TOLERANCE. measured: JS_CAP_TOP's result."""
+    by_id = {m["id"]: m for m in measured}
+    fails = []
+    for sid in doc.cap_top_pages:
+        m = by_id.get(sid)
+        if m is None:
+            fails.append(f"{sid}: no such {doc.unit} for the cap-height alignment")
+            continue
+        if (m["notes"], m["anchors"]) != (1, 1):
+            fails.append(f"{sid}: {m['notes']} .cap-top note(s) and {m['anchors']} table(s) marked "
+                         "data-cap-top-anchor, not one of each")
+            continue
+        trim = (m.get("trim"), m.get("edge"))
+        if trim != CAP_TOP:
+            fails.append(f"{sid}: .cap-top has text-box-trim {trim[0]!r} and text-box-edge "
+                         f"{trim[1]!r}, not {CAP_TOP[0]!r} and {CAP_TOP[1]!r}")
+        cap_line = m["baseline"] - m["cap"]
+        if abs(cap_line - m["note_top"]) > CAP_TOP_TOLERANCE:
+            fails.append(f"{sid}: .cap-top box starts at y {m['note_top']:.2f}, not at its cap "
+                         f"height, y {cap_line:.2f} (baseline {m['baseline']:.2f} less cap height "
+                         f"{m['cap']:.2f})")
+        if abs(m["note_top"] - m["anchor_top"]) > CAP_TOP_TOLERANCE:
+            fails.append(f"{sid}: .cap-top box starts at y {m['note_top']:.2f}, not level with its "
+                         f"table at y {m['anchor_top']:.2f}")
     return fails
 
 

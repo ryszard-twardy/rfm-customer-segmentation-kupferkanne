@@ -1,4 +1,6 @@
-{# Page 5: appendix A1 (derivation and contact-cost basis) and A2 (segment shares). A2 bars use
+{# Page 5: appendix A1 (derivation and contact-cost basis) and A2 (segment shares). The first note
+   beside the A1 per-euro table carries .cap-top, so its cap height sits on the table's top rule;
+   the table carries data-cap-top-anchor, by which the render checks that alignment. A2 bars use
    one scale for both share columns, mm_per_point mm per percentage point; the subtotal bar of the
    two win-back segments is split by their shares in 0.01 mm steps. #}
 {% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
@@ -22,7 +24,7 @@
 </tbody></table>
 {% call note() %}At the playbook's rates; amounts in €; kept = points of order value left as contribution after the discount. AOV = revenue ÷ orders ({{ ar.orders | num(0) }} and {{ hb.orders | num(0) }} orders). Contact cost at which contribution is exhausted: H ÷ {{ contacts | num(0) }} contacts, at the What-If default reactivation rate of {{ v.other.planning_reactivation_rate_pct | pct(0) }} (a planning assumption, not a measured rate) and one recovered order per reactivated customer. Contact, send and fulfilment costs are not in the data.{% endcall %}
 <div style="display:flex;gap:7mm;align-items:flex-start;margin-top:4mm">
-<table style="width:52%">
+<table data-cap-top-anchor style="width:52%">
 <thead><tr><th style="width:46%"><b>Per euro of discount</b></th><th><b>At {{ low | pct(0) }}</b></th><th><b>At {{ high | pct(0) }}</b></th></tr></thead>
 <tbody>
 <tr><td class="c-at-risk" style="font-weight:700">At Risk</td><td class="c-at-risk key">{{ pe.at_risk.r15 | num(2) }}</td><td>{{ pe.at_risk.r20 | num(2) }}</td></tr>

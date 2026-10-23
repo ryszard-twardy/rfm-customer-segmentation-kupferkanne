@@ -9,9 +9,11 @@ Run from the repository root:
 Each document is a Jinja2 template filled from values.json, the palette in notebooks/_brand.yml
 and meta.yml. Its HTML goes to briefing/build/ and Playwright Chromium prints it to PDF: the deck
 as twelve 1920 x 1080 px slides, the report as six A4 pages. checks.py then checks the templates,
-fonts, page fit, colour contrast and the palette's text colours, the PDF and its text layer,
-figure parity with values.json (including a second render with every value moved), the deck's
-word budget and speaker notes, and determinism. Any failure exits non-zero with the list.
+the chart scales (no figure drawn past its fixed-length scale), fonts, page fit, the appendix A1
+alignment (the first note's cap height level with the per-euro table), colour contrast and the
+palette's text colours, the PDF and its text layer, figure parity with values.json (including a
+second render with every value moved), the deck's word budget and speaker notes, and
+determinism. Any failure exits non-zero with the list.
 """
 
 from __future__ import annotations
@@ -60,7 +62,7 @@ class Document:
     page_pt: tuple[float, float]       # PDF page in pt
     page_pt_tolerance: float
     flow_limit: float                  # bottom padding edge: flow content ends above it
-    flow_allowance: dict[str, float]   # per page id, a later end accepted in the layout
+    cap_top_pages: tuple[str, ...]     # one .cap-top note each, level with its marked table
     word_limits: dict[str, int]        # per page id; pages without a limit are reported only
     main_pages: int                    # the first pages, counted against main_word_limit
     main_word_limit: int | None
@@ -107,7 +109,7 @@ DECK = Document(
     page_pt=(1440.0, 810.0),  # 1920 x 1080 px at 0.75 pt per px
     page_pt_tolerance=0.01,
     flow_limit=920,
-    flow_allowance={},
+    cap_top_pages=("a1",),
     # Word budget: whitespace-separated tokens of each slide's rendered text; the appendix
     # slides are reported only.
     word_limits={"cover": 60, "summary": 90, "pool": 75, "margin": 75, "cause": 75,
@@ -146,7 +148,7 @@ REPORT = Document(
     page_pt=(210 * PT_PER_MM, 297 * PT_PER_MM),
     page_pt_tolerance=0.5,
     flow_limit=277 * MM,  # the bottom padding edge of each page: 297 mm less 20 mm
-    flow_allowance={},
+    cap_top_pages=("appendix-1",),
     word_limits={},  # words per page are reported only
     main_pages=0,
     main_word_limit=None,
@@ -243,7 +245,11 @@ def load_inputs() -> dict:
     }
 
 
-def render_html(doc: Document, inputs: dict) -> str:
+def render_html(doc: Document, inputs: dict, scale_fails: list[str] | None = None) -> str:
+    """The document's HTML. A template guards each figure it draws on a fixed-length scale with
+    {% do on_scale(exhibit, figure, value, limit) %}, limit being its own scale constant; a figure
+    outside (0, limit] goes to scale_fails. build() passes the list to the first render only, so
+    the second render and the render with moved values never fail a scale."""
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(TEMPLATES),
         undefined=jinja2.StrictUndefined,
@@ -251,9 +257,15 @@ def render_html(doc: Document, inputs: dict) -> str:
         trim_blocks=True,
         lstrip_blocks=True,
         keep_trailing_newline=True,
+        extensions=["jinja2.ext.do"],
     )
+
+    def on_scale(exhibit: int, figure: str, value: float, limit: float) -> None:
+        if scale_fails is not None:
+            scale_fails.extend(checks.check_scale(doc, exhibit, figure, value, limit))
+
     env.filters.update(num=num, pct=pct, eur=eur, times=times, spell=spell, px=px)
-    env.globals.update(split_track=split_track, linear=linear)
+    env.globals.update(split_track=split_track, linear=linear, on_scale=on_scale)
     return env.get_template(doc.template).render(
         v=inputs["v"], palette=inputs["palette"], meta=inputs["meta"], pages=doc.pages,
         stylesheet=doc.stylesheet)
@@ -273,7 +285,9 @@ def browser_pass(playwright, doc: Document, html_path: pathlib.Path,
             page.locator(f"{doc.page_tag}#{s['id']}").screenshot()).hexdigest() for s in pages}
         result = {"faces": page.evaluate(checks.JS_FACES), "pages": pages, "shots": shots,
                   "runs": page.evaluate(checks.JS_TEXT_COLOURS, doc.page_selector),
-                  "fallbacks": checks.font_fallbacks(doc, page)}
+                  "fallbacks": checks.font_fallbacks(doc, page),
+                  "cap_top": page.evaluate(checks.JS_CAP_TOP,
+                                           [doc.page_selector, list(doc.cap_top_pages)])}
         page.pdf(path=str(pdf_path), prefer_css_page_size=True, print_background=True)
         return result
     finally:
@@ -287,7 +301,7 @@ def build(doc: Document) -> list[str]:
     inputs = load_inputs()
     BUILD.mkdir(exist_ok=True)
     fails = checks.lint_templates(doc, TEMPLATES)
-    html_text = render_html(doc, inputs)
+    html_text = render_html(doc, inputs, fails)
     doc.html.write_bytes(html_text.encode("utf-8"))
     second_html = BUILD / f"{doc.name}.second.html"
     second_html.write_bytes(render_html(doc, inputs).encode("utf-8"))
@@ -315,6 +329,7 @@ def build(doc: Document) -> list[str]:
                      f"are not {list(doc.pages)}")
     fails += checks.check_faces(doc, first["faces"]) + first["fallbacks"]
     fails += checks.check_fit(doc, pages)
+    fails += checks.check_cap_top(doc, first["cap_top"])
     fails += checks.check_contrast(doc, first["runs"])
     fails += checks.check_palette(doc, inputs["palette"])
     fails += pdf_fails + checks.check_text_layer(doc, texts)
@@ -346,7 +361,8 @@ def build(doc: Document) -> list[str]:
           f"{doc.pdf.stat().st_size:,} B")
     (BUILD / f"{doc.name}_checks.json").write_text(json.dumps(
         {"words": counts, "lowest": {s["id"]: s["lowest"] for s in pages},
-         "shots": first["shots"], "failures": fails}, indent=1), encoding="utf-8")
+         "shots": first["shots"], "cap_top": first["cap_top"], "failures": fails}, indent=1),
+        encoding="utf-8")
     return fails
 
 

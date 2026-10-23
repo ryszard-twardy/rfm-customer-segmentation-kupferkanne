@@ -1,5 +1,6 @@
 {# Appendix A1: derivation of the per-euro figures and the contact-cost basis. The first note
-   beside the per-euro table carries .cap-top, so its cap height sits on the table's top rule. #}
+   beside the per-euro table carries .cap-top, so its cap height sits on the table's top rule;
+   the table carries data-cap-top-anchor, by which the render checks that alignment. #}
 {% set contacts = 100 / v.other.planning_reactivation_rate_pct %}
 {% set low_rate = v.focus.at_risk.discount_pct %}
 {% set high_rate = v.focus.hibernating.discount_pct %}
@@ -38,7 +39,7 @@
 <p class="caption">AOV = revenue ÷ orders ({{ v.focus.at_risk.orders | num(0) }} and {{ v.focus.hibernating.orders | num(0) }} orders). Contact cost at which contribution is exhausted: H ÷ {{ contacts | num(0) }} contacts, at the What-If default reactivation rate of {{ v.other.planning_reactivation_rate_pct | pct(0) }} (a planning assumption, not a measured rate) and one recovered order per reactivated customer. Contact, send and fulfilment costs are not in the data.</p>
 </div>
 <div class="row" style="gap:64px;align-items:start">
-<div class="grid" style="width:760px;grid-template-columns:260px 250px 250px">
+<div class="grid" data-cap-top-anchor style="width:760px;grid-template-columns:260px 250px 250px">
 <p class="cell cell--head bold">Per euro of discount</p>
 <p class="cell cell--head bold r">At {{ low_rate | pct(0) }}</p>
 <p class="cell cell--head bold r">At {{ high_rate | pct(0) }}</p>

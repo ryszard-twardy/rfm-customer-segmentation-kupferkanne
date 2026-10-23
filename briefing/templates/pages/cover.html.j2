@@ -2,6 +2,7 @@
    at at_risk_bar percent of the row. #}
 {% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
 {% set at_risk_bar = 70 %}
+{% do on_scale(1, "Hibernating's contribution per €1,000 of discount over At Risk's", hb.per_1000_eur / ar.per_1000_eur, 1) %}
 <article id="cover" class="page page--cover">
 <div>
 <p class="eyebrow">Leadership decision paper</p>
