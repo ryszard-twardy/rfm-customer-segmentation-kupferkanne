@@ -29,7 +29,7 @@
 <tr class="last"><td class="c-hibernating" style="font-weight:700">Hibernating</td><td class="c-accent key">{{ pe.hibernating.r15 | num(2) }}</td><td class="c-hibernating key">{{ pe.hibernating.r20 | num(2) }}</td></tr>
 </tbody></table>
 <div class="c-heading" style="flex:1;font-size:9.5pt;line-height:1.45">
-<p><b>{{ v.ratios.playbook | times(2) }}</b> along the playbook's rates: {{ ar.per_euro | num(4) }} ÷ {{ hb.per_euro | num(4) }}.</p>
+<p class="cap-top"><b>{{ v.ratios.playbook | times(2) }}</b> along the playbook's rates: <span class="nowrap">{{ ar.per_euro | num(4) }} ÷ {{ hb.per_euro | num(4) }}</span>.</p>
 <p><b>About {{ v.ratios.common | times(1) }}</b> at either common rate, reading down a column.</p>
 <p class="exhibit-note" style="margin:0">Segment colour: the playbook's rates. Blue: the rate under test. Multiplied by 1,000, the playbook figures are the {{ ar.per_1000_eur | eur(0) }} and {{ hb.per_1000_eur | eur(0) }} per €1,000 of discount in <span class="nowrap">Exhibits 1 and 4</span>.</p>
 </div>

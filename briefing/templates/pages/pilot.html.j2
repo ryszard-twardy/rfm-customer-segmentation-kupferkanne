@@ -19,7 +19,12 @@
 <section>
 <p class="eyebrow">The ask</p>
 <h2>Approve the pilot and fix its group shares, observation window and contact-cost recording before launch.</h2>
-<p>Three settings need a decision before launch. The shares of the five groups are fixed in advance. The observation window is set together with the decision rule, and contribution counts every assigned customer, at zero for those who place no order. Contact cost is recorded per contacted customer and deducted from the offer group's contribution; it matters more than it looks, because at the {{ v.other.planning_reactivation_rate_pct | pct(0) }} planning rate contribution is exhausted at {{ ar.contact_cost_eur | eur(2) }} per contact in At&nbsp;Risk and {{ hb.contact_cost_eur | eur(2) }} in Hibernating.</p>
+<p>Three settings need a decision before launch.</p>
+<div class="settings">
+<div class="fact"><p class="key">Group shares</p><p>The shares of the five groups are fixed in advance.</p></div>
+<div class="fact"><p class="key">Observation window</p><p>Set together with the decision rule; contribution counts every assigned customer, at zero for those who place no order.</p></div>
+<div class="fact"><p class="key">Contact-cost recording</p><p>Per contacted customer, deducted from the offer group's contribution. It matters more than it looks: at the {{ v.other.planning_reactivation_rate_pct | pct(0) }} planning rate, contribution is exhausted at {{ ar.contact_cost_eur | eur(2) }} per contact in At&nbsp;Risk and {{ hb.contact_cost_eur | eur(2) }} in Hibernating.</p></div>
+</div>
 <div class="callout"><span class="figure">Approve the pilot</span><p class="caption c-heading">If the result is unclear, nothing changes: the playbook stays as it is. The downside is bounded, and the pilot produces evidence on which rate pays for itself.</p></div>
 </section>
 {{ foot(page) }}

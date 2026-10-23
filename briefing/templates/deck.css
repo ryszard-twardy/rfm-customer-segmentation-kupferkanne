@@ -38,6 +38,7 @@ section + section { break-before: page; }
 .num { font-variant-numeric: tabular-nums; }
 .nowrap { white-space: nowrap; }
 .r { text-align: right; }
+.cap-top { text-box: trim-start cap alphabetic; } /* the box starts at the first line's cap height, level with a rule beside it */
 
 /* Layout */
 .col { display: flex; flex-direction: column; }
@@ -63,13 +64,6 @@ section + section { break-before: page; }
 .grid--tight .cell { padding: 10px 12px; }
 .cell--bar { display: flex; align-items: center; gap: 16px; }
 .cell__value { width: 120px; font-size: 30px; line-height: 1.3; color: var(--heading-text); }
-
-/* A slide that runs past the content area at the shared sizes, fitted as in the accepted
-   layout: a slightly smaller title and captions, and tighter table header cells. */
-.slide--fit .title { font-size: 51.18px; }
-.slide--fit .caption--lead { font-size: 23.92px; }
-.slide--fit .caption--note { font-size: 23.62px; }
-.slide--fit .grid--derivation .cell--head { padding-top: 10px; padding-bottom: 10px; }
 
 /* Colours */
 .c-at-risk { color: var(--at-risk); }

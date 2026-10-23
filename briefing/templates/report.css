@@ -41,6 +41,7 @@ p { margin: 0 0 2.5mm; }
 
 .num { font-variant-numeric: tabular-nums; }
 .nowrap { white-space: nowrap; }
+.cap-top { text-box: trim-start cap alphabetic; } /* the box starts at the first line's cap height, level with a rule beside it */
 
 /* Exhibits */
 .exhibit-title { margin: 0 0 2mm; font-size: 8.5pt; font-weight: 700; color: var(--heading-text); }
@@ -78,7 +79,8 @@ p { margin: 0 0 2.5mm; }
 .tile.test { background: var(--accent-text); color: var(--on-fill-text); }
 .tile.test b { color: var(--on-fill-text); }
 .grp { padding-top: 2mm; border-top: 1.5pt solid; }
-.callout { display: flex; gap: 6mm; align-items: baseline; margin-top: 1mm; padding-top: 3mm; border-top: 1.5pt solid var(--heading-text); }
+.settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; margin-top: 1mm; } /* the ask's three settings, each a .fact */
+.callout { display: flex; gap: 6mm; align-items: center; margin-top: 6mm; padding-top: 6mm; border-top: 1.5pt solid var(--heading-text); }
 .callout .figure { font-size: 24pt; font-weight: 300; line-height: 1.05; color: var(--accent-text); white-space: nowrap; }
 
 /* Tables: A1 and A2 */
@@ -96,7 +98,7 @@ td.key { font-weight: 700; }
 .mini--split { display: inline-flex; } /* one span per segment */
 .mini--split > span { height: 100%; }
 
-/* Appendix facts and the sources */
+/* Facts (the appendix and the ask's settings) and the sources */
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
 .fact { margin-bottom: 2.5mm; padding-top: 2mm; border-top: .5pt solid var(--border); }
 .fact .key { margin: 0 0 .5mm; font-size: 7pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--label-text); }

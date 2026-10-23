@@ -107,7 +107,7 @@ DECK = Document(
     page_pt=(1440.0, 810.0),  # 1920 x 1080 px at 0.75 pt per px
     page_pt_tolerance=0.01,
     flow_limit=920,
-    flow_allowance={"a1": 924},  # A1 is fitted as in the accepted layout and ends at y 923.8
+    flow_allowance={},
     # Word budget: whitespace-separated tokens of each slide's rendered text; the appendix
     # slides are reported only.
     word_limits={"cover": 60, "summary": 90, "pool": 75, "margin": 75, "cause": 75,
