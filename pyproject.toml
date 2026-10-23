@@ -1,7 +1,7 @@
 [project]
 name = "rfm-customer-segmentation-kupferkanne"
 version = "0.0.0"
-description = "Reproducible Python environment for the BigQuery ingest utility in scripts/, the KPI parity harness, and the Quarto EDA notebook."
+description = "Reproducible Python environment for the BigQuery ingest utility in scripts/, the KPI parity harness, the Quarto EDA notebook, and the briefing render in briefing/."
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "db-dtypes>=1.7.1",
@@ -23,6 +23,9 @@ package = false
 
 [dependency-groups]
 dev = [
+    "jinja2==3.1.6",
+    "playwright==1.63.0",
+    "pypdf==6.19.0",
     "pytest>=9.0.3",
 ]
 

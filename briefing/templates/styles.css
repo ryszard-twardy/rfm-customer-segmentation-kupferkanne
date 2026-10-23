@@ -1,0 +1,94 @@
+/* Executive deck styles. Every colour is a custom property that base.html.j2 writes
+   on :root from the palette render.py reads in notebooks/_brand.yml. */
+
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 300; font-display: block; src: url("../fonts/lato-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 400; font-display: block; src: url("../fonts/lato-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 700; font-display: block; src: url("../fonts/lato-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 900; font-display: block; src: url("../fonts/lato-latin-900-normal.woff2") format("woff2"); }
+
+/* Page model: one 1920 x 1080 px slide per printed page; no element margins. */
+@page { size: 1920px 1080px; margin: 0; }
+*, *::before, *::after { margin: 0; box-sizing: border-box; }
+p { font-size: 32px; font-weight: 400; line-height: 1.4; }
+h1 { font-size: 96px; font-weight: 600; line-height: 1.1; }
+h2 { font-size: 64px; font-weight: 600; line-height: 1.15; }
+a { color: inherit; text-decoration: underline; }
+hr { border: 0; } /* a rule draws only the border its class sets */
+section { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+section + section { break-before: page; }
+
+/* Slide shell, header and footer */
+.slide { display: flex; flex-direction: column; gap: 48px; padding: 128px 160px 160px; background: var(--page); color: var(--foreground); font-family: "Lato", Arial, sans-serif; }
+.slide--cover { flex-direction: row; align-items: center; gap: 96px; background: var(--cover); }
+.head { display: flex; flex-direction: column; gap: 20px; }
+.head__row { display: flex; justify-content: space-between; align-items: center; }
+.parts { display: flex; gap: 32px; }
+.foot { position: absolute; left: 160px; right: 160px; bottom: 64px; display: flex; justify-content: space-between; align-items: center; }
+.foot p { font-size: 24px; color: var(--label-text); }
+
+/* Text roles */
+.label { font-size: 24px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; line-height: 1.4; color: var(--label-text); }
+.part { font-size: 24px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; line-height: 1.4; color: var(--label-text); }
+.part--current { color: var(--heading-text); text-decoration: underline; }
+.sublabel { font-size: 24px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; color: var(--label-text); }
+.title { font-size: 52px; font-weight: 700; line-height: 1.12; color: var(--heading-text); }
+.cover-title { font-size: 72px; font-weight: 700; line-height: 1.1; color: var(--heading-text); }
+.lead { font-size: 30px; line-height: 1.35; color: var(--foreground); }
+.caption { font-size: 24px; line-height: 1.4; color: var(--label-text); }
+.hero { font-size: 120px; font-weight: 300; line-height: 1; color: var(--heading-text); }
+.figure { font-size: 52px; font-weight: 300; line-height: 1; color: var(--heading-text); }
+.strong { font-size: 30px; font-weight: 700; line-height: 1.2; color: var(--heading-text); }
+.small { font-size: 24px; line-height: 1.2; color: var(--label-text); }
+.bold { font-weight: 700; }
+.num { font-variant-numeric: tabular-nums; }
+.nowrap { white-space: nowrap; }
+.r { text-align: right; }
+
+/* Layout */
+.col { display: flex; flex-direction: column; }
+.row { display: flex; }
+.rule-top { border-top: 1px solid var(--border); }
+.rule-strong { border-top: 2px solid var(--heading-text); }
+.card { flex: 1; display: flex; flex-direction: column; gap: 12px; border-top: 2px solid var(--heading-text); padding-top: 24px; }
+.callout { display: flex; flex-direction: column; gap: 8px; border-top: 2px solid var(--heading-text); padding-top: 20px; }
+.entry { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); padding-top: 20px; }
+.item { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--border); padding-top: 14px; }
+.seg-head { border-top: 4px solid currentColor; padding-top: 16px; }
+.tile { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 24px; background: var(--tile); }
+.seg { height: 72px; border-right: 2px solid var(--page); }
+.seg:last-child { border-right: 0; }
+.bar-text { font-size: 30px; font-weight: 700; line-height: 1.2; padding-left: 24px; }
+
+/* Tables */
+.grid { display: grid; border-top: 2px solid var(--heading-text); }
+.cell { padding: 12px; font-size: 30px; line-height: 1.3; color: var(--heading-text); border-bottom: 1px solid var(--border); }
+.cell--head { font-size: 24px; border-bottom-color: var(--heading-text); }
+.cell--sub { border-bottom-color: var(--heading-text); }
+.cell--total { border-bottom: 2px solid var(--heading-text); }
+.grid--tight .cell { padding: 10px 12px; }
+.cell--bar { display: flex; align-items: center; gap: 16px; }
+.cell__value { width: 120px; font-size: 30px; line-height: 1.3; color: var(--heading-text); }
+
+/* A slide that runs past the content area at the shared sizes, fitted as in the accepted
+   layout: a slightly smaller title and captions, and tighter table header cells. */
+.slide--fit .title { font-size: 51.18px; }
+.slide--fit .caption--lead { font-size: 23.92px; }
+.slide--fit .caption--note { font-size: 23.62px; }
+.slide--fit .grid--derivation .cell--head { padding-top: 10px; padding-bottom: 10px; }
+
+/* Colours */
+.c-at-risk { color: var(--at-risk); }
+.c-hibernating { color: var(--hibernating-focus); }
+.c-accent { color: var(--c1); } /* c1, the brand primary, is the deck's one accent: the rate under test */
+.c-heading { color: var(--heading-text); }
+.c-muted { color: var(--label-text); }
+.c-text { color: var(--foreground); }
+.c-on-fill { color: var(--on-fill-text); }
+.bg-at-risk { background: var(--at-risk); }
+.bg-hibernating { background: var(--hibernating-focus); }
+.bg-accent { background: var(--c1); }
+.bg-at-risk-tint { background: var(--at-risk-tint); }
+.bg-hibernating-tint { background: var(--hibernating-tint); }
+.bg-champions { background: var(--champions-context); }
+.bg-context { background: var(--segment-context); }
+.bg-heading { background: var(--heading-text); }

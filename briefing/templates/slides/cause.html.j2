@@ -1,0 +1,56 @@
+{# The cause: a slope chart of contribution per 1,000 of discount at the two rates.
+   y is linear in the value: the highest value sits at y_top, the lowest at y_bottom. #}
+{% set low_rate = v.focus.at_risk.discount_pct %}
+{% set high_rate = v.focus.hibernating.discount_pct %}
+{% set r = v.rates.per_1000_eur %}
+{% set values = [r.at_risk.r15, r.at_risk.r20, r.hibernating.r15, r.hibernating.r20] %}
+{% set y_top, y_bottom, v_max, v_min = 61.2, 372.8, values | max, values | min %}
+{% macro y(value) %}{{ linear(value, v_max, v_min, y_top, y_bottom) | round(1) }}{% endmacro %}
+{# Labels sit on their dots: number top = dot y in the 440 px box - 18; name top = number top + 37. #}
+{% macro label_top(value) %}{{ (40 + linear(value, v_max, v_min, y_top, y_bottom) - 18) | px }}{% endmacro %}
+<section id="cause" class="slide">
+{% call head("The cause", "Why") %}The per-euro gap comes mostly from the rates: at either common rate, {{ at_risk() }} retains about {{ v.ratios.common | times(1) }} as much.{% endcall %}
+<div class="row" style="gap:32px;align-items:start">
+<div class="col" style="width:1040px;gap:12px">
+<p class="caption">Contribution (€) per €1,000 of discount, on orders placed</p>
+<p class="caption">Filled: the playbook's rates; blue ring: under test.</p>
+<div style="position:relative;width:1040px;height:440px">
+<p class="sublabel" style="position:absolute;left:180px;top:0px;width:240px;text-align:center">{{ low_rate | pct(0) }} discount</p>
+<p class="sublabel" style="position:absolute;left:660px;top:0px;width:240px;text-align:center">{{ high_rate | pct(0) }} discount</p>
+<div style="position:absolute;left:0px;top:40px;width:1040px;height:400px">
+<svg aria-label="Slope chart: contribution per 1,000 euros of discount at a {{ low_rate | pct(0) }} and a {{ high_rate | pct(0) }} discount. At Risk {{ r.at_risk.r15 | num(0) }} at {{ low_rate | pct(0) }} and {{ r.at_risk.r20 | num(0) }} at {{ high_rate | pct(0) }}; Hibernating {{ r.hibernating.r15 | num(0) }} at {{ low_rate | pct(0) }} and {{ r.hibernating.r20 | num(0) }} at {{ high_rate | pct(0) }}. The playbook pairs At Risk at {{ low_rate | pct(0) }} with Hibernating at {{ high_rate | pct(0) }}; Hibernating at {{ low_rate | pct(0) }} is the rate under test." width="1040" height="400" viewBox="0 0 1040 400" xmlns="http://www.w3.org/2000/svg">
+<line x1="300" y1="16" x2="300" y2="392" style="stroke:var(--border)" stroke-width="2"/>
+<line x1="780" y1="16" x2="780" y2="392" style="stroke:var(--border)" stroke-width="2"/>
+<line x1="300" y1="{{ y(r.at_risk.r15) }}" x2="780" y2="{{ y(r.at_risk.r20) }}" style="stroke:var(--at-risk)" stroke-width="6" stroke-linecap="round"/>
+<line x1="300" y1="{{ y(r.hibernating.r15) }}" x2="780" y2="{{ y(r.hibernating.r20) }}" style="stroke:var(--hibernating-focus)" stroke-width="6" stroke-linecap="round"/>
+<circle cx="780" cy="{{ y(r.at_risk.r20) }}" r="11" style="fill:var(--page);stroke:var(--at-risk)" stroke-width="5"/>
+<circle cx="300" cy="{{ y(r.at_risk.r15) }}" r="15" style="fill:var(--at-risk)"/>
+<circle cx="780" cy="{{ y(r.hibernating.r20) }}" r="15" style="fill:var(--hibernating-focus)"/>
+<circle cx="300" cy="{{ y(r.hibernating.r15) }}" r="15" style="fill:var(--page);stroke:var(--c1)" stroke-width="7"/>
+</svg>
+</div>
+<p class="strong num r" style="position:absolute;left:72px;top:{{ label_top(r.at_risk.r15) }}px;width:200px">{{ r.at_risk.r15 | num(0) }}</p>
+<p class="small bold c-at-risk r" style="position:absolute;left:72px;top:{{ label_top(r.at_risk.r15) | int + 37 }}px;width:200px">At&#160;Risk</p>
+<p class="strong c-accent num r" style="position:absolute;left:72px;top:{{ label_top(r.hibernating.r15) }}px;width:200px">{{ r.hibernating.r15 | num(0) }}</p>
+<p class="small bold r" style="position:absolute;left:72px;top:{{ label_top(r.hibernating.r15) | int + 37 }}px;width:200px">Hibernating</p>
+<p class="strong c-muted num" style="position:absolute;left:808px;top:{{ label_top(r.at_risk.r20) }}px;width:200px">{{ r.at_risk.r20 | num(0) }}</p>
+<p class="strong num" style="position:absolute;left:808px;top:{{ label_top(r.hibernating.r20) }}px;width:200px">{{ r.hibernating.r20 | num(0) }}</p>
+</div>
+</div>
+<div class="col" style="flex:1;gap:32px">
+<div class="col" style="gap:12px">
+<p class="hero num">{{ v.ratios.playbook | times(2) }}</p>
+<p class="lead">in {{ at_risk() }} at the playbook's rates</p>
+</div>
+<hr class="rule-top" style="width:528px">
+<div class="col" style="gap:12px">
+<div class="row" style="align-items:baseline;gap:16px">
+<p class="lead" style="line-height:1">about</p>
+<p class="hero num">{{ v.ratios.common | times(1) }}</p>
+</div>
+<p class="lead">at either common rate</p>
+</div>
+</div>
+</div>
+{{ foot("Source: docs/methodology.md, Win-back discount allocation", page) }}
+</section>

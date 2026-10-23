@@ -1,0 +1,43 @@
+{# Appendix A4: the pilot's decision rule and the statistics behind it. #}
+{% set low_rate = v.focus.at_risk.discount_pct %}
+{% set high_rate = v.focus.hibernating.discount_pct %}
+<section id="a4" class="slide">
+{% call head("Appendix A4") %}Pilot decision rule and statistics{% endcall %}
+<div class="row" style="gap:96px;align-items:start">
+<div class="col" style="flex:1;gap:10px">
+<p class="label c-heading">Decision rule</p>
+<div class="item">
+<p class="sublabel">Stage 1: Rate</p>
+<p class="lead c-heading">{{ hibernating() }} moves to {{ low_rate | pct(0) }} only if the interval for {{ low_rate | pct(0) }} minus {{ high_rate | pct(0) }} lies above zero</p>
+</div>
+<div class="item">
+<p class="sublabel">Stage 2: Floor</p>
+<p class="lead c-heading">An offer stops only if the upper bound of its interval lies below <span class="nowrap">break-even</span></p>
+</div>
+<div class="item">
+<p class="sublabel">Stage 2: Priority</p>
+<p class="lead c-heading">If the budget is short, {{ at_risk() }} goes first only if its lower bound clears <span class="nowrap">break-even</span> and beats {{ hibernating() }}</p>
+</div>
+</div>
+<div class="col" style="flex:1;gap:10px">
+<p class="label c-heading">Statistics</p>
+<div class="item">
+<p class="sublabel">Intervals</p>
+<p class="lead c-heading"><b>{{ v.other.pilot_interval_pct | pct(0) }}</b> BCa bootstrap intervals that resample customers within each segment and group</p>
+</div>
+<div class="item">
+<p class="sublabel">Scope of the verdict</p>
+<p class="lead c-heading">The verdict holds at the tested rates only</p>
+</div>
+<div class="item">
+<p class="sublabel">Stage 1 metric</p>
+<p class="lead c-heading">Per euro of discount if the budget cannot cover everyone, else per assigned customer</p>
+</div>
+<div class="item">
+<p class="sublabel">First wave and defaults</p>
+<p class="lead c-heading">The first wave sizes the groups and is excluded; every decision defaults to the playbook as it is</p>
+</div>
+</div>
+</div>
+{{ foot("Source: docs/methodology.md, Pilot design, public project repository", page) }}
+</section>

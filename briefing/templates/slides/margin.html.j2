@@ -1,0 +1,30 @@
+{# The problem: gross margin split into points kept and points given as discount. #}
+{% macro split_bar(seg, fill, tint, px_per_point=25) %}
+<div class="row" style="align-items:center;gap:24px">
+<div class="row">
+<div class="row {{ fill }}" style="width:{{ (seg.kept_pts * px_per_point) | px }}px;height:96px;align-items:center">
+<p class="bar-text c-on-fill num" style="padding-left:28px">{{ seg.kept_pts | num(2) }} points kept</p>
+</div>
+<div class="row {{ tint }}" style="width:{{ (seg.discount_pct * px_per_point) | px }}px;height:96px;align-items:center">
+<p class="bar-text c-text">{{ seg.discount_pct | pct(0) }} off</p>
+</div>
+</div>
+<p class="caption">{{ seg.gross_margin_pct | pct(2) }} gross margin</p>
+</div>
+{% endmacro %}
+<section id="margin" class="slide">
+{% call head("The problem", "Why") %}The playbook gives its deepest discount, {{ v.focus.hibernating.discount_pct | pct(0) }}, to its thinnest margin, {{ hibernating() }} at {{ v.focus.hibernating.gross_margin_pct | pct(2) }}.{% endcall %}
+<div class="col" style="gap:32px">
+<p class="caption">Points of pre-offer order value: kept as contribution or given as discount</p>
+<div class="col" style="gap:8px">
+<p class="strong c-at-risk">At&#160;Risk</p>
+{{ split_bar(v.focus.at_risk, "bg-at-risk", "bg-at-risk-tint") }}
+</div>
+<div class="col" style="gap:8px">
+<p class="strong c-hibernating">Hibernating</p>
+{{ split_bar(v.focus.hibernating, "bg-hibernating", "bg-hibernating-tint") }}
+</div>
+<p class="lead">Gross margin falls with each step down the composite score: {{ v.segments.champions.gross_margin_pct | pct(2) }} for Champions, {{ v.segments.hibernating.gross_margin_pct | pct(2) }} for {{ hibernating() }}.</p>
+</div>
+{{ foot("Source: docs/methodology.md, Win-back discount allocation", page) }}
+</section>

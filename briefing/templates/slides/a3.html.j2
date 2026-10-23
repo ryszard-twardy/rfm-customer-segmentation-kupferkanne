@@ -1,0 +1,28 @@
+{# Appendix A3: data and method. #}
+{% set t = v.totals %}
+<section id="a3" class="slide">
+{% call head("Appendix A3") %}Data and method{% endcall %}
+<div class="row" style="gap:96px;align-items:start">
+<div class="col" style="flex:1;gap:10px">
+<div class="item">
+<p class="sublabel">Scale</p>
+<p class="lead c-heading"><b>{{ t.scored_customers | num(0) }}</b> scored customers; <b>{{ t.orders | num(0) }}</b> orders; revenue base <b>{{ t.revenue_base_eur | eur(2) }}</b>, profit margin <b>{{ t.profit_margin_pct | pct(2) }}</b></p>
+</div>
+<div class="item">
+<p class="sublabel">Data and pipeline</p>
+<p class="lead c-heading">Roughly <b>{{ t.raw_records | replace("~", "") }}</b> raw records, synthetic and regenerable; a {{ t.sql_pipeline_steps | spell }}-step BigQuery SQL pipeline plus {{ t.standalone_views | spell }} views</p>
+</div>
+</div>
+<div class="col" style="flex:1;gap:10px">
+<div class="item">
+<p class="sublabel">Model and segments</p>
+<p class="lead c-heading">Power BI, <b>{{ t.dax_measures | num(0) }}</b> DAX measures; segments are a single snapshot, so migration is not computable</p>
+</div>
+<div class="item">
+<p class="sublabel">Open issue</p>
+<p class="lead c-heading"><b>{{ t.orders_outside_tolerance | num(0) }}</b> of {{ t.orders | num(0) }} orders fall outside the {{ t.order_value_tolerance | num(3) }} order-value tolerance; unexplained and tracked</p>
+</div>
+</div>
+</div>
+{{ foot("Source: README.md and docs/methodology.md (Limitations), public project repository", page) }}
+</section>

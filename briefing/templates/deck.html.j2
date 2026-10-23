@@ -1,0 +1,34 @@
+{% extends "base.html.j2" %}
+{% block title %}Kupferkanne: win-back discount allocation – executive deck{% endblock %}
+{% block body %}
+{# Shared slide parts. Each slide template is one <section>; `page` is its page number. #}
+{% macro head(label, part=none) %}
+<div class="head">
+<div class="head__row">
+<p class="label">{{ label }}</p>
+{% if part %}
+<div class="parts">
+{% for name in ("Situation", "Why", "How") %}
+<p class="part{{ " part--current" if name == part else "" }}">{{ name }}</p>
+{% endfor %}
+</div>
+{% endif %}
+</div>
+<h2 class="title">{{ caller() }}</h2>
+</div>
+{% endmacro %}
+{% macro foot(source, page=none) %}
+<div class="foot">
+<p>{{ source }}</p>
+{% if page %}
+<p>{{ page }}</p>
+{% endif %}
+</div>
+{% endmacro %}
+{% macro at_risk() %}<span class="c-at-risk">At&#160;Risk</span>{% endmacro %}
+{% macro hibernating() %}<span class="c-hibernating">Hibernating</span>{% endmacro %}
+{% for slide in slides %}
+{% set page = loop.index %}
+{% include "slides/" ~ slide ~ ".html.j2" %}
+{% endfor %}
+{% endblock %}

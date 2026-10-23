@@ -1,0 +1,42 @@
+{# Appendix A2: segment shares; one bar scale for both share columns. #}
+{% set px_per_point = 3.4 %}
+{% macro bar(share, fill) %}<div class="{{ fill }}" style="width:{{ (share * px_per_point) | px }}px;height:18px"></div>{% endmacro %}
+{% macro share_row(seg, fill, tone="") %}
+{% set weight = " bold " ~ tone if tone else "" %}
+<p class="cell{{ weight }}">{{ caller() }}</p>
+<p class="cell r num">{{ seg.customers | num(0) }}</p>
+<div class="cell cell--bar"><p class="cell__value r num">{{ seg.customer_share_pct | pct(2) }}</p>{{ bar(seg.customer_share_pct, fill) }}</div>
+<p class="cell r num">{{ seg.lifetime_spend_eur | num(2) }}</p>
+<div class="cell cell--bar"><p class="cell__value r num">{{ seg.revenue_share_pct | pct(2) }}</p>{{ bar(seg.revenue_share_pct, fill) }}</div>
+{% endmacro %}
+{% set s = v.segments %}
+<section id="a2" class="slide">
+{% call head("Appendix A2") %}Segment shares of scored customers and of the revenue base{% endcall %}
+<div class="col" style="gap:12px">
+<p class="caption">Bars use one scale for both shares. Shares are rounded; subtotals use unrounded values.</p>
+<div class="grid grid--tight" style="grid-template-columns:356px 186px 288px 306px 464px">
+<p class="cell cell--head bold">Segment</p>
+<p class="cell cell--head bold r">Customers</p>
+<p class="cell cell--head bold">Share of scored customers</p>
+<p class="cell cell--head bold r">Lifetime spend (€)</p>
+<p class="cell cell--head bold">Share of revenue base</p>
+{% call share_row(s.champions, "bg-champions") %}Champions{% endcall %}
+{% call share_row(s.loyal_customers, "bg-context") %}Loyal Customers{% endcall %}
+{% call share_row(s.potential_loyalists, "bg-context") %}Potential Loyalists{% endcall %}
+{% call share_row(s.recent_customers, "bg-context") %}Recent Customers{% endcall %}
+{% call share_row(s.at_risk, "bg-at-risk", "c-at-risk") %}At&#160;Risk{% endcall %}
+{% call share_row(s.hibernating, "bg-hibernating", "c-hibernating") %}Hibernating{% endcall %}
+<p class="cell cell--sub bold">{{ at_risk() }} + {{ hibernating() }}</p>
+<p class="cell cell--sub bold r num">{{ v.win_back.customers | num(0) }}</p>
+<div class="cell cell--sub cell--bar"><p class="cell__value bold r num">{{ v.win_back.customer_share_pct | pct(2) }}</p><div class="row">{{ bar(s.at_risk.customer_share_pct, "bg-at-risk") }}{{ bar(s.hibernating.customer_share_pct, "bg-hibernating") }}</div></div>
+<p class="cell cell--sub bold r num">{{ v.win_back.lifetime_spend_eur | num(2) }}</p>
+<div class="cell cell--sub cell--bar"><p class="cell__value bold r num">{{ v.win_back.revenue_share_pct | pct(2) }}</p><div class="row">{{ bar(s.at_risk.revenue_share_pct, "bg-at-risk") }}{{ bar(s.hibernating.revenue_share_pct, "bg-hibernating") }}</div></div>
+<p class="cell cell--total bold">Total</p>
+<p class="cell cell--total bold r num">{{ v.totals.scored_customers | num(0) }}</p>
+<div class="cell cell--total cell--bar"><p class="cell__value bold r num">100.00%</p></div>
+<p class="cell cell--total bold r num">{{ v.totals.revenue_base_eur | num(2) }}</p>
+<div class="cell cell--total cell--bar"><p class="cell__value bold r num">100.00%</p></div>
+</div>
+</div>
+{{ foot("Source: docs/methodology.md, Appendix: segment shares; v_rfm_for_bi at the segment snapshot", page) }}
+</section>

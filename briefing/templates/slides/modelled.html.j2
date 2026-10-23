@@ -1,0 +1,38 @@
+{# The uncertainty: realised discount today plus the offer on top, 1,000 px = 60% off list,
+   with a rule at the deepest observed discount. #}
+{% set px_per_pct = 1000 / 60 %}
+{% macro discount_row(tone, seg, fill, tint) %}
+<div class="row" style="gap:64px;align-items:end">
+<div class="col" style="width:1000px;gap:8px">
+<p class="strong {{ tone }}">{{ caller() }}, {{ seg.discount_pct | pct(0) }} offer</p>
+<div class="row" style="height:72px">
+{% set dark = (seg.mean_realised_discount_pct * px_per_pct) | px %}
+<div class="row {{ fill }}" style="width:{{ dark }}px;height:72px;align-items:center">
+<p class="bar-text c-on-fill num">{{ seg.mean_realised_discount_pct | pct(2) }}</p>
+</div>
+<div class="{{ tint }}" style="width:{{ (seg.off_list_with_offer_pct * px_per_pct) | px - dark }}px;height:72px"></div>
+</div>
+</div>
+<p class="strong">roughly {{ seg.off_list_with_offer_pct | pct(1) }} off list</p>
+</div>
+{% endmacro %}
+{% set rule_x = (v.other.observed_max_discount_pct * px_per_pct) | int %}
+<section id="modelled" class="slide">
+{% call head("The uncertainty", "Why") %}The figures measure margin efficiency once an order is placed, not incrementality, so the ranking can narrow or reverse.{% endcall %}
+<div class="col" style="gap:64px">
+<div class="col" style="gap:28px">
+<p class="caption">Dark: mean realised discount today; light: the offer on top.</p>
+<div class="col" style="position:relative;width:1600px;gap:40px">
+{% call discount_row("c-at-risk", v.focus.at_risk, "bg-at-risk", "bg-at-risk-tint") %}At&#160;Risk{% endcall %}
+{% call discount_row("c-hibernating", v.focus.hibernating, "bg-hibernating", "bg-hibernating-tint") %}Hibernating{% endcall %}
+<div class="bg-heading" style="position:absolute;left:{{ rule_x }}px;top:30px;width:3px;height:242px"></div>
+<p class="small bold c-heading r" style="position:absolute;left:{{ rule_x - 300 }}px;top:0px;width:290px">Observed maximum {{ v.other.observed_max_discount_pct | pct(0) }}</p>
+</div>
+</div>
+<div class="callout">
+<p class="label">Not incremental</p>
+<p class="lead">{{ at_risk() }} customers may have ordered anyway: part of the discount is deadweight.</p>
+</div>
+</div>
+{{ foot("Source: docs/methodology.md, Limitations", page) }}
+</section>

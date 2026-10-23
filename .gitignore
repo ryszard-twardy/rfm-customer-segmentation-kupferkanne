@@ -120,3 +120,5 @@ notebooks/_freeze/
 *.quarto_ipynb*
 # Quarto auto-generates this nested .gitignore on every project render
 notebooks/.gitignore
+# Briefing render output
+briefing/build/

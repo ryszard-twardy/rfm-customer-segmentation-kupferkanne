@@ -1,0 +1,51 @@
+{# The win-back pool: two 100% bars over the six segments, 1,600 px each. #}
+{% set segments = [v.segments.champions, v.segments.loyal_customers, v.segments.potential_loyalists,
+                   v.segments.recent_customers, v.segments.at_risk, v.segments.hibernating] %}
+{% set fills = ["bg-champions", "bg-context", "bg-context", "bg-context", "bg-at-risk", "bg-hibernating"] %}
+{% set customer_px = split_track(segments | map(attribute="customer_share_pct") | list, 1600) %}
+{% set revenue_px = split_track(segments | map(attribute="revenue_share_pct") | list, 1600) %}
+<section id="pool" class="slide">
+{% call head("The win-back pool", "Situation") %}The win-back pool is broad but shallow: {{ v.win_back.customer_share_pct | pct(1) }} of scored customers, {{ v.win_back.revenue_share_pct | pct(1) }} of the revenue base.{% endcall %}
+<div class="col" style="gap:28px">
+<div class="col" style="gap:8px">
+<p class="sublabel">Share of scored customers</p>
+<div class="row">
+<div class="col" style="width:{{ customer_px[0] }}px;gap:2px">
+<p class="strong num">{{ v.segments.champions.customer_share_pct | pct(1) }}</p>
+<p class="small">Champions</p>
+</div>
+<div style="flex:1"></div>
+<div class="col" style="width:{{ customer_px[4] + customer_px[5] }}px;gap:2px">
+<p class="strong num">{{ v.win_back.customer_share_pct | pct(1) }}</p>
+<p class="small bold">{{ at_risk() }} + {{ hibernating() }}</p>
+</div>
+</div>
+<div class="row" style="height:72px">
+{% for width in customer_px %}
+<div class="seg {{ fills[loop.index0] }}" style="width:{{ width }}px"></div>
+{% endfor %}
+</div>
+</div>
+<div class="col" style="gap:8px">
+<p class="sublabel">Share of the revenue base</p>
+<div class="row" style="height:72px">
+{% for width in revenue_px %}
+<div class="seg {{ fills[loop.index0] }}" style="width:{{ width }}px"></div>
+{% endfor %}
+</div>
+<div class="row" style="justify-content:space-between">
+<div class="col" style="gap:2px">
+<p class="strong num">{{ v.segments.champions.revenue_share_pct | pct(1) }}</p>
+<p class="small">Champions</p>
+</div>
+<div class="col" style="gap:2px">
+<p class="strong r num">{{ v.win_back.revenue_share_pct | pct(1) }}</p>
+<p class="small bold r">{{ at_risk() }} + {{ hibernating() }}</p>
+</div>
+</div>
+</div>
+<p class="caption">Light grey: other segments.</p>
+<p class="lead">The playbook's budget shares bound any move: {{ v.focus.at_risk.budget_allocation }} for {{ at_risk() }}, {{ v.focus.hibernating.budget_allocation }} for {{ hibernating() }}.</p>
+</div>
+{{ foot("Source: docs/methodology.md, Appendix: segment shares", page) }}
+</section>

@@ -1,0 +1,25 @@
+{# Executive summary: the answer, the context and the three reasons. #}
+<section id="summary" class="slide">
+{% call head("Executive summary") %}Test <span class="c-accent">a {{ v.focus.at_risk.discount_pct | pct(0) }} rate for Hibernating</span> in a controlled pilot with holdouts before the playbook changes.{% endcall %}
+<div class="col" style="gap:40px">
+<p class="lead c-muted">{{ at_risk() }} and {{ hibernating() }}: {{ v.win_back.customer_share_pct | pct(1) }} of scored customers, {{ v.win_back.revenue_share_pct | pct(1) }} of the revenue base.</p>
+<div class="row" style="gap:56px">
+<div class="card">
+<p class="label">Problem</p>
+<p class="hero num">{{ v.focus.hibernating.discount_pct | pct(0) }}</p>
+<p class="lead">off for {{ hibernating() }} ({{ v.focus.hibernating.gross_margin_pct | pct(2) }} margin), against {{ v.focus.at_risk.discount_pct | pct(0) }} for {{ at_risk() }} ({{ v.focus.at_risk.gross_margin_pct | pct(2) }}).</p>
+</div>
+<div class="card">
+<p class="label">Cause</p>
+<p class="hero num">{{ v.ratios.playbook | times(2) }}</p>
+<p class="lead">as much per euro of discount in {{ at_risk() }} at the playbook's rates; about {{ v.ratios.common | times(1) }} at either common rate.</p>
+</div>
+<div class="card">
+<p class="label">Uncertainty</p>
+<p class="hero">Modelled</p>
+<p class="lead">Margin efficiency once an order is placed, not incrementality: the ranking can narrow or reverse.</p>
+</div>
+</div>
+</div>
+{{ foot("Source: README.md, docs/methodology.md", page) }}
+</section>

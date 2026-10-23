@@ -1,0 +1,61 @@
+{# Appendix A1: derivation of the per-euro figures and the contact-cost basis.
+   At the shared sizes this slide runs past the content area, so it carries .slide--fit (see
+   styles.css). The two no-wrap phrases keep the caption's line breaks of the accepted layout. #}
+{% set contacts = 100 / v.other.planning_reactivation_rate_pct %}
+{% set low_rate = v.focus.at_risk.discount_pct %}
+{% set high_rate = v.focus.hibernating.discount_pct %}
+{% macro derivation_row(seg, tone, last=false) %}
+{% set cell = "cell cell--total" if last else "cell" %}
+<p class="{{ cell }} bold {{ tone }}">{{ caller() }}</p>
+<p class="{{ cell }} r num">{{ seg.revenue_eur | num(2) }}</p>
+<p class="{{ cell }} r num">{{ seg.profit_eur | num(2) }}</p>
+<p class="{{ cell }} r num">{{ seg.gross_margin_pct | pct(4) }}</p>
+<p class="{{ cell }} r num">{{ seg.discount_pct | pct(0) }}</p>
+<p class="{{ cell }} r num">{{ seg.kept_pts | num(2) }}</p>
+<p class="{{ cell }} bold r num">{{ seg.per_euro | num(4) }}</p>
+<p class="{{ cell }} r num">{{ seg.aov_eur | num(2) }}</p>
+<p class="{{ cell }} r num">{{ seg.per_order_eur | num(2) }}</p>
+<p class="{{ cell }} bold r num">{{ seg.contact_cost_eur | num(2) }}</p>
+{% endmacro %}
+<section id="a1" class="slide slide--fit">
+{% call head("Appendix A1") %}Derivation of the per-euro figures and the contact-cost basis{% endcall %}
+<div class="col" style="gap:40px">
+<div class="col" style="gap:12px">
+<p class="caption caption--lead">At the playbook's rates. Amounts in €; kept = points of order value left as contribution after the discount.</p>
+<div class="grid grid--derivation" style="grid-template-columns:205px 185px 178px 176px 133px 140px 146px 120px 140px 177px">
+<p class="cell cell--head c-muted"><span class="c-heading"><b>Segment</b></span></p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Revenue</b></span><br>A</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Profit</b></span><br>B</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Gross margin</b></span><br>C = B ÷ A</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Discount</b></span><br>D</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Kept, pts</b></span><br>E = C − D</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Per euro</b></span><br>F = E ÷ D</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>AOV</b></span><br>G</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Per order</b></span><br>H = E × G</p>
+<p class="cell cell--head c-muted r"><span class="c-heading"><b>Contact cost</b></span><br>I = H ÷ {{ contacts | num(0) }}</p>
+{% call derivation_row(v.focus.at_risk, "c-at-risk") %}At&#160;Risk{% endcall %}
+{% call derivation_row(v.focus.hibernating, "c-hibernating", last=true) %}Hibernating{% endcall %}
+</div>
+<p class="caption caption--note">AOV = revenue ÷ orders ({{ v.focus.at_risk.orders | num(0) }} and {{ v.focus.hibernating.orders | num(0) }} orders). Contact cost at which contribution is exhausted: H ÷ {{ contacts | num(0) }} contacts, at the What-If default reactivation <span class="nowrap">rate of</span> {{ v.other.planning_reactivation_rate_pct | pct(0) }} (a planning assumption, not a measured rate) and one recovered order per reactivated customer. Contact, send and fulfilment costs are not in <span class="nowrap">the data.</span></p>
+</div>
+<div class="row" style="gap:64px;align-items:start">
+<div class="grid" style="width:760px;grid-template-columns:260px 250px 250px">
+<p class="cell cell--head bold">Per euro of discount</p>
+<p class="cell cell--head bold r">At {{ low_rate | pct(0) }}</p>
+<p class="cell cell--head bold r">At {{ high_rate | pct(0) }}</p>
+<p class="cell bold c-at-risk">At&#160;Risk</p>
+<p class="cell bold c-at-risk r num">{{ v.rates.per_euro.at_risk.r15 | num(2) }}</p>
+<p class="cell r num">{{ v.rates.per_euro.at_risk.r20 | num(2) }}</p>
+<p class="cell cell--total bold c-hibernating">Hibernating</p>
+<p class="cell cell--total bold c-accent r num">{{ v.rates.per_euro.hibernating.r15 | num(2) }}</p>
+<p class="cell cell--total bold c-hibernating r num">{{ v.rates.per_euro.hibernating.r20 | num(2) }}</p>
+</div>
+<div class="col" style="flex:1;gap:16px;padding-top:12px">
+<p class="lead c-heading"><b>{{ v.ratios.playbook | times(2) }}</b> along the playbook's rates: {{ v.focus.at_risk.per_euro | num(4) }} ÷ {{ v.focus.hibernating.per_euro | num(4) }}.</p>
+<p class="lead c-heading"><b>About {{ v.ratios.common | times(1) }}</b> at either common rate, reading down a column.</p>
+<p class="caption">Segment colour: the playbook's rates. Blue: the rate under test. Multiplied by 1,000, the playbook figures are the {{ v.focus.at_risk.per_1000_eur | eur(0) }} and {{ v.focus.hibernating.per_1000_eur | eur(0) }} per €1,000 of discount on the slides.</p>
+</div>
+</div>
+</div>
+{{ foot("Source: docs/methodology.md, Derivation and Cost basis; v_rfm_for_bi and sales_curated", page) }}
+</section>

@@ -1,0 +1,24 @@
+{# The ask: approve the pilot and the three settings to fix before launch. #}
+<section id="ask" class="slide">
+{% call head("The ask", "How") %}Approve the pilot and fix its group shares, observation window and contact-cost recording before launch.{% endcall %}
+<div class="row" style="gap:80px;align-items:start">
+<div class="col" style="width:640px;gap:24px">
+<p class="hero c-accent">Approve<br>the pilot</p>
+</div>
+<div class="col" style="flex:1;gap:16px">
+<div class="entry">
+<p class="strong">Group shares</p>
+<p class="lead">Fixed before launch across the five groups.</p>
+</div>
+<div class="entry">
+<p class="strong">Observation window</p>
+<p class="lead">Set before launch; customers without an order count at zero.</p>
+</div>
+<div class="entry">
+<p class="strong">Contact-cost recording</p>
+<p class="lead">Per contacted customer. At the {{ v.other.planning_reactivation_rate_pct | pct(0) }} planning rate, contribution is exhausted at {{ v.focus.at_risk.contact_cost_eur | eur(2) }} ({{ at_risk() }}) and {{ v.focus.hibernating.contact_cost_eur | eur(2) }} ({{ hibernating() }}) per contact.</p>
+</div>
+</div>
+</div>
+{{ foot("Source: docs/methodology.md, Cost basis, Pilot design", page) }}
+</section>
