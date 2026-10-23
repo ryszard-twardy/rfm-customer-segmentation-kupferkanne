@@ -1,0 +1,31 @@
+{# Page 1: cover and executive summary. Exhibit 1 bars scale with the per-1,000 figures, At Risk
+   at at_risk_bar percent of the row. #}
+{% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
+{% set at_risk_bar = 70 %}
+<article id="cover" class="page page--cover">
+<div>
+<p class="eyebrow">Leadership decision paper</p>
+<h1>Kupferkanne: win-back discount allocation</h1>
+<p class="lead">Test <span class="c-accent">a {{ ar.discount_pct | pct(0) }} rate for Hibernating</span> in a controlled pilot with holdouts before the playbook changes.</p>
+<p class="meta"><b>Ryszard Twardy, data analyst</b> · {{ meta.date }}{% if meta.status %} · {{ meta.status }}{% endif %}<br><a href="https://ryszard-twardy.github.io/kupferkanne/">ryszard-twardy.github.io/kupferkanne</a> · Kupferkanne is a fictional brand; the data is synthetic and regenerable.</p>
+</div>
+<div>
+<p class="eyebrow">Executive summary</p>
+<p>At Risk and Hibernating hold {{ v.win_back.customer_share_pct | pct(1) }} of scored customers but {{ v.win_back.revenue_share_pct | pct(1) }} of the revenue base. The win-back playbook offers At&nbsp;Risk {{ ar.discount_pct | pct(0) }} and Hibernating {{ hb.discount_pct | pct(0) }}. This paper sets out why the rate, not the allocation, is the first thing to test, and how to test it.</p>
+</div>
+<div class="pillars">
+<div class="pillar"><p class="eyebrow">Problem</p><p class="hero num">{{ hb.discount_pct | pct(0) }}</p><p class="caption">off for {{ hibernating() }}, the thinnest margin at {{ hb.gross_margin_pct | pct(2) }}; {{ at_risk() }} gets {{ ar.discount_pct | pct(0) }} at {{ ar.gross_margin_pct | pct(2) }}. The deepest discount goes to the thinnest margin.</p></div>
+<div class="pillar"><p class="eyebrow">Cause</p><p class="hero num">{{ v.ratios.playbook | times(2) }}</p><p class="caption">as much contribution per euro of discount in {{ at_risk() }} at the playbook's rates, but about {{ v.ratios.common | num(1) }} times at either common rate: most of the gap comes from the rates.</p></div>
+<div class="pillar"><p class="eyebrow">Uncertainty</p><p class="hero">Modelled</p><p class="caption">The figures measure margin efficiency once an order is placed, not incrementality, so the ranking can narrow or reverse.</p></div>
+</div>
+<div>
+{% call exhibit(1) %}Contribution per €1,000 of discount, at the playbook's rates{% endcall %}
+<p class="bar-label c-at-risk">At Risk</p>
+<div class="row"><div class="bar bg-at-risk" style="width:{{ at_risk_bar }}%"></div><span class="bar-value num">{{ ar.per_1000_eur | eur(0) }}</span></div>
+<p class="bar-label c-hibernating" style="margin-top:2.5mm">Hibernating</p>
+<div class="row"><div class="bar bg-hibernating" style="width:{{ (at_risk_bar * hb.per_1000_eur / ar.per_1000_eur) | round(2) }}%"></div><span class="bar-value num">{{ hb.per_1000_eur | eur(0) }}</span></div>
+{% call note() %}At the playbook's rates, each €1,000 of discount retains {{ ar.per_1000_eur | eur(0) }} of contribution in At&nbsp;Risk and {{ hb.per_1000_eur | eur(0) }} in Hibernating, {{ v.ratios.playbook | num(2) }} times as much. A margin-efficiency figure on orders placed, not an incremental return.{% endcall %}
+</div>
+<p>The recommendation is a pilot with holdouts in both segments and a decision rule fixed before launch. The leadership team is asked to approve it and to fix three settings today: group shares, the observation window and contact-cost recording.</p>
+{{ foot(page, "Figures from README.md and docs/methodology.md") }}
+</article>

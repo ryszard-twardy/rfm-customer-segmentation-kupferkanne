@@ -27,7 +27,7 @@
 {% endmacro %}
 {% macro at_risk() %}<span class="c-at-risk">At&#160;Risk</span>{% endmacro %}
 {% macro hibernating() %}<span class="c-hibernating">Hibernating</span>{% endmacro %}
-{% for slide in slides %}
+{% for slide in pages %}
 {% set page = loop.index %}
 {% include "slides/" ~ slide ~ ".html.j2" %}
 {% endfor %}

@@ -1,0 +1,16 @@
+{% extends "base.html.j2" %}
+{% block title %}Kupferkanne: win-back discount allocation – decision report{% endblock %}
+{% block body %}
+{# Shared report parts. Each page template is one article.page; page is its page number. #}
+{% macro exhibit(number) %}<p class="exhibit-title">Exhibit {{ number }} · {{ caller() }}</p>{% endmacro %}
+{% macro note() %}<p class="exhibit-note">{{ caller() }}</p>{% endmacro %}
+{% macro foot(page, source=none) %}
+<div class="foot"><span>Kupferkanne win-back · fictional brand, synthetic data{% if source %} · {{ source }}{% endif %}</span><span>{{ page }}</span></div>
+{% endmacro %}
+{% macro at_risk() %}<span class="c-at-risk nowrap">At Risk</span>{% endmacro %}
+{% macro hibernating() %}<span class="c-hibernating">Hibernating</span>{% endmacro %}
+{% for name in pages %}
+{% set page = loop.index %}
+{% include "pages/" ~ name ~ ".html.j2" %}
+{% endfor %}
+{% endblock %}

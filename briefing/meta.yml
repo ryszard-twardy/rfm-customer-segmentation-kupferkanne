@@ -1,4 +1,4 @@
-# Cover line of the deck (and later the report): "<date> · <status>", or the date alone
+# Cover line of the deck and the report: "<date> · <status>", or the date alone
 # when status is empty. Status is cleared at acceptance; the date is set at the release.
 date: 2026-10-22
 status: Draft for review

@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <title>{% block title %}{% endblock %}</title>
 <style>
+{% include "fonts.css" %}
 :root {
 {% for name, value in palette.items() %}
   --{{ name }}: {{ value }};
 {% endfor %}
 }
-{% include "styles.css" %}
+{% include stylesheet %}
 </style>
 </head>
 <body>

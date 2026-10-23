@@ -1,0 +1,56 @@
+{# Page 5: appendix A1 (derivation and contact-cost basis) and A2 (segment shares). A2 bars use
+   one scale for both share columns, mm_per_point mm per percentage point; the subtotal bar of the
+   two win-back segments is split by their shares in 0.01 mm steps. #}
+{% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
+{% set low, high = ar.discount_pct, hb.discount_pct %}
+{% set pe, s, wb = v.rates.per_euro, v.segments, v.win_back %}
+{% set contacts = 100 / v.other.planning_reactivation_rate_pct %}
+{% set mm_per_point = 0.3 %}
+{% macro derivation_row(seg, tone, row_class="") %}<tr{% if row_class %} class="{{ row_class }}"{% endif %}><td class="{{ tone }}" style="font-weight:700">{{ caller() }}</td><td>{{ seg.revenue_eur | num(2) }}</td><td>{{ seg.profit_eur | num(2) }}</td><td>{{ seg.gross_margin_pct | pct(4) }}</td><td>{{ seg.discount_pct | pct(0) }}</td><td>{{ seg.kept_pts | num(2) }}</td><td class="key">{{ seg.per_euro | num(4) }}</td><td>{{ seg.aov_eur | num(2) }}</td><td>{{ seg.per_order_eur | num(2) }}</td><td class="key">{{ seg.contact_cost_eur | num(2) }}</td></tr>{% endmacro %}
+{% macro mini(share, fill) %}<span class="mini {{ fill }}" style="width:{{ (share * mm_per_point) | round(2) }}mm"></span>{% endmacro %}
+{% macro mini_split(whole, at_risk_share, hibernating_share) %}{% set width = (whole * mm_per_point * 100) | px %}{% set parts = split_track([at_risk_share, hibernating_share], width) %}<span class="mini mini--split" style="width:{{ width / 100 }}mm"><span class="bg-at-risk" style="width:{{ parts[0] / 100 }}mm"></span><span class="bg-hibernating" style="width:{{ parts[1] / 100 }}mm"></span></span>{% endmacro %}
+{% macro share_row(seg, fill, tone="") %}<tr><td{% if tone %} class="{{ tone }}" style="font-weight:700"{% endif %}>{{ caller() }}</td><td>{{ seg.customers | num(0) }}</td><td style="text-align:left">{{ seg.customer_share_pct | pct(2) }}{{ mini(seg.customer_share_pct, fill) }}</td><td>{{ seg.lifetime_spend_eur | num(2) }}</td><td style="text-align:left">{{ seg.revenue_share_pct | pct(2) }}{{ mini(seg.revenue_share_pct, fill) }}</td></tr>{% endmacro %}
+<article id="appendix-1" class="page">
+<section>
+<p class="eyebrow">Appendix A1</p>
+<h3>Derivation of the per-euro figures and the contact-cost basis</h3>
+<table>
+<thead><tr><th style="width:13%"><b>Segment</b>&nbsp;</th><th><b>Revenue</b>A</th><th><b>Profit</b>B</th><th><b>Gross margin</b>C = B ÷ A</th><th><b>Discount</b>D</th><th><b>Kept, pts</b>E = C − D</th><th><b>Per euro</b>F = E ÷ D</th><th><b>AOV</b>G</th><th><b>Per order</b>H = E × G</th><th><b>Contact cost</b>I = H ÷ {{ contacts | num(0) }}</th></tr></thead>
+<tbody>
+{% call derivation_row(ar, "c-at-risk") %}At Risk{% endcall %}
+{% call derivation_row(hb, "c-hibernating", "last") %}Hibernating{% endcall %}
+</tbody></table>
+{% call note() %}At the playbook's rates; amounts in €; kept = points of order value left as contribution after the discount. AOV = revenue ÷ orders ({{ ar.orders | num(0) }} and {{ hb.orders | num(0) }} orders). Contact cost at which contribution is exhausted: H ÷ {{ contacts | num(0) }} contacts, at the What-If default reactivation rate of {{ v.other.planning_reactivation_rate_pct | pct(0) }} (a planning assumption, not a measured rate) and one recovered order per reactivated customer. Contact, send and fulfilment costs are not in the data.{% endcall %}
+<div style="display:flex;gap:7mm;align-items:flex-start;margin-top:4mm">
+<table style="width:52%">
+<thead><tr><th style="width:46%"><b>Per euro of discount</b></th><th><b>At {{ low | pct(0) }}</b></th><th><b>At {{ high | pct(0) }}</b></th></tr></thead>
+<tbody>
+<tr><td class="c-at-risk" style="font-weight:700">At Risk</td><td class="c-at-risk key">{{ pe.at_risk.r15 | num(2) }}</td><td>{{ pe.at_risk.r20 | num(2) }}</td></tr>
+<tr class="last"><td class="c-hibernating" style="font-weight:700">Hibernating</td><td class="c-accent key">{{ pe.hibernating.r15 | num(2) }}</td><td class="c-hibernating key">{{ pe.hibernating.r20 | num(2) }}</td></tr>
+</tbody></table>
+<div class="c-heading" style="flex:1;font-size:9.5pt;line-height:1.45">
+<p><b>{{ v.ratios.playbook | times(2) }}</b> along the playbook's rates: {{ ar.per_euro | num(4) }} ÷ {{ hb.per_euro | num(4) }}.</p>
+<p><b>About {{ v.ratios.common | times(1) }}</b> at either common rate, reading down a column.</p>
+<p class="exhibit-note" style="margin:0">Segment colour: the playbook's rates. Blue: the rate under test. Multiplied by 1,000, the playbook figures are the {{ ar.per_1000_eur | eur(0) }} and {{ hb.per_1000_eur | eur(0) }} per €1,000 of discount in <span class="nowrap">Exhibits 1 and 4</span>.</p>
+</div>
+</div>
+</section>
+<section>
+<p class="eyebrow">Appendix A2</p>
+<h3>Segment shares of scored customers and of the revenue base</h3>
+<table>
+<thead><tr><th style="width:27%"><b>Segment</b></th><th style="width:13%"><b>Customers</b></th><th style="width:20%;text-align:left"><b>Share of scored customers</b></th><th style="width:18%"><b>Lifetime spend (€)</b></th><th style="width:22%;text-align:left"><b>Share of revenue base</b></th></tr></thead>
+<tbody>
+{% call share_row(s.champions, "bg-champions") %}Champions{% endcall %}
+{% call share_row(s.loyal_customers, "bg-context") %}Loyal Customers{% endcall %}
+{% call share_row(s.potential_loyalists, "bg-context") %}Potential Loyalists{% endcall %}
+{% call share_row(s.recent_customers, "bg-context") %}Recent Customers{% endcall %}
+{% call share_row(s.at_risk, "bg-at-risk", "c-at-risk") %}At Risk{% endcall %}
+{% call share_row(s.hibernating, "bg-hibernating", "c-hibernating") %}Hibernating{% endcall %}
+<tr class="sum"><td><span class="c-at-risk">At&nbsp;Risk</span> + <span class="c-hibernating">Hibernating</span></td><td>{{ wb.customers | num(0) }}</td><td style="text-align:left">{{ wb.customer_share_pct | pct(2) }}{{ mini_split(wb.customer_share_pct, s.at_risk.customer_share_pct, s.hibernating.customer_share_pct) }}</td><td>{{ wb.lifetime_spend_eur | num(2) }}</td><td style="text-align:left">{{ wb.revenue_share_pct | pct(2) }}{{ mini_split(wb.revenue_share_pct, s.at_risk.revenue_share_pct, s.hibernating.revenue_share_pct) }}</td></tr>
+<tr class="last" style="font-weight:700"><td style="font-weight:700">Total</td><td style="font-weight:700">{{ v.totals.scored_customers | num(0) }}</td><td style="text-align:left;font-weight:700">100.00%</td><td style="font-weight:700">{{ v.totals.revenue_base_eur | num(2) }}</td><td style="text-align:left;font-weight:700">100.00%</td></tr>
+</tbody></table>
+{% call note() %}Bars use one scale for both shares. Shares are rounded; subtotals use unrounded values. Source: docs/methodology.md, Appendix: segment shares; v_rfm_for_bi at the segment snapshot.{% endcall %}
+</section>
+{{ foot(page, "Source: docs/methodology.md, Derivation and Cost basis") }}
+</article>

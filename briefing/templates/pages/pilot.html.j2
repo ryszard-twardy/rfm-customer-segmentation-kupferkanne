@@ -1,0 +1,26 @@
+{# Page 4: the pilot and the ask. The rate under test is the At Risk rate, offered to
+   Hibernating. #}
+{% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
+{% set low, high = ar.discount_pct | pct(0), hb.discount_pct | pct(0) %}
+<article id="pilot" class="page">
+<section>
+<p class="eyebrow">The pilot</p>
+<h2>A controlled pilot with holdouts tests <span class="c-accent">Hibernating's rate</span> first; an unresolved interval keeps the playbook.</h2>
+<p>Eligible customers are randomised within each segment into five groups: in At&nbsp;Risk, the playbook's {{ low }} offer and a holdout with no win-back discount; in Hibernating, the playbook's {{ high }} offer, a {{ low }} offer under test and a holdout. The primary metric is incremental contribution per euro of discount, each offer group against its segment's holdout, built from per-customer means over an observation window set before launch.</p>
+<div style="margin:4mm 0">
+{% call exhibit(6) %}Pilot groups{% endcall %}
+<div style="display:flex;gap:5mm">
+<div style="flex:2"><p class="bar-label c-at-risk grp">At Risk</p><div class="tiles"><div class="tile"><b>Offer {{ low }}</b>playbook rate</div><div class="tile"><b>Holdout</b>no win-back discount</div></div></div>
+<div style="flex:3"><p class="bar-label c-hibernating grp">Hibernating</p><div class="tiles"><div class="tile"><b>Offer {{ high }}</b>playbook rate</div><div class="tile test"><b>Offer {{ low }}</b>rate under test</div><div class="tile"><b>Holdout</b>no win-back discount</div></div></div>
+</div>
+</div>
+<p>The decision rule is fixed before launch, and every decision defaults to the playbook as it is. Stage 1 sets the rate: Hibernating moves to {{ low }} only if the lower bound for the {{ low }} group minus the {{ high }} group is above zero. Stage 2 sets the floor and the priority: each offer stops only if the upper bound of its incremental contribution per euro of discount is below <span class="nowrap">break-even</span>, and, if the budget cannot cover everyone, At&nbsp;Risk goes first only if its lower bound clears <span class="nowrap">break-even</span> and beats Hibernating at the selected rate. Intervals are {{ v.other.pilot_interval_pct | pct(0) }} BCa bootstrap intervals; the first wave sizes the groups and is excluded from the decision data.</p>
+</section>
+<section>
+<p class="eyebrow">The ask</p>
+<h2>Approve the pilot and fix its group shares, observation window and contact-cost recording before launch.</h2>
+<p>Three settings need a decision before launch. The shares of the five groups are fixed in advance. The observation window is set together with the decision rule, and contribution counts every assigned customer, at zero for those who place no order. Contact cost is recorded per contacted customer and deducted from the offer group's contribution; it matters more than it looks, because at the {{ v.other.planning_reactivation_rate_pct | pct(0) }} planning rate contribution is exhausted at {{ ar.contact_cost_eur | eur(2) }} per contact in At&nbsp;Risk and {{ hb.contact_cost_eur | eur(2) }} in Hibernating.</p>
+<div class="callout"><span class="figure">Approve the pilot</span><p class="caption c-heading">If the result is unclear, nothing changes: the playbook stays as it is. The downside is bounded, and the pilot produces evidence on which rate pays for itself.</p></div>
+</section>
+{{ foot(page) }}
+</article>

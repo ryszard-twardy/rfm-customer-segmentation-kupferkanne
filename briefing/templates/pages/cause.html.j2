@@ -1,0 +1,76 @@
+{# Page 3: cause and uncertainty.
+   Exhibit 4, a slope chart of contribution per 1,000 of discount at the two rates: y is linear in
+   the value, the highest value at y_top and the lowest at y_bottom, a range that places the dots
+   of the accepted layout within half a pixel; each label keeps its offset from its dot.
+   Exhibit 5: the bar frame is full_width_points points of discount wide, with a rule at the
+   deepest observed discount; the rule label ends 1.2 mm left of the rule. #}
+{% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
+{% set low, high = ar.discount_pct, hb.discount_pct %}
+{% set r, pe = v.rates.per_1000_eur, v.rates.per_euro %}
+{% set values = [r.at_risk.r15, r.at_risk.r20, r.hibernating.r15, r.hibernating.r20] %}
+{% set y_top, y_bottom, v_max, v_min = 25.49, 167.26, values | max, values | min %}
+{% macro y(value, offset=0) %}{{ (linear(value, v_max, v_min, y_top, y_bottom) + offset) | round(2) }}{% endmacro %}
+{% set full_width_points = 60 %}
+{% set rule = (v.other.observed_max_discount_pct / full_width_points * 100) | round(2) %}
+{% macro discount_bars(seg, fill, tint) %}{% set dark = (seg.mean_realised_discount_pct / full_width_points * 100) | round(2) %}{% set total = (seg.off_list_with_offer_pct / full_width_points * 100) | round(2) %}<div style="display:flex;height:8mm"><div class="{{ fill }}" style="width:{{ dark }}%"></div><div class="{{ tint }}" style="width:{{ (total - dark) | round(2) }}%"></div></div>{% endmacro %}
+<article id="cause" class="page">
+<section>
+<p class="eyebrow">The cause</p>
+<h2>The per-euro gap comes mostly from the rates: at either common rate, <span class="c-at-risk">At Risk</span> retains about {{ v.ratios.common | times(1) }} as much.</h2>
+<p>Per euro of discount, contribution is (gross margin − discount rate) ÷ discount rate: {{ ar.per_euro | num(4) }} for At&nbsp;Risk at {{ low | pct(0) }} and {{ hb.per_euro | num(4) }} for Hibernating at {{ high | pct(0) }}. At the playbook's rates, At&nbsp;Risk therefore retains {{ v.ratios.playbook | num(2) }} times as much contribution per euro of discount. Read at one common rate instead, the gap shrinks to about {{ v.ratios.common | num(1) }} times, at {{ low | pct(0) }} ({{ pe.at_risk.r15 | num(2) }} against {{ pe.hibernating.r15 | num(2) }}) and at {{ high | pct(0) }} ({{ pe.at_risk.r20 | num(2) }} against {{ pe.hibernating.r20 | num(2) }}), and swapping the rates reverses the ranking. The lever is the rate, and the cheapest first test is whether Hibernating works at {{ low | pct(0) }} instead of {{ high | pct(0) }}.</p>
+<div style="margin-top:4mm">
+{% call exhibit(4) %}Contribution (€) per €1,000 of discount, on orders placed{% endcall %}
+<div style="display:flex;gap:6mm;align-items:center">
+<svg width="400" height="210" viewBox="0 0 400 210" role="img" aria-label="Slope chart: contribution per €1,000 of discount at a {{ low | pct(0) }} and a {{ high | pct(0) }} discount. At Risk {{ r.at_risk.r15 | num(0) }} and {{ r.at_risk.r20 | num(0) }}; Hibernating {{ r.hibernating.r15 | num(0) }} and {{ r.hibernating.r20 | num(0) }}." style="flex:none">
+<line x1="120" y1="8" x2="120" y2="182" style="stroke:var(--border)" stroke-width="1"/>
+<line x1="300" y1="8" x2="300" y2="182" style="stroke:var(--border)" stroke-width="1"/>
+<line x1="120" y1="{{ y(r.at_risk.r15) }}" x2="300" y2="{{ y(r.at_risk.r20) }}" style="stroke:var(--at-risk-text)" stroke-width="3" stroke-linecap="round"/>
+<line x1="120" y1="{{ y(r.hibernating.r15) }}" x2="300" y2="{{ y(r.hibernating.r20) }}" style="stroke:var(--hibernating-text)" stroke-width="3" stroke-linecap="round"/>
+<circle cx="300" cy="{{ y(r.at_risk.r20) }}" r="5" style="fill:var(--page);stroke:var(--at-risk-text)" stroke-width="2.5"/>
+<circle cx="120" cy="{{ y(r.at_risk.r15) }}" r="6.5" style="fill:var(--at-risk-text)"/>
+<circle cx="300" cy="{{ y(r.hibernating.r20) }}" r="6.5" style="fill:var(--hibernating-text)"/>
+<circle cx="120" cy="{{ y(r.hibernating.r15) }}" r="6.5" style="fill:var(--page);stroke:var(--accent-text)" stroke-width="3"/>
+<text x="106" y="{{ y(r.at_risk.r15, -0.6) }}" text-anchor="end" font-family="Lato" font-weight="700" font-size="12" style="fill:var(--heading-text)">{{ r.at_risk.r15 | num(0) }}</text>
+<text x="106" y="{{ y(r.at_risk.r15, 12.4) }}" text-anchor="end" font-family="Lato" font-weight="700" font-size="9.5" style="fill:var(--at-risk-text)">At Risk</text>
+<text x="106" y="{{ y(r.hibernating.r15, -1.2) }}" text-anchor="end" font-family="Lato" font-weight="700" font-size="12" style="fill:var(--accent-text)">{{ r.hibernating.r15 | num(0) }}</text>
+<text x="106" y="{{ y(r.hibernating.r15, 11.8) }}" text-anchor="end" font-family="Lato" font-weight="700" font-size="9.5" style="fill:var(--label-text)">Hibernating</text>
+<text x="314" y="{{ y(r.at_risk.r20, 4.4) }}" font-family="Lato" font-weight="700" font-size="12" style="fill:var(--label-text)">{{ r.at_risk.r20 | num(0) }}</text>
+<text x="314" y="{{ y(r.hibernating.r20, 4.2) }}" font-family="Lato" font-weight="700" font-size="12" style="fill:var(--heading-text)">{{ r.hibernating.r20 | num(0) }}</text>
+<text x="120" y="200" text-anchor="middle" font-family="Lato" font-weight="700" font-size="8.5" letter-spacing="1" style="fill:var(--label-text)">{{ low | pct(0) }} DISCOUNT</text>
+<text x="300" y="200" text-anchor="middle" font-family="Lato" font-weight="700" font-size="8.5" letter-spacing="1" style="fill:var(--label-text)">{{ high | pct(0) }} DISCOUNT</text>
+</svg>
+<div style="flex:1">
+<p class="hero num" style="font-size:28pt;margin:0 0 1.5mm">{{ v.ratios.playbook | times(2) }}</p>
+<p class="caption" style="margin-bottom:4mm">as much in {{ at_risk() }} at the playbook's rates (the filled dots)</p>
+<p class="hero num" style="font-size:28pt;margin:0 0 1.5mm"><span style="font-size:10pt;font-weight:400">about</span> {{ v.ratios.common | times(1) }}</p>
+<p class="caption">at either common rate, reading down a column; swapping the rates reverses the ranking</p>
+</div>
+</div>
+{% call note() %}Filled dots: the playbook's rates. Blue ring: the rate under test. The values at {{ r.at_risk.r20 | num(0) }} and {{ r.hibernating.r15 | num(0) }} are derived from the margins and rates (per euro {{ pe.at_risk.r20 | num(2) }} and {{ pe.hibernating.r15 | num(2) }} in docs/methodology.md).{% endcall %}
+</div>
+</section>
+<section>
+<p class="eyebrow">The uncertainty</p>
+<h2>The figures measure margin efficiency once an order is placed, not incrementality, so the ranking can narrow or reverse.</h2>
+<p>Every figure so far measures how much margin a euro of discount keeps once an order is placed; none says whether the discount caused the order. An At&nbsp;Risk customer may have ordered without the offer, which turns part of the concession into deadweight; a Hibernating customer is less likely to. Both segments already buy at a discount: mean realised discount is {{ ar.mean_realised_discount_pct | pct(2) }} for At&nbsp;Risk and {{ hb.mean_realised_discount_pct | pct(2) }} for Hibernating, and a further {{ low | num(0) }} or {{ high | num(0) }} points compounds to roughly {{ ar.off_list_with_offer_pct | pct(1) }} and {{ hb.off_list_with_offer_pct | pct(1) }} off list, against an observed maximum of {{ v.other.observed_max_discount_pct | pct(0) }}. No campaign cost exists in the data, and the dataset is synthetic: the figures attest to pipeline integrity rather than to a market observation.</p>
+<div style="margin-top:4mm">
+{% call exhibit(5) %}Discount off list price: mean realised today (dark) and with the win-back offer on top (light){% endcall %}
+<div style="display:flex;gap:6mm;align-items:flex-end">
+<div class="discount-frame">
+<p class="bar-label c-at-risk">At Risk, {{ low | pct(0) }} offer</p>
+{{ discount_bars(ar, "bg-at-risk", "bg-at-risk-tint") }}
+<p class="bar-label c-hibernating" style="margin-top:3mm">Hibernating, {{ high | pct(0) }} offer</p>
+{{ discount_bars(hb, "bg-hibernating", "bg-hibernating-tint") }}
+<div class="bg-heading" style="position:absolute;left:{{ rule }}%;top:4mm;bottom:0;width:1pt"></div>
+<p class="c-heading" style="position:absolute;right:calc({{ (100 - rule) | round(2) }}% + 1.2mm);top:-1mm;font-size:8pt;font-weight:700;margin:0;white-space:nowrap">Observed maximum {{ v.other.observed_max_discount_pct | pct(0) }}</p>
+</div>
+<div style="flex:1;font-size:9pt;line-height:1.35">
+<p style="margin:0"><b class="c-heading">roughly {{ ar.off_list_with_offer_pct | pct(1) }} off list</b><br><span class="c-muted">from {{ ar.mean_realised_discount_pct | pct(2) }} today</span></p>
+<p style="margin:6.5mm 0 0"><b class="c-heading">roughly {{ hb.off_list_with_offer_pct | pct(1) }} off list</b><br><span class="c-muted">from {{ hb.mean_realised_discount_pct | pct(2) }} today</span></p>
+</div>
+</div>
+{% call note() %}Source: docs/methodology.md, Limitations.{% endcall %}
+</div>
+</section>
+{{ foot(page) }}
+</article>

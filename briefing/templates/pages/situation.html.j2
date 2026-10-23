@@ -1,0 +1,44 @@
+{# Page 2: situation and problem. Exhibit 2 stacks split 100 percent by the segment shares in
+   0.01 steps; Exhibit 3 tracks are track_points points of order value wide. #}
+{% set ar, hb = v.focus.at_risk, v.focus.hibernating %}
+{% set s, wb = v.segments, v.win_back %}
+{% set order = [s.champions, s.loyal_customers, s.potential_loyalists, s.recent_customers, s.at_risk, s.hibernating] %}
+{% set fills = ["bg-champions", "bg-context", "bg-context", "bg-context", "bg-at-risk", "bg-hibernating"] %}
+{% set customers = split_track(order | map(attribute="customer_share_pct") | list, 10000) %}
+{% set revenue = split_track(order | map(attribute="revenue_share_pct") | list, 10000) %}
+{% set track_points = 70 %}
+{% macro stack(parts) %}{% for part in parts %}<div class="{{ fills[loop.index0] }}" style="width:{{ part / 100 }}%"></div>{% endfor %}{% endmacro %}
+{% macro win_back_label() %}<span class="c-at-risk" style="font-weight:700">At&nbsp;Risk</span> + <span class="c-hibernating" style="font-weight:700">Hibernating</span>{% endmacro %}
+{% macro track(seg, fill, tint) %}{% set parts = split_track([seg.kept_pts, seg.discount_pct], 10000) %}<div class="track"><div style="display:flex;width:{{ (seg.gross_margin_pct / track_points * 100) | round(2) }}%"><div class="seg {{ fill }} c-on-fill" style="width:{{ parts[0] / 100 }}%">{{ seg.kept_pts | num(2) }} points kept</div><div class="seg {{ tint }} c-text" style="width:{{ parts[1] / 100 }}%">{{ seg.discount_pct | pct(0) }} off</div></div><span class="c-muted" style="font-size:8.5pt">{{ seg.gross_margin_pct | pct(2) }} gross margin</span></div>{% endmacro %}
+<article id="situation" class="page">
+<section>
+<p class="eyebrow">Situation</p>
+<h2>The win-back pool is broad but shallow: {{ wb.customer_share_pct | pct(1) }} of scored customers, {{ wb.revenue_share_pct | pct(1) }} of the revenue base.</h2>
+<p>Kupferkanne scores {{ v.totals.scored_customers | num(0) }} customers into six segments. The two win-back segments, At&nbsp;Risk and Hibernating, hold {{ wb.customers | num(0) }} of them, {{ wb.customer_share_pct | pct(1) }} of scored customers, but {{ wb.lifetime_spend_eur | eur(2) }} of lifetime spend, {{ wb.revenue_share_pct | pct(1) }} of the revenue base. Value sits at the other end: Champions are {{ s.champions.customer_share_pct | pct(1) }} of scored customers and {{ s.champions.revenue_share_pct | pct(1) }} of the revenue base.</p>
+<p>The decision is therefore about margin discipline on a small pool, not a growth lever. Any reallocation is bounded: the playbook's budget shares are {{ ar.budget_allocation }} for At&nbsp;Risk and {{ hb.budget_allocation }} for Hibernating.</p>
+<div style="margin-top:4mm">
+{% call exhibit(2) %}Share of scored customers and of the revenue base, by segment{% endcall %}
+<div class="slab"><div style="width:{{ customers[0] / 100 }}%"><b class="num">{{ s.champions.customer_share_pct | pct(1) }}</b>Champions</div><div style="flex:1"></div><div style="width:{{ (customers[4] + customers[5]) / 100 }}%"><b class="num">{{ wb.customer_share_pct | pct(1) }}</b>{{ win_back_label() }}</div></div>
+<div class="stack" style="margin-top:1.5mm">{{ stack(customers) }}</div>
+<p class="exhibit-note" style="margin:1mm 0 3mm">Share of scored customers</p>
+<p class="exhibit-note" style="margin:0 0 1mm">Share of the revenue base</p>
+<div class="stack">{{ stack(revenue) }}</div>
+<div class="slab" style="margin-top:1.5mm;justify-content:space-between"><div><b class="num">{{ s.champions.revenue_share_pct | pct(1) }}</b>Champions</div><div style="text-align:right"><b class="num">{{ wb.revenue_share_pct | pct(1) }}</b>{{ win_back_label() }}</div></div>
+{% call note() %}Light grey: Loyal Customers, Potential Loyalists and Recent Customers. Source: docs/methodology.md, Appendix: segment shares.{% endcall %}
+</div>
+</section>
+<section>
+<p class="eyebrow">The problem</p>
+<h2>The playbook gives its deepest discount, {{ hb.discount_pct | pct(0) }}, to its thinnest margin, {{ hibernating() }} at {{ hb.gross_margin_pct | pct(2) }}.</h2>
+<p>Gross margin falls with each step down the composite score, from {{ s.champions.gross_margin_pct | pct(2) }} for Champions to {{ s.hibernating.gross_margin_pct | pct(2) }} for Hibernating. Yet the playbook's deepest win-back discount, {{ hb.discount_pct | pct(0) }}, goes to Hibernating, while At&nbsp;Risk, at a {{ ar.gross_margin_pct | pct(2) }} gross margin, gets {{ ar.discount_pct | pct(0) }}. Because the discount is a percentage off order value and unit cost is unchanged, contribution is simply gross margin minus the discount rate: after its offer, At&nbsp;Risk keeps {{ ar.kept_pts | num(2) }} points of order value and Hibernating keeps {{ hb.kept_pts | num(2) }}.</p>
+<div style="margin-top:4mm">
+{% call exhibit(3) %}Points of pre-offer order value kept as contribution and given away as the win-back discount{% endcall %}
+<p class="bar-label c-at-risk">At Risk</p>
+{{ track(ar, "bg-at-risk", "bg-at-risk-tint") }}
+<p class="bar-label c-hibernating" style="margin-top:2.5mm">Hibernating</p>
+{{ track(hb, "bg-hibernating", "bg-hibernating-tint") }}
+{% call note() %}Source: docs/methodology.md, Win-back discount allocation.{% endcall %}
+</div>
+</section>
+{{ foot(page) }}
+</article>

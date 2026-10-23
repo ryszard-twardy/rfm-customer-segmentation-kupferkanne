@@ -1,11 +1,6 @@
 /* Executive deck styles. Every colour is a custom property that base.html.j2 writes
    on :root from the palette render.py reads in notebooks/_brand.yml. */
 
-@font-face { font-family: "Lato"; font-style: normal; font-weight: 300; font-display: block; src: url("../fonts/lato-latin-300-normal.woff2") format("woff2"); }
-@font-face { font-family: "Lato"; font-style: normal; font-weight: 400; font-display: block; src: url("../fonts/lato-latin-400-normal.woff2") format("woff2"); }
-@font-face { font-family: "Lato"; font-style: normal; font-weight: 700; font-display: block; src: url("../fonts/lato-latin-700-normal.woff2") format("woff2"); }
-@font-face { font-family: "Lato"; font-style: normal; font-weight: 900; font-display: block; src: url("../fonts/lato-latin-900-normal.woff2") format("woff2"); }
-
 /* Page model: one 1920 x 1080 px slide per printed page; no element margins. */
 @page { size: 1920px 1080px; margin: 0; }
 *, *::before, *::after { margin: 0; box-sizing: border-box; }

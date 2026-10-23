@@ -1,0 +1,8 @@
+/* Lato, the latin subset in briefing/fonts/ (SIL Open Font License, see LICENSE there):
+   the four faces the deck and the report use. base.html.j2 includes this file in both
+   documents. */
+
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 300; font-display: block; src: url("../fonts/lato-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 400; font-display: block; src: url("../fonts/lato-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 700; font-display: block; src: url("../fonts/lato-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 900; font-display: block; src: url("../fonts/lato-latin-900-normal.woff2") format("woff2"); }

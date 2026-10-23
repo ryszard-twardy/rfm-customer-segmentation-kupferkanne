@@ -1,5 +1,5 @@
-# Brand definition shared by the Quarto outputs (analytical notebook, executive
-# report, deck). Derived from the Power BI theme in theme/rfm_dashboard_theme.json
+# Brand definition shared by the Quarto notebooks and the briefing render (executive
+# deck and decision report). Derived from the Power BI theme in theme/rfm_dashboard_theme.json
 # ("RFM Customer Segmentation – Palette C Muted Earth") and the Theme row in
 # docs/architecture.md, except the fonts.
 # Segment colours follow the Segment Color measure in docs/measures.md and
@@ -57,6 +57,14 @@ color:
     hibernating_tint: "#DCD9D4"   # Hibernating discount and offer fills
     champions_context: "#B8B2A7"  # Champions as contrast in the share bars
     segment_context: "#CFC8BC"    # the other three segments
+    # Report text colours: at_risk, hibernating_focus and c1 darkened in OKLab lightness (hue and
+    # chroma held) to the first 0.01 step that reaches 4.5:1 on #FFFFFF, #F7F5F1 and #F1EFE9, for
+    # the report's small text (8 to 13 pt). The report uses them for its segment and accent colours
+    # (text, strokes and fills); the deck keeps the base colours, as its text is at least 24 px.
+    # Derived and asserted in briefing/checks.py.
+    at_risk_text: "#9D5752"
+    hibernating_text: "#6F6D65"
+    accent_text: "#417197"
   foreground: "#3D4752"  # theme foreground: text on the canvas
   background: "#FFFFFF"  # canvas
   primary: c1            # theme tableAccent

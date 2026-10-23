@@ -1,0 +1,50 @@
+{# Page 6: appendix A3 (data and method), A4 (pilot decision rule and statistics) and the
+   sources. #}
+{% set t, r, wb = v.totals, v.rates.per_1000_eur, v.win_back %}
+{% set low, high = v.focus.at_risk.discount_pct | pct(0), v.focus.hibernating.discount_pct | pct(0) %}
+<article id="appendix-2" class="page">
+<section>
+<p class="eyebrow">Appendix A3</p>
+<h3>Data and method</h3>
+<div class="facts">
+<div>
+<div class="fact"><p class="key">Scale</p><p><b>{{ t.scored_customers | num(0) }}</b> scored customers; <b>{{ t.orders | num(0) }}</b> orders; revenue base <b>{{ t.revenue_base_eur | eur(2) }}</b>, profit margin <b>{{ t.profit_margin_pct | pct(2) }}</b></p></div>
+<div class="fact"><p class="key">Data and pipeline</p><p>Roughly <b>{{ t.raw_records | replace("~", "") }}</b> raw records, synthetic and regenerable; a {{ t.sql_pipeline_steps | spell }}-step BigQuery SQL pipeline plus {{ t.standalone_views | spell }} views</p></div>
+</div>
+<div>
+<div class="fact"><p class="key">Model and segments</p><p>Power BI, <b>{{ t.dax_measures | num(0) }}</b> DAX measures; segments are a single snapshot at the analysis date, so migration is not computable</p></div>
+<div class="fact"><p class="key">Open issue</p><p><b>{{ t.orders_outside_tolerance | num(0) }}</b> of {{ t.orders | num(0) }} orders fall outside the {{ t.order_value_tolerance | num(3) }} order-value tolerance; unexplained and tracked</p></div>
+</div>
+</div>
+</section>
+<section>
+<p class="eyebrow">Appendix A4</p>
+<h3>Pilot decision rule and statistics</h3>
+<div class="facts">
+<div>
+<p class="colh">Decision rule</p>
+<div class="fact"><p class="key">Stage 1: Rate</p><p>{{ hibernating() }} moves to {{ low }} only if the lower bound for the {{ low }} group minus the {{ high }} group is above zero</p></div>
+<div class="fact"><p class="key">Stage 2: Floor</p><p>An offer stops only if the upper bound of its interval lies below <span class="nowrap">break-even</span></p></div>
+<div class="fact"><p class="key">Stage 2: Priority</p><p>If the budget is short, {{ at_risk() }} goes first only if its lower bound clears <span class="nowrap">break-even</span> and beats {{ hibernating() }}</p></div>
+</div>
+<div>
+<p class="colh">Statistics</p>
+<div class="fact"><p class="key">Intervals</p><p><b>{{ v.other.pilot_interval_pct | pct(0) }}</b> BCa bootstrap intervals that resample customers within each segment and group</p></div>
+<div class="fact"><p class="key">Scope of the verdict</p><p>The verdict holds at the tested rates only</p></div>
+<div class="fact"><p class="key">Stage 1 metric</p><p>Per euro of discount if the budget cannot cover everyone, else per assigned customer</p></div>
+<div class="fact"><p class="key">First wave and defaults</p><p>The first wave sizes the groups and is excluded from the decision data; every decision defaults to the playbook as it is</p></div>
+</div>
+</div>
+</section>
+<section>
+<p class="eyebrow">About this paper</p>
+<h3>Sources and status</h3>
+<ul class="src">
+<li>Every figure comes from the public project repository: README.md ("The finding") and docs/methodology.md ("Win-back discount allocation", "Pilot design", "Limitations", "Appendix: segment shares"). Each figure is stated with its condition.</li>
+<li>The deck and this report read every figure from briefing/values.json, which the project's exhibits notebook writes: it checks published values against the literals in docs/methodology.md and README.md and computes the derived ones by stated formulas. The values {{ r.at_risk.r20 | eur(0) }} and {{ r.hibernating.r15 | eur(0) }} per €1,000 of discount are derived from the published margins and rates; the A2 subtotal shares, {{ wb.customer_share_pct | pct(2) }} and {{ wb.revenue_share_pct | pct(2) }}, are computed from unrounded values.</li>
+<li>Kupferkanne is a fictional brand and the data is synthetic and regenerable: the figures prove the pipeline, not a market.</li>
+<li>Project page: <a href="https://ryszard-twardy.github.io/kupferkanne/">ryszard-twardy.github.io/kupferkanne</a></li>
+</ul>
+</section>
+{{ foot(page, "Source: README.md and docs/methodology.md") }}
+</article>
