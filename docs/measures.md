@@ -311,7 +311,7 @@ CALCULATE (
 )
 ```
 
-**Definition note:** `[Revenue at Risk]` totals the lifetime spend of customers currently sitting in the At Risk and Hibernating segments – a value-concentration (exposure) metric. It applies no churn probability and no time horizon, so it is not a forecast of revenue that will be lost; the Page 4 What-If scenario prices the recoverable upside separately.
+**Definition note:** `[Revenue at Risk]` totals the lifetime spend of customers currently sitting in the At Risk and Hibernating segments – a value-concentration (exposure) metric. It applies no churn probability and no time horizon, so it is not a forecast of revenue that will be lost; the Page 4 What-If scenario prices a gross win-back scenario separately.
 
 ```dax
 % Revenue at Risk =

@@ -8,9 +8,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+---
+
+## [1.4.0] – 2026-10-24
+
+Executive deck and decision report. A 12-slide deck and a six-page A4 report recommend a controlled pilot with holdouts that tests a 15% win-back rate for Hibernating before the playbook changes. Both are built from HTML templates and printed to PDF, and every figure they quote comes from one values file that the exhibits notebook checks against `docs/methodology.md` and `README.md`.
+
+### Added
+
+- The executive deck, `docs/kupferkanne_win_back_discount_allocation_deck.pdf` (eight slides and four appendix slides), and the decision report, `docs/kupferkanne_win_back_discount_allocation_report.pdf` (six A4 pages); both are also attached to the release.
+- `briefing/`: Jinja2 templates and styles for the deck and the report, the Lato fonts with their license, the speaker notes, `meta.yml` (cover date and status) and `render.py`, which prints both documents to PDF with Playwright Chromium.
+- `briefing/values.json`: every figure the two documents quote, each with its class (live, derived or cited), unit and source, written by `notebooks/exhibits_win_back.qmd`.
+- `briefing/checks.py`, run on every render: fonts, page fit and layout (chart scales, the appendix A1 alignment), colour contrast, the PDF text layer, figure parity with `briefing/values.json` (including a second render with every value moved), the deck's word budget and speaker notes, and determinism. The same parity rule is applied to the figures in the README's "The finding".
+- Palette keys in `notebooks/_brand.yml` for the deck and the report, including three report text colours darkened to reach 4.5:1 on the report's surfaces.
+- Development dependencies `jinja2`, `playwright` and `pypdf` in `pyproject.toml` and `uv.lock`.
+
+### Changed
+
+- `notebooks/exhibits_win_back.qmd` writes `briefing/values.json` and fails if the file differs from the values it computes, unless `KK_WRITE_VALUES` is `1`; its check table grows from 67 to 81 rows.
+
 ### Documentation
 
 - `README.md`: a link to the case study on the portfolio site; a "The finding" section with the win-back result at the playbook's rates and at a common rate, cited to `docs/methodology.md`; the live report link goes through the portfolio's short link; the Risk question asks what a win-back would recover and the Churn Risk & What-If row describes a gross scenario, instead of "the upside of acting"; the 60-second review path starts with the finding; the render step names Quarto 1.9.38; the footer links the portfolio.
+- `README.md`: the deck and the report linked at the top and after "The finding"; the latest release carries both PDFs beside the Power BI file and its PDF; the repository map rows for `briefing/` and `docs/`, render step 6 for the deck and the report, and a "Scope, honestly" line on the checked finding; status badge v1.4.0.
+- `AGENTS.md`: the `briefing/` layout row, the render command under Checks and the release status.
+- `docs/measures.md`: the `[Revenue at Risk]` note says that the What-If page prices a gross win-back scenario, instead of "the recoverable upside".
+- Analytical notebook appendix: the prerequisites name Quarto CLI 1.9.38.
 
 ---
 
@@ -347,9 +370,8 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ## Roadmap
 
-### [1.4.0] – planned
+### [1.5.0] – planned
 
-- The executive report and the companion deck.
 - Investigate the 646 orders that fall outside the 0.001 order-value reconciliation tolerance, then fix them or document the cause (known issue in `docs/methodology.md` Limitations).
 
 ### Considered, not committed
@@ -360,7 +382,8 @@ This release consolidates four months of iteration that pre-dates the v1.0.0 tag
 
 ---
 
-[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.4.0
 [1.3.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.3.0
 [1.2.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.2.0
 [1.1.0]: https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/tag/v1.1.0

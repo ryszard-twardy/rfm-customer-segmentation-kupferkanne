@@ -2,7 +2,7 @@
 
 **End-to-end customer analytics: a BigQuery warehouse, a Kimball star schema, and a Power BI semantic model shipped as code.**
 
-[![Status](https://img.shields.io/badge/status-v1.3.0-blue)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-v1.4.0-blue)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![BigQuery](https://img.shields.io/badge/warehouse-BigQuery-4285F4)](docs/architecture.md)
 [![Power BI](https://img.shields.io/badge/BI-Power%20BI%20(PBIP%2FTMDL)-F2C811)](pbip/)
@@ -14,11 +14,13 @@ Fifteen thousand customers, one retention budget. This project is what the analy
 
 **Case study:** [the finding, the build and the report in brief](https://ryszard-twardy.github.io/kupferkanne/) on the portfolio site.
 
+**Decision paper:** the [executive deck](docs/kupferkanne_win_back_discount_allocation_deck.pdf) and the [decision report](docs/kupferkanne_win_back_discount_allocation_report.pdf) (PDF) on which win-back discount rate to test before the playbook changes.
+
 **Live report:** [open the interactive dashboard in the Power BI Service](https://ryszard-twardy.github.io/kupferkanne/report/) – no sign-in required.
 
 **Notebooks:** [the analytical notebook and the win-back exhibits](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/) on GitHub Pages, rendered with Quarto from [`notebooks/`](notebooks/).
 
-**Offline:** the Power BI file with its data (`.pbix`) and a PDF of the six visible report pages are attached to the [latest release](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/latest).
+**Offline:** the Power BI file with its data (`.pbix`) and a PDF of the six visible report pages are attached to the [latest release](https://github.com/ryszard-twardy/rfm-customer-segmentation-kupferkanne/releases/latest), with the deck and the report.
 
 > **Reviewing in 60 seconds?** Start with [the finding](#the-finding), then skim [the six report pages](#the-report-six-report-pages-plus-a-customer-drillthrough), read the scoring logic in [`docs/methodology.md`](docs/methodology.md), open one measure in [`pbip/`](pbip/) to see the model-as-code format, and read one decision in [`docs/adr/`](docs/adr/). That is the project in miniature.
 
@@ -40,7 +42,7 @@ Each question maps to specific report pages, and every figure on those pages is 
 - **Most of the per-euro gap comes from the rates, not from the segments.** At the playbook's rates, each 1,000 EUR of discount retains an expected 2,465 EUR of contribution in At Risk against 1,335 EUR in Hibernating, 1.85 times as much. With either rate applied to both segments, At Risk retains about 1.2 times as much, and swapping the rates reverses the ranking.
 - **The pool is broad but shallow, and the figures are modelled.** The two segments hold 3,909 of the 14,967 scored customers (26.1%) but 2.0% of the revenue base. The figures measure margin efficiency once an order is placed, not incrementality. The recommendation is a controlled pilot with holdouts that tests Hibernating's rate first.
 
-Derivation and pilot design: [`docs/methodology.md`](docs/methodology.md#win-back-discount-allocation). Charts: [win-back exhibits](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/exhibits_win_back.html).
+Derivation and pilot design: [`docs/methodology.md`](docs/methodology.md#win-back-discount-allocation). Charts: [win-back exhibits](https://ryszard-twardy.github.io/rfm-customer-segmentation-kupferkanne/exhibits_win_back.html). Decision paper: [deck](docs/kupferkanne_win_back_discount_allocation_deck.pdf) and [report](docs/kupferkanne_win_back_discount_allocation_report.pdf).
 
 ## The system
 
@@ -105,7 +107,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 | [`pbip/`](pbip/) | Power BI project: report definition (PBIR) + semantic model (TMDL) |
 | [`graphics/`](graphics/) | Navigation icons (SVG): four states for each of the six navigable pages, plus a reset control and the icon-set license |
 | [`theme/`](theme/) | Power BI report theme: `rfm_dashboard_theme.json` |
-| [`docs/`](docs/) | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/`, `img/` (README screenshot and exhibit images) |
+| [`docs/`](docs/) | `architecture.md`, `data_model.md`, `methodology.md`, `measures.md`, `glossary.md`, `adr/`, `img/` (README screenshot and exhibit images), and the deck and report PDFs |
 | [`notebooks/`](notebooks/) | Quarto sources: the EDA notebook (analytical companion to the SQL EDA views), the win-back exhibits page that renders `docs/img/exhibits/` and writes `briefing/values.json`, the shared brand file `_brand.yml`, the exhibits stylesheet `exhibits.css` and the Quarto project file `_quarto.yml` |
 | [`briefing/`](briefing/) | Executive deck and decision report: Jinja2 templates and styles, the Lato fonts with their license, `values.json` (every figure the two documents quote), `meta.yml` (cover date and status), the speaker notes, `render.py`, which prints both documents to PDF with Playwright Chromium, and `checks.py`, the checks it runs on every render |
 | [`harness/`](harness/) | KPI regression harness – baseline + verify for the canonical KPIs |
@@ -120,7 +122,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 3. **Run the pipeline.** Execute the numbered `sql/` scripts in order, then the two view scripts (`sql/v_cohort_retention.sql`, `sql/v_revenue_new_returning.sql`), which read `sales_curated`. Every script is idempotent (`CREATE OR REPLACE` for views and most tables; three tables are dropped first with `DROP TABLE IF EXISTS`), so re-runs are safe. The scripts, the Power Query sources and the notebooks name the BigQuery project `kupferkanne-2026`; running elsewhere means replacing that ID.
 4. **Open the report.** Open the `.pbip` in Power BI Desktop, authenticate the BigQuery connector (OAuth), and refresh.
 5. **Render the notebooks.** With Quarto 1.9.38, Application Default Credentials with read access to `kupferkanne-2026.sales` and Lato installed, run `uv sync`, then `quarto render notebooks/eda_kupferkanne.qmd` and `quarto render notebooks/exhibits_win_back.qmd` from the repo root (on Windows, set `QUARTO_PYTHON` to `.venv\Scripts\python.exe` first). The exhibits render fails if any exhibit it draws differs from the file in `docs/img/exhibits/`; set `KK_WRITE_EXHIBITS` to `1` to rewrite those files instead. The notebook's appendix gives the full steps.
-6. **Render the deck and the report.** Once per machine, run `uv run playwright install chromium` (the `uv sync` of step 5 installs Playwright); then `uv run python briefing/render.py` from the repo root writes both PDFs and their HTML to `briefing/build/` (ignored by Git) and exits non-zero if any check fails: fonts, page fit and layout (chart scales, the appendix A1 alignment), colour contrast, the PDF text layer, figure parity with `briefing/values.json` and the deck's word budget. The exhibits render in step 5 fails if `briefing/values.json` differs from the values it computes; set `KK_WRITE_VALUES` to `1` to rewrite the file instead.
+6. **Render the deck and the report.** Once per machine, run `uv run playwright install chromium` (the `uv sync` of step 5 installs Playwright); then `uv run python briefing/render.py` from the repo root writes both PDFs and their HTML to `briefing/build/` (ignored by Git) and exits non-zero if any check fails: fonts, page fit and layout (chart scales, the appendix A1 alignment), colour contrast, the PDF text layer, figure parity with `briefing/values.json`, also for the figures in [The finding](#the-finding), and the deck's word budget. The exhibits render in step 5 fails if `briefing/values.json` differs from the values it computes; set `KK_WRITE_VALUES` to `1` to rewrite the file instead.
 
 ## Scope, honestly
 
@@ -128,7 +130,7 @@ Development follows a deliberately designed, AI-assisted workflow with the engin
 - The pipeline runs manually per session. Orchestration (Dataform, dbt) was considered and consciously deferred – see the [CHANGELOG roadmap](CHANGELOG.md).
 - The What-If reactivation scenario is first-order and gross (no discount netting); it is labelled as a scenario, not a forecast, wherever it appears.
 - Import mode and a single-developer workflow: simplicity was chosen over enterprise plumbing wherever the plumbing adds no analytical signal.
-- Headline figures in the docs and notebooks are copied by hand. The KPI harness checks the canonical totals, and the exhibits page checks its figures against `docs/methodology.md` at render time.
+- Headline figures in the docs and notebooks are copied by hand. The KPI harness checks the canonical totals, the exhibits page checks its figures against `docs/methodology.md` at render time, and the deck and report render checks the figures in [The finding](#the-finding) against `briefing/values.json`.
 
 ## Documentation
 

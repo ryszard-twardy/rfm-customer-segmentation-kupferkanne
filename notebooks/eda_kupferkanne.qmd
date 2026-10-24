@@ -584,7 +584,7 @@ Rendering queries BigQuery live; the published HTML does not – a reader of
 the rendered report needs no credentials. To re-render:
 
 1. **Prerequisites** (machine-local, not covered by the repo manifest):
-   Quarto CLI (1.9+), Google Cloud SDK with Application Default Credentials
+   Quarto CLI 1.9.38, Google Cloud SDK with Application Default Credentials
    (`gcloud auth application-default login`) and read access to the
    `kupferkanne-2026.sales` dataset.
 2. **Python environment** (covered by the manifest): `uv sync` at the repo

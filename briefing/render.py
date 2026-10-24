@@ -12,8 +12,8 @@ as twelve 1920 x 1080 px slides, the report as six A4 pages. checks.py then chec
 the chart scales (no figure drawn past its fixed-length scale), fonts, page fit, the appendix A1
 alignment (the first note's cap height level with the per-euro table), colour contrast and the
 palette's text colours, the PDF and its text layer, figure parity with values.json (including a
-second render with every value moved), the deck's word budget and speaker notes, and
-determinism. Any failure exits non-zero with the list.
+second render with every value moved, and the figures in the README's "The finding"), the deck's
+word budget and speaker notes, and determinism. Any failure exits non-zero with the list.
 """
 
 from __future__ import annotations
@@ -40,6 +40,7 @@ BUILD = HERE / "build"
 VALUES = HERE / "values.json"
 META = HERE / "meta.yml"
 BRAND = REPO / "notebooks" / "_brand.yml"
+README = REPO / "README.md"
 
 
 # --- Documents -------------------------------------------------------------------------
@@ -341,6 +342,7 @@ def build(doc: Document) -> list[str]:
                                  doc.unit)
     moved_html = render_html(doc, dict(inputs, v=checks.perturb(raw)))
     fails += checks.check_sentinel(doc, raw, date, html_text, moved_html)
+    fails += checks.check_readme_finding(raw, README.read_text(encoding="utf-8"))
     fails += checks.check_words(doc, counts)
     if notes is not None:
         fails += checks.check_notes(doc, notes, pages) + checks.check_notes_text(doc, notes)

@@ -5,7 +5,8 @@ JavaScript below; the templates reach check_scale through render.py's on_scale g
 takes the spec of the document it checks (a render.Document) first and returns a list of
 failures, empty when the check passes. The spec supplies what differs between the documents:
 page size and count, flow limit, the pages with a .cap-top note, word limits, the non-data
-constants and the speaker notes, if any.
+constants and the speaker notes, if any. check_readme_finding, run with each document, holds
+the figures of README.md's "The finding" to the same parity rules and takes no spec.
 """
 
 from __future__ import annotations
@@ -470,6 +471,73 @@ def check_sentinel(doc, raw: dict, date: str, html_text: str, moved_html: str) -
                 continue
             fails.append(f"{doc.unit} {page} ({sid}): figure {figure!r} does not follow "
                          "values.json")
+    return fails
+
+
+# --- README finding --------------------------------------------------------------------
+
+README_SECTION = "## The finding"
+README_UNIT_WORD = re.compile(r" (EUR|times)\b")  # how the README writes € and ×
+README_UNIT_OF = dict(UNIT_OF, EUR="eur")
+README_PER_1000 = re.compile(r"1,000 EUR of discount\b")  # the unit of the per-1,000 figures
+LINK_TARGET = re.compile(r"\]\([^)]*\)")
+
+
+def readme_figures(text: str) -> list[tuple[int, str, str | None, str]] | None:
+    """(line number, figure as written, unit, digits) for each number in the README's "The
+    finding", from its heading to the next "## " heading, link targets aside; None without the
+    section. The unit is the one the README writes: "%" pct, "EUR" eur, "times" ratio, none on a
+    whole number count; "per-1,000" for the unit of "1,000 EUR of discount"; None for a decimal
+    without a unit, for a K or M figure and for a word whose digits NUMBER does not read whole
+    (a unit glued on, "2,466EUR"), the word then being the figure."""
+    lines = text.splitlines()
+    if README_SECTION not in lines:
+        return None
+    start = lines.index(README_SECTION) + 1
+    figures = []
+    for number, line in enumerate(lines[start:], start + 1):
+        if line.startswith("## "):
+            break
+        line = LINK_TARGET.sub("]", line)
+        masked = NUMBER.sub(lambda m: " " * len(m.group(0)), line)
+        unread = [w.span() for w in re.finditer(r"\S+", line)
+                  if re.search(r"\d", masked[w.start():w.end()])]
+        found = [(start, line[start:end], None, line[start:end]) for start, end in unread]
+        for m in NUMBER.finditer(line):
+            if any(start <= m.start() < end for start, end in unread):
+                continue
+            sign, whole, decimals, suffix = m.groups()
+            word = README_UNIT_WORD.match(line, m.end())
+            written = m.group(0) + (word.group(0) if word else "")
+            unit = README_UNIT_OF.get(sign or suffix or (word.group(1) if word else ""))
+            if README_PER_1000.match(line, m.start()):
+                unit = "per-1,000"
+            elif unit is None and not decimals and not suffix:
+                unit = "count"
+            found.append((m.start(), written, unit, whole + (decimals or "")))
+        figures += [(number, *figure[1:]) for figure in sorted(found, key=lambda f: f[0])]
+    return figures
+
+
+def check_readme_finding(raw: dict, text: str) -> list[str]:
+    """The README's "The finding" under the documents' figure-parity rule: each figure a
+    values.json leaf of the unit it is written in, at the precision written. text: README.md."""
+    figures = readme_figures(text)
+    if figures is None:
+        return [f'README.md: no "{README_SECTION}" section']
+    if all(unit == "per-1,000" for _, _, unit, _ in figures):
+        return [f'README.md: "{README_SECTION}" holds no figures']
+    forms, _ = number_forms(raw)
+    fails = []
+    for line, written, unit, digits in figures:
+        if unit == "per-1,000":
+            continue
+        if unit is None:
+            fails.append(f"README.md:{line}: figure {written!r} has no unit the check reads "
+                         "(%, EUR, times, or none on a whole number count)")
+        elif digits not in forms[unit]:
+            fails.append(f"README.md:{line}: figure {written!r} is not a values.json leaf "
+                         f"with unit {unit} at the precision written")
     return fails
 
 
